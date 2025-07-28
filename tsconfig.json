@@ -19,6 +19,12 @@
       }
     ],
     "paths": {
+      "@/*": ["./*"],
+      "@/app/*": ["./app/*"],
+      "@/presentation/*": ["./presentation/*"],
+      "@/shared/*": ["./shared/*"],
+      "@/public/*": ["./public/*"],
+      "@/ui/*": ["./shared/shadcn/ui/*"],
       "@types/*": ["./*"]
     }
   },

@@ -1,0 +1,156 @@
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <!-- ЛОГОТИПЫ -->
+  <symbol id="translator-logo" viewBox="0 0 100 100">
+    <circle
+      cx="50"
+      cy="50"
+      r="48"
+      fill="#000"
+      stroke="#000"
+      stroke-width="2"
+    />
+
+    <g id="berry-leaf">
+      <circle cx="0" cy="-46" r="3" fill="#E10600" />
+      <ellipse
+        cx="-5"
+        cy="-50"
+        rx="2"
+        ry="4"
+        fill="#009933"
+        transform="rotate(-30 0 -46)"
+      />
+      <ellipse
+        cx="5"
+        cy="-50"
+        rx="2"
+        ry="4"
+        fill="#009933"
+        transform="rotate(30 0 -46)"
+      />
+    </g>
+    <use
+      href="#berry-leaf"
+      transform="translate(50 50) rotate(0)"
+    />
+    <use
+      href="#berry-leaf"
+      transform="translate(50 50) rotate(45)"
+    />
+    <use
+      href="#berry-leaf"
+      transform="translate(50 50) rotate(90)"
+    />
+    <use
+      href="#berry-leaf"
+      transform="translate(50 50) rotate(135)"
+    />
+    <use
+      href="#berry-leaf"
+      transform="translate(50 50) rotate(180)"
+    />
+    <use
+      href="#berry-leaf"
+      transform="translate(50 50) rotate(225)"
+    />
+    <use
+      href="#berry-leaf"
+      transform="translate(50 50) rotate(270)"
+    />
+    <use
+      href="#berry-leaf"
+      transform="translate(50 50) rotate(315)"
+    />
+
+    <text
+      x="50"
+      y="55"
+      text-anchor="middle"
+      dominant-baseline="middle"
+      font-family="Arial, sans-serif"
+      font-size="60"
+      font-weight="bold"
+      fill="#FFF"
+      stroke="#FFF"
+      stroke-width="0.5"
+    >
+      A
+    </text>
+
+    <circle
+      cx="78"
+      cy="22"
+      r="18"
+      fill="#FFF"
+      stroke="#000"
+      stroke-width="2"
+    />
+    <text
+      x="78"
+      y="28"
+      text-anchor="middle"
+      font-family="Arial, sans-serif"
+      font-size="24"
+      font-weight="bold"
+      fill="#000"
+    >
+      文
+    </text>
+
+    <circle
+      cx="78"
+      cy="78"
+      r="18"
+      fill="#FFF"
+      stroke="#000"
+      stroke-width="2"
+    />
+    <text
+      x="78"
+      y="78"
+      text-anchor="middle"
+      dominant-baseline="middle"
+      font-family="Arial, sans-serif"
+      font-size="24"
+      font-weight="bold"
+      fill="#000"
+    >
+      تر
+    </text>
+  </symbol>
+
+  <!-- ИКОНКИ ИНТЕРФЕЙСА -->
+  <symbol id="copy" viewBox="0 0 24 24">
+    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" fill="none" stroke="currentColor" stroke-width="2"/>
+    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" fill="none" stroke="currentColor" stroke-width="2"/>
+  </symbol>
+
+  <symbol id="volume-up" viewBox="0 0 24 24">
+    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="none" stroke="currentColor" stroke-width="2"/>
+    <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" fill="none" stroke="currentColor" stroke-width="2"/>
+  </symbol>
+
+  <symbol id="swap" viewBox="0 0 24 24">
+    <path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5" fill="none" stroke="currentColor" stroke-width="2"/>
+  </symbol>
+
+  <!-- ФЛАГИ ЯЗЫКОВ -->
+  <symbol id="flag-ru" viewBox="0 0 60 40">
+    <rect width="60" height="40" fill="#FFFFFF"/>
+    <rect width="60" height="13.33" y="13.33" fill="#0052B4"/>
+    <rect width="60" height="13.33" y="26.67" fill="#D80027"/>
+  </symbol>
+
+  <symbol id="flag-us" viewBox="0 0 60 40">
+    <rect width="60" height="40" fill="#B22234"/>
+    <rect x="0" y="0" width="24" height="21.54" fill="#3C3B6E"/>
+    <g fill="#FFFFFF">
+      <rect y="3.08" width="60" height="3.08"/>
+      <rect y="9.23" width="60" height="3.08"/>
+      <rect y="15.38" width="60" height="3.08"/>
+      <rect y="21.54" width="60" height="3.08"/>
+      <rect y="27.69" width="60" height="3.08"/>
+      <rect y="33.85" width="60" height="3.08"/>
+    </g>
+  </symbol>
+</svg> 
