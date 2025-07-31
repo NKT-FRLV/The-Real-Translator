@@ -5,7 +5,7 @@ import Image from 'next/image';
 export const AppDescription: React.FC = () => {
   const translationStyles = [
     {
-      name: 'Classic',
+      name: 'Natural',
       description: 'Standard, professional translation'
     },
     {
@@ -15,16 +15,12 @@ export const AppDescription: React.FC = () => {
     {
       name: 'Street Slang',
       description: 'Casual expressions and local slang'
-    },
-    {
-      name: 'Playful',
-      description: 'Fun and humorous tone'
     }
   ];
 
   return (
-    <div className="w-full px-4">
-      <div className="p-4">
+    <div className="w-full">
+      <div className="p-2 md:p-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
           {/* Left Content */}
           <div className="space-y-6">

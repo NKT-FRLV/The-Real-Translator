@@ -19,13 +19,13 @@ interface ToneSelectorProps {
 const ToneSelector = ({ value, className, onToneChange }: ToneSelectorProps) => {
 	return (
 		<Select value={value} onValueChange={onToneChange}>
-			<SelectTrigger size="max" className={cn("flex justify-center text-gray-300 font-semibold text-xl bg-transparent border-none focus:ring-0 hover:bg-gray-700", className)} icon={false}>
+			<SelectTrigger size="max" className={cn("flex justify-center text-gray-300 font-semibold text-sm md:text-xl bg-transparent border-none focus:ring-0 hover:bg-gray-700", className)} icon={false}>
 				<SelectValue placeholder="Select a Tone" />
 			</SelectTrigger>
 			<SelectContent>
 				{Object.entries(toneStyle).map(([key, label]) => (
-					<SelectItem key={key} value={key} className="font-medium text-lg">
-						{label}
+					<SelectItem key={key} value={key} className="font-medium text-sm md:text-xl">
+						{label[0].toUpperCase() + label.slice(1)}
 					</SelectItem>
 				))}
 			</SelectContent>

@@ -87,7 +87,7 @@ export const TranslatorBox: React.FC = () => {
 	//   };
 
 	return (
-		<div className="w-full min-h-[50vh] max-h-screen mx-auto space-y-4 flex flex-col">
+		<div className="w-full min-h-[50vh] max-h-screen mx-auto space-y-2 md:space-y-4 flex flex-col">
 			{/* Language Selector */}
 			<LanguageSelector
 				fromLang={fromLang}
@@ -101,7 +101,7 @@ export const TranslatorBox: React.FC = () => {
 			/>
 
 			{/* Translation Interface */}
-			<div className="flex-1 grid grid-cols-1 gap-4 mb-8 lg:grid-cols-2 w-full bg-gradient-to-t from-red-900/20 to-[90%] from-[#121214] rounded-4xl px-4 pb-4">
+			<div className="w-full flex-1 grid grid-cols-1 gap-3 md:gap-4 mb-4 md:mb-8 lg:grid-cols-2 bg-gradient-to-t from-red-900/20 to-[90%] from-[#121214] rounded-4xl px-3 md:px-4 pb-3 md:pb-4">
 				<TextArea
 					value={inputText}
 					onChange={handleInputChange}
