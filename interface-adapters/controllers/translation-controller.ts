@@ -131,7 +131,7 @@ export class TranslationController {
       ...(chunk.type === 'delta' && { d: chunk.content }),
       ...(chunk.type === 'metrics' && { metrics: chunk.metrics }),
       ...(chunk.type === 'completed' && { 
-        completed: true, 
+        // completed: true, 
         metrics: chunk.metrics 
       }),
       ...(chunk.type === 'error' && { error: chunk.error })

@@ -1,4 +1,9 @@
 // Domain Value Object - Тон перевода
+import { Tone as ToneType } from "@/shared/types/types";
+import { toneStyle } from "@/shared/constants/tone-style";
+
+const SupportedTones: ToneType[] = Object.values(toneStyle);
+
 export class Tone {
   constructor(public readonly value: ToneType) {
     if (!this.isValidTone(value)) {
@@ -24,8 +29,7 @@ export class Tone {
 }
 
 // Константы тонов
-export const SupportedTones = ['natural', 'intellectual', 'street'] as const;
-export type ToneType = typeof SupportedTones[number];
+
 
 // Инструкции для каждого тона
 export const ToneInstructions = {
