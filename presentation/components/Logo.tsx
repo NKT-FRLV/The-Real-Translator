@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 interface LogoProps {
 	className?: string;
@@ -23,6 +24,7 @@ const Logo: React.FC<LogoProps> = ({
 			href={href}
 			className={`${className}`}
 		>
+			{/* <Image src="/logo_T.png" alt="Logo" width={80} height={80} className={`${responsiveClasses}`} /> */}
 			<svg 
 				width={responsive ? undefined : size} 
 				height={responsive ? undefined : size}

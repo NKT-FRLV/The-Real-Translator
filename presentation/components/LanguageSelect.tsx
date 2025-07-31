@@ -8,17 +8,19 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/shared/shadcn/ui/select";
+import { cn } from "@/shared/shadcn/utils";
 
 interface LanguageSelectProps {
 	disabledValue: LanguageShort;
 	value: LanguageShort;
+	className?: string;
 	setValue: (value: LanguageShort) => void;
 }
 
-const LanguageSelect = ({ disabledValue, value, setValue }: LanguageSelectProps) => {
+const LanguageSelect = ({ disabledValue, value, className, setValue }: LanguageSelectProps) => {
 	return (
 		<Select value={value} onValueChange={setValue}>
-			<SelectTrigger size="max" className="flex justify-center w-full text-gray-300 font-semibold text-xl bg-transparent border-none focus:ring-0 hover:bg-gray-700" icon={false} disabled={disabledValue === value}>
+			<SelectTrigger size="max" className={cn("flex justify-center text-gray-300 font-semibold text-xl bg-transparent border-none focus:ring-0 hover:bg-gray-700", className)} icon={false} disabled={disabledValue === value}>
 				<SelectValue placeholder="Select a language" />
 			</SelectTrigger>
 			<SelectContent>
