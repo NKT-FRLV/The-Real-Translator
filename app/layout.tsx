@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-	title: "AI Translator - Real-time Translation",
-	description: "Fast AI-powered translation with real-time streaming. Translate between multiple languages instantly.",
+	title: "The Real Translator",
+	description: "Fast AI-powered translation with real-time streaming. Translate between multiple languages instantly. As natural as possible.",
 };
 
 export default function RootLayout({
