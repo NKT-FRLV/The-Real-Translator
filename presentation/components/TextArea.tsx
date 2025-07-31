@@ -41,7 +41,7 @@ export const TextArea: React.FC<TextAreaProps> = ({
 	return (
 		<div className="flex flex-col w-full rounded-lg border border-gray-700 bg-[#252427]">
 			<label
-				className="p-4 min-h-[200px] flex-1"
+				className="p-3 md:p-4 min-h-[150px] md:min-h-[200px] flex-1"
 				style={{ height: "fit-content" }}
 			>
 				<textarea
@@ -50,8 +50,10 @@ export const TextArea: React.FC<TextAreaProps> = ({
 					placeholder={placeholder}
 					readOnly={readOnly}
 					className={`w-full h-full bg-transparent text-white placeholder-gray-500 border-none outline-none resize-none ${
-						value.length < 30 ? "text-4xl" : "text-2xl"
-					} font-medium placeholder:text-2xl ${className}`}
+						value.length < 30 
+							? "text-xl md:text-3xl lg:text-4xl" 
+							: "text-base md:text-lg lg:text-2xl"
+					} font-medium placeholder:text-base md:placeholder:text-lg lg:placeholder:text-2xl ${className}`}
 					maxLength={maxLength}
 					style={{
 						// height: "auto",
@@ -67,54 +69,54 @@ export const TextArea: React.FC<TextAreaProps> = ({
 				/>
 			</label>
 
-			<div className="border-t border-gray-700 p-3 flex justify-between items-center">
-				<div className="flex items-center space-x-3">
-					<button className="p-2 hover:bg-gray-700 rounded-lg transition-colors">
-						<Volume2 className="w-4 h-4 text-gray-400" />
+			<div className="border-t border-gray-700 p-2 md:p-3 flex justify-between items-center">
+				<div className="flex items-center space-x-1 md:space-x-3">
+					<button className="p-1.5 md:p-2 hover:bg-gray-700 rounded-lg transition-colors">
+						<Volume2 className="w-3.5 h-3.5 md:w-4 md:h-4 text-gray-400" />
 					</button>
 
 					{isInput && (
-						<button className="p-2 hover:bg-gray-600 rounded-lg transition-colors">
-							<Mic className="w-4 h-4 text-gray-400" />
+						<button className="p-1.5 md:p-2 hover:bg-gray-600 rounded-lg transition-colors">
+							<Mic className="w-3.5 h-3.5 md:w-4 md:h-4 text-gray-400" />
 						</button>
 					)}
 
-					<button className="p-2 hover:bg-gray-600 rounded-lg transition-colors">
-						<Copy className="w-4 h-4 text-gray-400" />
+					<button className="p-1.5 md:p-2 hover:bg-gray-600 rounded-lg transition-colors">
+						<Copy className="w-3.5 h-3.5 md:w-4 md:h-4 text-gray-400" />
 					</button>
 				</div>
 
-				<div className="flex items-center space-x-3">
+				<div className="flex items-center space-x-1 md:space-x-3">
 					{isInput ? (
 						<>
-							<span className="text-sm text-gray-500">
+							<span className="text-xs md:text-sm text-gray-500">
 								{value.length}/{maxLength}
 							</span>
 							{value.length > 0 && (
 								<button
 									onClick={onClear}
-									className="p-2 hover:bg-gray-600 rounded-lg transition-colors"
+									className="p-1.5 md:p-2 hover:bg-gray-600 rounded-lg transition-colors"
 								>
-									<X className="w-4 h-4 text-gray-400" />
+									<X className="w-3.5 h-3.5 md:w-4 md:h-4 text-gray-400" />
 								</button>
 							)}
 						</>
 					) : (
 						<>
-							<button className="p-2 hover:bg-gray-600 rounded-lg transition-colors">
-								<Bookmark className="w-4 h-4 text-gray-400" />
+							<button className="p-1.5 md:p-2 hover:bg-gray-600 rounded-lg transition-colors">
+								<Bookmark className="w-3.5 h-3.5 md:w-4 md:h-4 text-gray-400" />
 							</button>
-							<button className="p-2 hover:bg-gray-600 rounded-lg transition-colors">
-								<Share className="w-4 h-4 text-gray-400" />
+							<button className="p-1.5 md:p-2 hover:bg-gray-600 rounded-lg transition-colors">
+								<Share className="w-3.5 h-3.5 md:w-4 md:h-4 text-gray-400" />
 							</button>
-							<button className="p-2 hover:bg-gray-600 rounded-lg transition-colors">
-								<ThumbsUp className="w-4 h-4 text-gray-400" />
+							<button className="p-1.5 md:p-2 hover:bg-gray-600 rounded-lg transition-colors">
+								<ThumbsUp className="w-3.5 h-3.5 md:w-4 md:h-4 text-gray-400" />
 							</button>
-							<button className="p-2 hover:bg-gray-600 rounded-lg transition-colors">
-								<ThumbsDown className="w-4 h-4 text-gray-400" />
+							<button className="p-1.5 md:p-2 hover:bg-gray-600 rounded-lg transition-colors">
+								<ThumbsDown className="w-3.5 h-3.5 md:w-4 md:h-4 text-gray-400" />
 							</button>
-							<button className="p-2 hover:bg-gray-600 rounded-lg transition-colors">
-								<Copy className="w-4 h-4 text-gray-400" />
+							<button className="p-1.5 md:p-2 hover:bg-gray-600 rounded-lg transition-colors">
+								<Copy className="w-3.5 h-3.5 md:w-4 md:h-4 text-gray-400" />
 							</button>
 						</>
 					)}
