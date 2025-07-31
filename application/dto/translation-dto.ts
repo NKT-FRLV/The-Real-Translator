@@ -1,19 +1,21 @@
 // Application Layer DTOs - объекты передачи данных между слоями
 
+import { LanguageShort, Tone } from "@/shared/types/types";
+
 export interface TranslateTextRequest {
   text: string;
-  fromLang: string;
-  toLang: string;
-  tone: string;
+  fromLang: LanguageShort;
+  toLang: LanguageShort;
+  tone: Tone;
 }
 
 export interface TranslateTextResponse {
   id: string;
   originalText: string;
   translatedText: string;
-  sourceLanguage: string;
-  targetLanguage: string;
-  tone: string;
+  sourceLanguage: LanguageShort;
+  targetLanguage: LanguageShort;
+  tone: Tone;
   createdAt: string;
   metadata?: TranslationMetadataDto;
 }
@@ -27,9 +29,9 @@ export interface TranslationMetadataDto {
 
 export interface StreamTranslationRequest {
   text: string;
-  fromLang: string;
-  toLang: string;
-  tone: string;
+  fromLang: LanguageShort;
+  toLang: LanguageShort;
+  tone: Tone;
   abortSignal?: AbortSignal;
 }
 

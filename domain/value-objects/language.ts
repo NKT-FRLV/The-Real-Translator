@@ -1,8 +1,14 @@
 // Domain Value Object - Язык
+import { languages } from '../../shared/constants/languages';
+
+type LanguageKey = keyof typeof languages;
+type LanguageCode = typeof languages[LanguageKey]['code'];
+type LanguageLabel = typeof languages[LanguageKey]['label'];
+
 export class Language {
   constructor(
-    public readonly code: string,
-    public readonly label: string
+    public readonly code: LanguageCode,
+    public readonly label: LanguageLabel
   ) {
     if (!code || code.trim().length === 0) {
       throw new Error('Language code cannot be empty');

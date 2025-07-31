@@ -4,6 +4,7 @@ import { Tone } from '@/domain/value-objects/tone';
 import { ITranslationPort } from '@/application/ports/translation-port';
 import { StreamTranslationChunk } from '@/application/dto/translation-dto';
 import { OpenAITranslationRepository } from '../ai/openai-translation-repository';
+import { StreamingTranslationResult } from '@/domain/repositories/translation-repository';
 
 // Infrastructure Adapter - адаптер между application и infrastructure слоями
 export class TranslationAdapter implements ITranslationPort {
@@ -32,7 +33,7 @@ export class TranslationAdapter implements ITranslationPort {
     tone: Tone,
     abortSignal?: AbortSignal
   ): AsyncIterable<StreamTranslationChunk> {
-    const stream = this.repository.translateTextStream(
+    const stream: AsyncIterable<StreamingTranslationResult> = this.repository.translateTextStream(
       text,
       sourceLanguage,
       targetLanguage,

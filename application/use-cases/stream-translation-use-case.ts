@@ -1,5 +1,5 @@
 import { LanguageFactory } from '@/domain/value-objects/language';
-import { ToneFactory, ToneType } from '@/domain/value-objects/tone';
+import { ToneFactory } from '@/domain/value-objects/tone';
 import { TranslationDomainService } from '@/domain/services/translation-service';
 import { ITranslationPort } from '../ports/translation-port';
 import { StreamTranslationRequest, StreamTranslationChunk } from '../dto/translation-dto';
@@ -21,7 +21,7 @@ export class StreamTranslationUseCase {
       // 2. Валидация входных данных
       const sourceLanguage = LanguageFactory.create(request.fromLang);
       const targetLanguage = LanguageFactory.create(request.toLang);
-      const tone = ToneFactory.create(request.tone as ToneType);
+      const tone = ToneFactory.create(request.tone);
 
       // 3. Проверка бизнес-правил
       this.translationService.validateTranslationRequest(

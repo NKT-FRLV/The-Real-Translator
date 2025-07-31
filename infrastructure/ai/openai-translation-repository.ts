@@ -71,12 +71,14 @@ export class OpenAITranslationRepository implements ITranslationRepository {
       console.log('🚀 OpenAI stream started, abortSignal:', abortSignal?.aborted);
 
       for await (const event of stream) {
-        // 📊 Логирование chunks для отладки
-        console.log('📦 OpenAI chunk received:', {
-          type: event.type,
-          aborted: abortSignal?.aborted,
-          content: event.type === "response.output_text.delta" ? event.delta : null
-        });
+        // 📊 Логирование только важных events (не служебных)
+        if (event.type === "response.output_text.delta" || event.type === "response.completed") {
+          console.log('📦 OpenAI chunk received:', {
+            type: event.type,
+            aborted: abortSignal?.aborted,
+            content: event.type === "response.output_text.delta" ? event.delta : null
+          });
+        }
 
         // ✅ Проверяем отмену перед каждым событием
         if (abortSignal?.aborted) {

@@ -1,12 +1,14 @@
 // Domain Entity - основная бизнес-сущность перевода
+import { LanguageShort, Tone } from "@/shared/types/types";
+
 export class Translation {
   constructor(
     public readonly id: string,
     public readonly originalText: string,
     public readonly translatedText: string,
-    public readonly sourceLanguage: string,
-    public readonly targetLanguage: string,
-    public readonly tone: string,
+    public readonly sourceLanguage: LanguageShort,
+    public readonly targetLanguage: LanguageShort,
+    public readonly tone: Tone,
     public readonly createdAt: Date,
     public readonly metadata?: TranslationMetadata
   ) {}
@@ -14,11 +16,12 @@ export class Translation {
   static create(
     originalText: string,
     translatedText: string,
-    sourceLanguage: string,
-    targetLanguage: string,
-    tone: string,
+    sourceLanguage: LanguageShort,
+    targetLanguage: LanguageShort,
+    tone: Tone,
     metadata?: TranslationMetadata
   ): Translation {
+	console.log(originalText)
     return new Translation(
       crypto.randomUUID(),
       originalText,
