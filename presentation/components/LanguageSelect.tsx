@@ -20,7 +20,7 @@ interface LanguageSelectProps {
 const LanguageSelect = ({ disabledValue, value, className, setValue }: LanguageSelectProps) => {
 	return (
 		<Select value={value} onValueChange={setValue}>
-			<SelectTrigger size="max" className={cn("flex justify-center text-gray-300 font-semibold text-xl bg-transparent border-none focus:ring-0 hover:bg-gray-700", className)} icon={false} disabled={disabledValue === value}>
+			<SelectTrigger size="max" className={cn("flex justify-center text-gray-300 font-semibold text-sm md:text-xl bg-transparent border-none focus:ring-0 hover:bg-gray-700", className)} icon={false} disabled={disabledValue === value}>
 				<SelectValue placeholder="Select a language" />
 			</SelectTrigger>
 			<SelectContent>

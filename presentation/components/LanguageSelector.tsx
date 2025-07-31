@@ -43,9 +43,9 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({
 	};
 
 	return (
-		<div className="px-4 w-full">
-			<div className="flex h-18 items-center justify-start border-b border-gray-700 bg-[#252427] px-6 py-2 rounded-lg">
-				<div className="flex w-full h-full items-center gap-4">
+		<div className="px-3 md:px-4 w-full">
+			<div className="flex h-16 md:h-18 items-center justify-start border-b border-gray-700 bg-[#252427] px-3 md:px-6 py-2 rounded-lg">
+				<div className="flex w-full h-full items-center gap-2 md:gap-4">
 					<LanguageSelect
 						value={fromLanguage}
 						setValue={setFromLanguage}
@@ -55,23 +55,25 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({
 					<Button
 						variant="ghost"
 						size="icon"
-						className="h-full min-w-[80px] hover:bg-gray-700"
+						className="h-full min-w-[40px] md:min-w-[80px] hover:bg-gray-700"
 						onClick={handleSwapLanguages}
 					>
 						<ArrowLeftRight
-							height={40}
-							width={20}
-							className="text-gray-400 stroke-2 size-6"
+							height={32}
+							width={16}
+							className="text-gray-400 stroke-2 size-4 md:size-6"
 						/>
 					</Button>
-					<div className="w-full flex flex-1 items-center gap-4">
+					<div className="w-full flex flex-1 items-center gap-0 md:gap-4">
 						<LanguageSelect
 							value={toLanguage}
 							setValue={setToLanguage}
 							disabledValue={fromLanguage}
 							className="flex-1"
 						/>
-						<ToneSelector value={tone} onToneChange={onToneChange} />
+						<div className="text-xs md:text-base border-l border-gray-700 p-0">
+							<ToneSelector value={tone} onToneChange={onToneChange} />
+						</div>
 					</div>
 				</div>
 			</div>

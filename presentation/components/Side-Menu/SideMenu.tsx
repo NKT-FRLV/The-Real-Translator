@@ -12,7 +12,7 @@ import Logo from '../Logo'
 
 const SideMenu = () => {
   return (
-	<header className="fixed top-0 bottom-0 flex flex-col items-center justify-between py-8 pr-8 border-r border-gray-700">
+	<header className="hidden md:flex fixed top-0 bottom-0 flex flex-col items-center justify-between py-8 pr-8 border-r border-gray-700">
 		{/* Логотип сверху */}
 		<div className="flex items-center gap-2">
 			<Logo responsive/>
@@ -32,13 +32,13 @@ const SideMenu = () => {
 						<NavigationMenuContent>
 							<div className="w-48 p-2">
 								<NavigationMenuLink className="block p-2 text-sm hover:bg-gray-100">
-									Документы
+									Documents
 								</NavigationMenuLink>
 								<NavigationMenuLink className="block p-2 text-sm hover:bg-gray-100">
-									Веб-страницы
+									Web Pages
 								</NavigationMenuLink>
 								<NavigationMenuLink className="block p-2 text-sm hover:bg-gray-100">
-									Текст
+									Text
 								</NavigationMenuLink>
 							</div>
 						</NavigationMenuContent>
@@ -54,13 +54,13 @@ const SideMenu = () => {
 						<NavigationMenuContent>
 							<div className="w-48 p-2">
 								<NavigationMenuLink className="block p-2 text-sm hover:bg-gray-100">
-									Последние переводы
+									Recent Translations
 								</NavigationMenuLink>
 								<NavigationMenuLink className="block p-2 text-sm hover:bg-gray-100">
-									Сегодня
+									Today
 								</NavigationMenuLink>
 								<NavigationMenuLink className="block p-2 text-sm hover:bg-gray-100">
-									На этой неделе
+									This Week
 								</NavigationMenuLink>
 							</div>
 						</NavigationMenuContent>
@@ -76,13 +76,13 @@ const SideMenu = () => {
 						<NavigationMenuContent>
 							<div className="w-48 p-2">
 								<NavigationMenuLink className="block p-2 text-sm hover:bg-gray-100">
-									Сохраненные переводы
+									Saved Translations
 								</NavigationMenuLink>
 								<NavigationMenuLink className="block p-2 text-sm hover:bg-gray-100">
-									Коллекции
+									Collections
 								</NavigationMenuLink>
 								<NavigationMenuLink className="block p-2 text-sm hover:bg-gray-100">
-									Экспорт
+									Export
 								</NavigationMenuLink>
 							</div>
 						</NavigationMenuContent>
@@ -99,13 +99,13 @@ const SideMenu = () => {
 						<NavigationMenuContent>
 							<div className="w-48 p-2">
 								<NavigationMenuLink className="block p-2 text-sm hover:bg-gray-100">
-									Языки
+									Languages
 								</NavigationMenuLink>
 								<NavigationMenuLink className="block p-2 text-sm hover:bg-gray-100">
-									Темы
+									Themes
 								</NavigationMenuLink>
 								<NavigationMenuLink className="block p-2 text-sm hover:bg-gray-100">
-									Уведомления
+									Notifications
 								</NavigationMenuLink>
 							</div>
 						</NavigationMenuContent>
@@ -124,10 +124,10 @@ const SideMenu = () => {
 									FAQ
 								</NavigationMenuLink>
 								<NavigationMenuLink className="block p-2 text-sm hover:bg-gray-100">
-									Горячие клавиши
+									Shortcuts
 								</NavigationMenuLink>
 								<NavigationMenuLink className="block p-2 text-sm hover:bg-gray-100">
-									Обратная связь
+									Feedback
 								</NavigationMenuLink>
 							</div>
 						</NavigationMenuContent>
