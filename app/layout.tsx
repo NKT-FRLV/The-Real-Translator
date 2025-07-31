@@ -18,6 +18,20 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
 	title: "The Real Translator",
 	description: "Fast AI-powered translation with real-time streaming. Translate between multiple languages instantly. As natural as possible.",
+	metadataBase: new URL("https://translator.nkt-frlv.dev/"),
+	
+	openGraph: {
+		title: "The Real Translator",
+		description: "Fast AI-powered translation with real-time streaming. Translate between multiple languages instantly. As natural as possible.",
+		images: ["/opengraph-image.png"],
+	},
+	
+	twitter: {
+		card: "summary_large_image",
+		title: "The Real Translator",
+		description: "Fast AI-powered translation with real-time streaming. Translate between multiple languages instantly.",
+		images: ["/opengraph-image.png"],
+	},
 };
 
 export default function RootLayout({
