@@ -24,18 +24,18 @@ export const AppDescription: React.FC = () => {
 
   return (
     <div className="w-full px-4">
-      <div className="bg-gradient-to-r from-[#252427] to-[#1a1a1d] rounded-2xl p-8 border border-gray-700">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+      <div className="p-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
           {/* Left Content */}
           <div className="space-y-6">
             <div>
-              <h2 className="text-3xl font-bold text-white mb-4">
+              <h2 className="text-5xl font-bold text-white mb-4">
                 AI-Powered Translator
-                <span className="block text-xl font-normal text-gray-300 mt-2">
+                <span className="block text-3xl font-semibold text-gray-300 mt-2">
                   for 100+ Languages
                 </span>
               </h2>
-              <p className="text-gray-300 text-lg leading-relaxed">
+              <p className="text-gray-300 text-xl font-semibold leading-relaxed">
                 Experience translation that goes beyond word-for-word accuracy. 
                 Our AI understands context, culture, and nuance to deliver translations 
                 that sound natural and authentic—just like a native speaker would say it.
@@ -66,7 +66,7 @@ export const AppDescription: React.FC = () => {
           </div>
 
           {/* Right Content - С локальным изображением */}
-          <div className="flex justify-center items-center">
+          <div className="flex justify-center items-center pt-4">
             <Image 
               src="/popularTranslations.png"  // файл из папки public/
               alt="AI Translation Illustration"
