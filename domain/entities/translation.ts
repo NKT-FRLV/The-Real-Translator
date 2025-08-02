@@ -21,7 +21,10 @@ export class Translation {
     tone: Tone,
     metadata?: TranslationMetadata
   ): Translation {
+
 	console.log(originalText)
+	console.log(translatedText)
+	
     return new Translation(
       crypto.randomUUID(),
       originalText,

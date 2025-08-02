@@ -59,6 +59,8 @@ export class OpenAITranslationRepository implements ITranslationRepository {
         return;
       }
 
+	//   const adaptedUserInput = `<<<${text}>>>`;
+
       const instructions = this.domainService.buildPromptInstructions(
         sourceLanguage,
         targetLanguage,
