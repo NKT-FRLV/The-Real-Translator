@@ -8,7 +8,6 @@ import { useDebounce } from "use-debounce";
 import { toneStyle } from "@/shared/constants/tone-style";
 
 export const TranslatorBox: React.FC = () => {
-
 	//  Users Input for translation
 	const [inputText, setInputText] = useState("");
 	const [debouncedInputText] = useDebounce(inputText, 1000);
@@ -37,10 +36,13 @@ export const TranslatorBox: React.FC = () => {
 		[]
 	);
 
-	const handleInputChange = useCallback((text: string) => {
-		cancel();
-		setInputText(text);
-	}, [cancel]);
+	const handleInputChange = useCallback(
+		(text: string) => {
+			cancel();
+			setInputText(text);
+		},
+		[cancel]
+	);
 
 	const handleClearInput = useCallback(() => {
 		setInputText("");
