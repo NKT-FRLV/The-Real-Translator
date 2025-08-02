@@ -1,9 +1,9 @@
 import { Tone } from "../types/types";
 
 export const toneStyle = {
-	natural: 'natural',
-	intellectual: 'intellectual',
-	street: 'street',
+	natural: "natural",
+	intellectual: "intellectual",
+	street: "street",
 } as const satisfies Record<Tone, Tone>;
 
 // Детальные описания стилей для ИИ

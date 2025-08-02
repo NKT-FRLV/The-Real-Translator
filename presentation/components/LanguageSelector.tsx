@@ -64,16 +64,15 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({
 							className="text-gray-400 stroke-2 size-4 md:size-6"
 						/>
 					</Button>
-					<div className="w-full flex flex-1 items-center gap-0 md:gap-4">
+					<div className="w-full h-full flex flex-1 items-center">
 						<LanguageSelect
 							value={toLanguage}
 							setValue={setToLanguage}
 							disabledValue={fromLanguage}
 							className="flex-1"
 						/>
-						<div className="text-xs md:text-base border-l border-gray-700 p-0">
-							<ToneSelector value={tone} onToneChange={onToneChange} />
-						</div>
+						<div className="text-xs p-0 md:text-base md:mx-2 h-full w-[1px] bg-gray-700"></div>
+						<ToneSelector value={tone} onToneChange={onToneChange} />
 					</div>
 				</div>
 			</div>
