@@ -39,7 +39,7 @@ export const TextArea: React.FC<TextAreaProps> = ({
 	};
 
 	return (
-		<div className="flex flex-col w-full rounded-lg border border-gray-700 bg-myCard">
+		<div className="flex flex-col w-full rounded-lg border border-gray-700 bg-accent/30">
 			<label
 				className="p-3 md:p-4 min-h-[150px] md:min-h-[200px] flex-1"
 				style={{ height: "fit-content" }}
