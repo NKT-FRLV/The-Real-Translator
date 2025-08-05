@@ -49,7 +49,7 @@ export const TextArea: React.FC<TextAreaProps> = ({
 					onChange={handleTextChange}
 					placeholder={placeholder}
 					readOnly={readOnly}
-					className={`w-full h-full bg-transparent text-white placeholder-gray-500 border-none outline-none resize-none ${
+					className={`w-full h-full bg-transparent text-foreground placeholder-gray-500 border-none outline-none resize-none ${
 						value.length < 30 
 							? "text-xl md:text-3xl lg:text-4xl" 
 							: "text-base md:text-lg lg:text-2xl"
