@@ -103,7 +103,7 @@ export const TranslatorBox: React.FC = () => {
 			/>
 
 			{/* Translation Interface */}
-			<div className="w-full flex-1 grid grid-cols-1 gap-3 md:gap-4 mb-4 md:mb-8 lg:grid-cols-2 bg-gradient-to-t from-red-900/20 to-[90%] from-[#121214] rounded-4xl px-3 md:px-4 pb-3 md:pb-4">
+			<div className="w-full flex-1 grid grid-cols-1 gap-3 md:gap-4 mb-4 md:mb-8 lg:grid-cols-2 bg-gradient-to-t from-red-900/20 to-[90%] from-[#121214] rounded-xl px-3 md:px-4 pb-3 md:pb-4">
 				<TextArea
 					value={inputText}
 					onChange={handleInputChange}
