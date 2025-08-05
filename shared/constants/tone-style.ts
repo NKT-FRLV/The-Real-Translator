@@ -1,10 +1,5 @@
-import { Tone } from "../types/types";
-
-export const toneStyle = {
-	natural: "natural",
-	intellectual: "intellectual",
-	street: "street",
-} as const satisfies Record<Tone, Tone>;
+// Re-export domain constants for presentation layer compatibility
+export { toneStyle } from "../../domain/constants/tone-style";
 
 // Детальные описания стилей для ИИ
 // export const toneDescriptions = {

@@ -1,5 +1,3 @@
-import { languages } from "../constants/languages";
-
-export type LanguageShort = keyof typeof languages;
-
-export type Tone = 'natural' | 'intellectual' | 'street';
+// Re-export domain types for presentation layer compatibility
+export type { LanguageShort } from "../../domain/constants/languages";
+export type { Tone } from "../../domain/constants/tone-style";
