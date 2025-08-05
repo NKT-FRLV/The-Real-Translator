@@ -1,5 +1,6 @@
 // Domain Entity - основная бизнес-сущность перевода
-import { LanguageShort, Tone } from "@/shared/types/types";
+import { LanguageShort } from "../constants/languages";
+import { Tone } from "../constants/tone-style";
 
 export class Translation {
   constructor(
