@@ -3,7 +3,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { ClientWarmer } from "@/presentation/components/ClientWarmer";
 import { PerformanceMonitor } from "@/presentation/components/PerformanceMonitor";
 import "./globals.css";
+
 import Footer from "@/presentation/components/footer/Footer";
+import ThemeProvider from "@/presentation/providers/ThemeProvider";
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
@@ -17,19 +19,22 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
 	title: "The Real Translator",
-	description: "Fast AI-powered translation with real-time streaming. Translate between multiple languages instantly. As natural as possible.",
+	description:
+		"Fast AI-powered translation with real-time streaming. Translate between multiple languages instantly. As natural as possible.",
 	metadataBase: new URL("https://translator.nkt-frlv.dev/"),
-	
+
 	openGraph: {
 		title: "The Real Translator",
-		description: "Fast AI-powered translation with real-time streaming. Translate between multiple languages instantly. As natural as possible.",
+		description:
+			"Fast AI-powered translation with real-time streaming. Translate between multiple languages instantly. As natural as possible.",
 		images: ["/opengraph-image.png"],
 	},
-	
+
 	twitter: {
 		card: "summary_large_image",
 		title: "The Real Translator",
-		description: "Fast AI-powered translation with real-time streaming. Translate between multiple languages instantly.",
+		description:
+			"Fast AI-powered translation with real-time streaming. Translate between multiple languages instantly.",
 		images: ["/opengraph-image.png"],
 	},
 };
@@ -40,20 +45,26 @@ export default function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<html lang="en">
+		<html lang="en" suppressHydrationWarning>
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
 			>
-				{/* Just widgets temporals*/}
-				<ClientWarmer />
-				<PerformanceMonitor />
-				<div className="h-max-content flex flex-col justify-between items-center font-sans py-4 px-0 md:pb-20 md:p-8">
-					<main className="flex flex-col items-center justify-center flex-1 sm:items-start w-full">
-						
-						{children}
-					</main>
-					<Footer />
-				</div>
+				<ThemeProvider
+					attribute="class"
+					defaultTheme="system"
+					enableSystem
+					disableTransitionOnChange
+				>
+					{/* Just widgets temporals*/}
+					<ClientWarmer />
+					<PerformanceMonitor />
+					<div className="h-max-content flex flex-col justify-between items-center font-sans py-4 px-0 md:pb-20 md:p-8">
+						<main className="flex flex-col items-center justify-center flex-1 sm:items-start w-full">
+							{children}
+						</main>
+						<Footer />
+					</div>
+				</ThemeProvider>
 			</body>
 		</html>
 	);

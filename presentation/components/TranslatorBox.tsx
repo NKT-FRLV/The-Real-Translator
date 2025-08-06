@@ -72,9 +72,9 @@ export const TranslatorBox: React.FC = () => {
 		handleTranslate();
 	}, [debouncedInputText, handleTranslate]);
 
-	const handleCancel = useCallback(() => {
-		cancel();
-	}, [cancel]);
+	// const handleCancel = useCallback(() => {
+	// 	cancel();
+	// }, [cancel]);
 
 	// ✅ Format metrics for display
 	//   const formatMetrics = () => {

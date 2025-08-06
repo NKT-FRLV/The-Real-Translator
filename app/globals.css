@@ -4,8 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-	/* height: 100svh;
-	width: 100svw; */
+
 	--myCard: #f0f0f074;
 	--radius: 0.65rem;
 	--background: oklch(1 0 0);
@@ -84,8 +83,17 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
+*, 
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+body {
+	height: 100%;
+}
+
+.dark {
 	--background: oklch(0.141 0.005 285.823);
 	--background-hover: #00000063;
 	--foreground: oklch(0.985 0 0);
@@ -118,54 +126,6 @@
 	--sidebar-accent-foreground: oklch(0.985 0 0);
 	--sidebar-border: oklch(1 0 0 / 10%);
 	--sidebar-ring: oklch(0.637 0.237 25.331);
-	--myCard: #252427;
-	
-  }
-}
-
-*, 
-*::before,
-*::after {
-	box-sizing: border-box;
-}
-
-body {
-	height: 100%;
-}
-
-.dark {
-	--background: oklch(0.129 0.042 264.695);
-	--background-hover: #00000063;
-	--foreground: oklch(0.984 0.003 247.858);
-	--card: oklch(0.208 0.042 265.755);
-	--card-foreground: oklch(0.984 0.003 247.858);
-	--popover: oklch(0.208 0.042 265.755);
-	--popover-foreground: oklch(0.984 0.003 247.858);
-	--primary: oklch(0.929 0.013 255.508);
-	--primary-foreground: oklch(0.208 0.042 265.755);
-	--secondary: oklch(0.279 0.041 260.031);
-	--secondary-foreground: oklch(0.984 0.003 247.858);
-	--muted: oklch(0.279 0.041 260.031);
-	--muted-foreground: oklch(0.704 0.04 256.788);
-	--accent: oklch(0.279 0.041 260.031);
-	--accent-foreground: oklch(0.984 0.003 247.858);
-	--destructive: oklch(0.704 0.191 22.216);
-	--border: oklch(1 0 0 / 10%);
-	--input: oklch(1 0 0 / 15%);
-	--ring: oklch(0.551 0.027 264.364);
-	--chart-1: oklch(0.488 0.243 264.376);
-	--chart-2: oklch(0.696 0.17 162.48);
-	--chart-3: oklch(0.769 0.188 70.08);
-	--chart-4: oklch(0.627 0.265 303.9);
-	--chart-5: oklch(0.645 0.246 16.439);
-	--sidebar: oklch(0.208 0.042 265.755);
-	--sidebar-foreground: oklch(0.984 0.003 247.858);
-	--sidebar-primary: oklch(0.488 0.243 264.376);
-	--sidebar-primary-foreground: oklch(0.984 0.003 247.858);
-	--sidebar-accent: oklch(0.279 0.041 260.031);
-	--sidebar-accent-foreground: oklch(0.984 0.003 247.858);
-	--sidebar-border: oklch(1 0 0 / 10%);
-	--sidebar-ring: oklch(0.551 0.027 264.364);
 	--myCard: #252427;
 }
 
