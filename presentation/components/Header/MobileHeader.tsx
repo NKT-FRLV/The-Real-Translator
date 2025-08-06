@@ -1,7 +1,8 @@
 "use client";
 import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/shadcn/ui/avatar';
-import Logo from '../Logo';
+import ThemeSwitcher from './ThemeSwitcher';
+import Logo from './Logo';
 
 interface MobileHeaderProps {
   onMenuToggle: () => void;
@@ -13,7 +14,7 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({ onMenuToggle, isMenuOpen })
     <header className="md:hidden fixed top-0 left-0 right-0 z-50 bg-background border-b border-gray-700 px-4 py-3">
       <div className="flex items-center justify-between">
         {/* Left side: Burger menu and logo with title */}
-        <div className="flex items-center gap-8">
+        <div className="flex items-center gap-4">
           {/* Burger menu button */}
           <button
             onClick={onMenuToggle}
@@ -40,14 +41,15 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({ onMenuToggle, isMenuOpen })
           </button>
 
           {/* Logo and title */}
-          <div className="flex items-center gap-8">
+          <div className="flex items-center gap-6">
             <Logo size={32} />
-            <h1 className="text-lg font-semibold text-white">Real-Translator</h1>
+            <h1 className="text-lg font-semibold text-foreground">Real-Translator</h1>
           </div>
         </div>
 
-        {/* Right side: Avatar */}
+        {/* Right side: Avatar and Theme-Swith button */}
         <div className="flex items-center">
+		<ThemeSwitcher className='mr-4'/>
           <Avatar className="w-8 h-8">
             <AvatarImage src="https://github.com/shadcn.png" />
             <AvatarFallback>RT</AvatarFallback>

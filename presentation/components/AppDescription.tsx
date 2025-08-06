@@ -21,13 +21,13 @@ export const AppDescription: React.FC = () => {
   return (
     <div className="w-full">
       <div className="p-2 md:p-4">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center md:items-start">
           {/* Left Content */}
           <div className="space-y-6">
             <div>
-              <h2 className="text-5xl font-bold text-foreground mb-4">
+              <h2 className="text-5xl font-bold text-foreground mb-4 text-center md:text-left">
                 AI-Powered Translator
-                <span className="block text-3xl font-semibold text-foreground mt-2">
+                <span className="block text-3xl font-semibold text-foreground my-6 md:my-2">
                   for 100+ Languages
                 </span>
               </h2>

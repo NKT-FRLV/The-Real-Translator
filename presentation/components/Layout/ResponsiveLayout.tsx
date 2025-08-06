@@ -1,8 +1,8 @@
 "use client";
 import React, { useState } from 'react';
-import SideMenu from '../Side-Menu/SideMenu';
+import DesktopSideMenu from '../Header/DesktopSideMenu';
 import MobileHeader from '../Header/MobileHeader';
-import BurgerMenu from '../Navigation/BurgerMenu';
+import BurgerMenu from '../Header/BurgerMenu';
 
 interface ResponsiveLayoutProps {
   children: React.ReactNode;
@@ -36,7 +36,7 @@ const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({ children }) => {
       {/* Main Content Area */}
       <div className="w-full h-full flex justify-start gap-4 pt-16 md:pt-0">
         {/* Desktop Side Menu - only visible on desktop */}
-        <SideMenu />
+        <DesktopSideMenu />
         
         {/* Content */}
         <div className="m-0 px-0 md:ml-30 flex flex-col gap-4 w-full h-full items-center justify-start md:justify-center">
