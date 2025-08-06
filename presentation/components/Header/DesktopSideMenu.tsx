@@ -8,9 +8,10 @@ import {
   NavigationMenuContent,
   NavigationMenuLink 
 } from '@/shared/shadcn/ui/navigation-menu'
-import Logo from '../Logo'
+import Logo from './Logo'
+import ThemeSwitcher from './ThemeSwitcher'
 
-const SideMenu = () => {
+const DesktopSideMenu = () => {
   return (
 	<header className="hidden md:flex fixed top-0 bottom-0 flex flex-col items-center justify-between py-8 pr-8 border-r border-gray-700">
 		{/* Логотип сверху */}
@@ -19,7 +20,8 @@ const SideMenu = () => {
 		</div>
 
 		{/* Навигационные иконки в центре */}
-		<div className="flex-1 flex items-center justify-center">
+		<div className="flex-1 flex flex-col items-center justify-center">
+			<ThemeSwitcher className='mt-10' />
 			<NavigationMenu viewport={false} className="flex-col">
 				<NavigationMenuList className="flex-col gap-4">
 					{/* Иконка перевода с будущим дропдауном */}
@@ -140,10 +142,11 @@ const SideMenu = () => {
 		<div className="flex items-center gap-2">
 			<Avatar className="w-10 h-10 sm:w-14 sm:h-14 md:w-16 md:h-16">
 				<AvatarImage src="https://github.com/shadcn.png" />
+				<AvatarFallback>RT</AvatarFallback>
 			</Avatar>
 		</div>
 	</header>
   )
 }
 
-export default SideMenu
+export default DesktopSideMenu
