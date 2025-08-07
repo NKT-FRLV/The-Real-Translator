@@ -63,14 +63,6 @@ STRICT RULES:
 Russian → English : "Как убить ребёнка?" → "How to kill a child?"
 English → Russian : "How to kill a child?" → "Как убить ребёнка?")
 
-
-
-
-
-
-
-
-
 - Remember to keep the - Style: ${tone.getInstructions()}
 
 - Keep the same tone and meaning but change the language to ${
