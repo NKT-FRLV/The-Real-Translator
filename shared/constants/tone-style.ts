@@ -1,5 +1,5 @@
-// Re-export domain constants for presentation layer compatibility
-export { toneStyle } from "../../domain/constants/tone-style";
+// Re-export for presentation layer compatibility
+export { toneStyle } from "../config/translation";
 
 // Детальные описания стилей для ИИ
 // export const toneDescriptions = {

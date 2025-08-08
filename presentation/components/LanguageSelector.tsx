@@ -13,8 +13,8 @@ interface LanguageSelectorProps {
 	toLang?: LanguageShort;
 	tone?: Tone;
 	onToneChange: (tone: Tone) => void;
-	onLanguageChange?: (fromLang: LanguageShort, toLang: LanguageShort) => void;
-	onSwapResultToInputText?: () => void;
+	onLanguageChange: (fromLang: LanguageShort, toLang: LanguageShort) => void;
+	onSwapResultToInputText: () => void;
 }
 
 const LanguageSelector: React.FC<LanguageSelectorProps> = ({
@@ -31,15 +31,15 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({
 
 	// ✅ Notify parent when languages change
 	useEffect(() => {
-		onLanguageChange?.(fromLanguage, toLanguage);
-		onToneChange?.(tone);
+		onLanguageChange(fromLanguage, toLanguage);
+		onToneChange(tone);
 	}, [fromLanguage, toLanguage, tone, onLanguageChange, onToneChange]);
 
 	const handleSwapLanguages = () => {
 		const temp = fromLanguage;
 		setFromLanguage(toLanguage);
 		setToLanguage(temp);
-		onSwapResultToInputText?.();
+		onSwapResultToInputText();
 	};
 
 	return (

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import { TextArea } from "./TextArea";
 import LanguageSelector from "./LanguageSelector";
 import { useStreamingTranslation } from "@/presentation/hooks/useStreamingTranslation";
@@ -9,14 +9,15 @@ import { toneStyle } from "@/shared/constants/tone-style";
 
 export const TranslatorBox: React.FC = () => {
 	//  Users Input for translation
+	const isSwapped = useRef(false);
 	const [inputText, setInputText] = useState("");
-	const [debouncedInputText] = useDebounce(inputText, 1000);
+	const [debouncedInputText] = useDebounce(inputText, isSwapped.current ? 0 : 1000);
 
 	//  Chosen tone(style) for translation
 	const [tone, setTone] = useState<Tone>(toneStyle.natural);
 
 	//  Chosen languages for translation
-	const [fromLang, setFromLang] = useState<LanguageShort>("en");
+	const [fromLang, setFromLang] = useState<LanguageShort>("ru");
 	const [toLang, setToLang] = useState<LanguageShort>("es");
 
 	const {
@@ -32,8 +33,9 @@ export const TranslatorBox: React.FC = () => {
 	const handleSwapResultToInputText = useCallback(
 		(translatedText: string) => {
 			setInputText(translatedText);
-		},
-		[]
+			isSwapped.current = true;
+			},
+		[setInputText]
 	);
 
 	const handleInputChange = useCallback(
@@ -47,7 +49,8 @@ export const TranslatorBox: React.FC = () => {
 	const handleClearInput = useCallback(() => {
 		setInputText("");
 		reset();
-		cancel();
+		cancel()
+		
 	}, [reset, cancel]);
 
 	const handleLanguageChange = useCallback(
@@ -60,6 +63,7 @@ export const TranslatorBox: React.FC = () => {
 
 	const handleTranslate = useCallback(async () => {
 		if (!debouncedInputText.trim()) return;
+		if (isSwapped.current) isSwapped.current = false;
 
 		await translate(debouncedInputText, {
 			fromLang,
@@ -72,21 +76,6 @@ export const TranslatorBox: React.FC = () => {
 		handleTranslate();
 	}, [debouncedInputText, handleTranslate]);
 
-	// const handleCancel = useCallback(() => {
-	// 	cancel();
-	// }, [cancel]);
-
-	// ✅ Format metrics for display
-	//   const formatMetrics = () => {
-	//     if (!metrics.ttft && !metrics.totalTime) return null;
-
-	//     const parts = [];
-	//     if (metrics.ttft) parts.push(`First token: ${metrics.ttft}ms`);
-	//     if (metrics.tokensPerSecond) parts.push(`Speed: ${metrics.tokensPerSecond} tok/s`);
-	//     if (metrics.totalTime) parts.push(`Total: ${metrics.totalTime}ms`);
-
-	//     return parts.join(' • ');
-	//   };
 
 	return (
 		<div className="w-full min-h-[50vh] max-h-screen mx-auto space-y-2 md:space-y-4 flex flex-col">
@@ -126,45 +115,6 @@ export const TranslatorBox: React.FC = () => {
 					readOnly={true}
 					className={error ? "text-red-400" : ""}
 				/>
-
-				{/* Action Buttons */}
-				{/* <div className="col-span-2 flex gap-2 items-center">
-          <button 
-            onClick={handleTranslate}
-            disabled={isStreaming || !inputText.trim()}
-            className="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            {isStreaming ? '🔄 Translating...' : '🌍 Translate'}
-          </button>
-          
-          {isStreaming && (
-            <button 
-              onClick={handleCancel}
-              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
-            >
-              ✋ Cancel
-            </button>
-          )}
-          
-          {(result || error) && !isStreaming && (
-            <button 
-              onClick={reset}
-              className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
-            >
-              🗑️ Clear
-            </button>
-          )}
-        </div> */}
-
-				{/* Performance Metrics */}
-				{/* {formatMetrics() && (
-          <div className="col-span-2 text-sm text-gray-400 text-center py-2 border-t border-gray-700">
-            📊 Performance: {formatMetrics()}
-            {metrics.tokenCount && (
-              <span className="ml-2">• {metrics.tokenCount} tokens</span>
-            )}
-          </div>
-        )} */}
 			</div>
 		</div>
 	);

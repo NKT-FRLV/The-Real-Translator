@@ -1,7 +1,6 @@
 // Application Layer DTOs - объекты передачи данных между слоями
 
-import { LanguageShort } from "@/domain/constants/languages";
-import { Tone } from "@/domain/constants/tone-style";
+import { LanguageShort, Tone } from "@/shared/types/types";
 
 export interface TranslateTextRequest {
   text: string;

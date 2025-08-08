@@ -1,12 +1,11 @@
 // presentation/hooks/useStreamingTranslation.ts - Clean UI Hook
 import { useState, useCallback, useRef } from 'react';
 import { LanguageShort, Tone } from '@/shared/types/types';
-import { toneStyle } from '@/shared/constants/tone-style';
 
 interface TranslationOptions {
   fromLang: LanguageShort;
   toLang: LanguageShort;
-  tone?: Tone;
+  tone: Tone;
 }
 
 interface PerformanceMetrics {
@@ -16,16 +15,16 @@ interface PerformanceMetrics {
   tokenCount?: number;
 }
 
-interface TranslationState {
+interface TranslationState<T> {
   isStreaming: boolean;
   result: string;
   error: string | null;
-  metrics: PerformanceMetrics;
+  metrics: T;
 }
 
 // ✅ Clean Presentation Hook - только UI логика
 export const useStreamingTranslation = () => {
-  const [state, setState] = useState<TranslationState>({
+  const [state, setState] = useState<TranslationState<PerformanceMetrics>>({
     isStreaming: false,
     result: '',
     error: null,
@@ -69,7 +68,7 @@ export const useStreamingTranslation = () => {
           text, 
           fromLang: options.fromLang,
           toLang: options.toLang,
-          tone: options.tone || toneStyle.natural
+          tone: options.tone
         }),
         signal: abortController.signal,
         cache: 'no-store',
@@ -136,7 +135,7 @@ export const useStreamingTranslation = () => {
 // ✅ Вспомогательные функции - вынесены из основного хука
 async function processStreamResponse(
   response: Response,
-  setState: React.Dispatch<React.SetStateAction<TranslationState>>,
+  setState: React.Dispatch<React.SetStateAction<TranslationState<PerformanceMetrics>>>,
   localMetrics: PerformanceMetrics,
   abortController: AbortController
 ) {
