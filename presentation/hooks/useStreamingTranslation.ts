@@ -1,5 +1,5 @@
 // presentation/hooks/useStreamingTranslation.ts - Clean UI Hook
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, type Dispatch, type SetStateAction } from 'react';
 import { LanguageShort, Tone } from '@/shared/types/types';
 
 interface TranslationOptions {
@@ -63,7 +63,10 @@ export const useStreamingTranslation = () => {
       // ✅ Простой HTTP вызов - делегируем сложность контроллеру
       const response = await fetch('/api/translate-stream', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'text/event-stream'
+        },
         body: JSON.stringify({ 
           text, 
           fromLang: options.fromLang,
@@ -76,6 +79,19 @@ export const useStreamingTranslation = () => {
 
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const contentType = response.headers.get('content-type') || '';
+      if (!contentType.includes('text/event-stream')) {
+        // Try to extract error details if JSON
+        let msg = 'Invalid content type for SSE';
+        try {
+          const maybeJson = await response.clone().json();
+          if (maybeJson && typeof maybeJson.error === 'string') {
+            msg = maybeJson.error;
+          }
+        } catch {}
+        throw new Error(msg);
       }
 
       // ✅ Простой SSE парсинг - только UI обновления
@@ -135,7 +151,7 @@ export const useStreamingTranslation = () => {
 // ✅ Вспомогательные функции - вынесены из основного хука
 async function processStreamResponse(
   response: Response,
-  setState: React.Dispatch<React.SetStateAction<TranslationState<PerformanceMetrics>>>,
+  setState: Dispatch<SetStateAction<TranslationState<PerformanceMetrics>>>,
   localMetrics: PerformanceMetrics,
   abortController: AbortController
 ) {
@@ -144,42 +160,64 @@ async function processStreamResponse(
 
   const decoder = new TextDecoder();
   let buffer = '';
+  let pendingText = '';
+  let rafId: number | null = null;
 
-  while (!abortController.signal.aborted) {
-    const { done, value } = await reader.read();
-    if (done) break;
+  const flush = () => {
+    if (pendingText.length === 0) return;
+    setState(prev => ({ ...prev, result: prev.result + pendingText }));
+    pendingText = '';
+    rafId = null;
+  };
 
-    buffer += decoder.decode(value, { stream: true });
-    const lines = buffer.split('\n');
-    buffer = lines.pop() || '';
+  const scheduleFlush = () => {
+    if (rafId != null) return;
+    rafId = requestAnimationFrame(flush);
+  };
 
-    for (const line of lines) {
-      if (line.startsWith('data: ')) {
-        try {
-          const data = JSON.parse(line.slice(6));
-          
-          if (data.d) {
-            setState(prev => ({ ...prev, result: prev.result + data.d }));
-          } else if (data.metrics) {
-            const newMetrics = { ...localMetrics, ...data.metrics };
-            Object.assign(localMetrics, newMetrics);
-            setState(prev => ({ ...prev, metrics: newMetrics }));
-          } else if (data.completed) {
-            if (data.metrics) {
-              setState(prev => ({ 
-                ...prev, 
-                metrics: { ...prev.metrics, ...data.metrics }
-              }));
+  try {
+    while (!abortController.signal.aborted) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop() || '';
+
+      for (const line of lines) {
+        if (line.startsWith('data: ')) {
+          try {
+            const data = JSON.parse(line.slice(6));
+            
+            if (data.d) {
+              pendingText += data.d as string;
+              scheduleFlush();
+            } else if (data.metrics) {
+              const newMetrics = { ...localMetrics, ...data.metrics };
+              Object.assign(localMetrics, newMetrics);
+              setState(prev => ({ ...prev, metrics: newMetrics }));
+            } else if (data.completed) {
+              if (pendingText.length > 0) flush();
+              if (data.metrics) {
+                setState(prev => ({ 
+                  ...prev, 
+                  metrics: { ...prev.metrics, ...data.metrics }
+                }));
+              }
+              return;
+            } else if (data.error) {
+              throw new Error(data.error);
             }
-            return;
-          } else if (data.error) {
-            throw new Error(data.error);
+          } catch {
+            // ignore malformed line
           }
-        } catch (parseError) {
-          console.warn('Failed to parse SSE data:', parseError);
         }
       }
     }
+  } finally {
+    if (rafId != null) cancelAnimationFrame(rafId);
+    try { reader.releaseLock(); } catch {}
+    try { await response.body?.cancel(); } catch {}
   }
 }
 

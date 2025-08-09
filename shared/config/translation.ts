@@ -29,6 +29,7 @@ export type LanguageShort = keyof typeof languages;
 export const toneStyle = {
   natural: "natural",
   intellectual: "intellectual",
+  poetic: "poetic",
   street: "street",
 } as const;
 

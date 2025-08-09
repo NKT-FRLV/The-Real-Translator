@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useCallback, useEffect, useRef } from "react";
-import { TextArea } from "./TextArea";
-import LanguageSelector from "./LanguageSelector";
+import { TextArea } from "../elements/Translator-Box/TextArea";
+import LanguageSelector from "../elements/Translator-Box/LanguageSelector";
 import { useStreamingTranslation } from "@/presentation/hooks/useStreamingTranslation";
 import { LanguageShort, Tone } from "@/shared/types/types";
 import { useDebounce } from "use-debounce";
@@ -78,7 +78,7 @@ export const TranslatorBox: React.FC = () => {
 
 
 	return (
-		<div className="w-full min-h-[50vh] max-h-screen mx-auto space-y-2 md:space-y-4 flex flex-col">
+		<div className="w-full min-h-[50vh] max-h-content mx-auto space-y-2 md:space-y-4 flex flex-col">
 			{/* Language Selector */}
 			<LanguageSelector
 				fromLang={fromLang}
