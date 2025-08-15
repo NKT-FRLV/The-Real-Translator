@@ -13,7 +13,7 @@ import {
 
 interface TextAreaProps {
 	value?: string;
-	onChange?: (value: string) => void;
+	onChange?: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
 	onClear?: () => void;
 	placeholder?: string;
 	isInput?: boolean;
@@ -32,11 +32,7 @@ export const TextArea: React.FC<TextAreaProps> = ({
 	maxLength = 10000,
 	className,
 }) => {
-	const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-		if (onChange) {
-			onChange(e.target.value);
-		}
-	};
+
 
 	return (
 		<div className="flex flex-col w-full rounded-lg border border-gray-700 bg-accent/30">
@@ -46,7 +42,7 @@ export const TextArea: React.FC<TextAreaProps> = ({
 			>
 				<textarea
 					value={value}
-					onChange={handleTextChange}
+					onChange={onChange}
 					placeholder={placeholder}
 					readOnly={readOnly}
 					className={`w-full h-full bg-transparent text-foreground placeholder-gray-500 border-none outline-none resize-none ${

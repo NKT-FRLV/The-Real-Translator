@@ -1,18 +1,20 @@
-'use client';
-import { warmupServerConnection } from '@/api/translate-stream';
-import { useEffect } from 'react';
+// presentation/components/ClientWarmer.tsx
+"use client";
 
+import { useEffect } from "react";
+import { warmupServerConnection } from "@/client_api/warmer";
+
+/**
+ * Лёгкий «вармер» API: через 120мс после маунта шлёт HEAD, чтобы
+ * разбудить edge-функцию и соединение. Без type assertions.
+ */
 export const ClientWarmer: React.FC = () => {
   useEffect(() => {
-    // ⚡ Warm up the API connection on app load
-    warmupServerConnection('/api/translate-stream', 1000);
-
-    // Small delay to not interfere with initial page load
-    const timer = setTimeout(warmupServerConnection, 100);
-    
+    const timer = setTimeout(() => {
+      void warmupServerConnection("/api/translate-stream", 800);
+    }, 120);
     return () => clearTimeout(timer);
   }, []);
 
-  // This component renders nothing - it's just for side effects
-  return null;
-}; 
+  return null; // сайд-эффект, ничего не рендерим
+};

@@ -33,7 +33,7 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({
 	useEffect(() => {
 		onLanguageChange(fromLanguage, toLanguage);
 		onToneChange(tone);
-	}, [fromLanguage, toLanguage, tone, onLanguageChange, onToneChange]);
+	}, [fromLanguage, toLanguage, tone ]);
 
 	const handleSwapLanguages = () => {
 		const temp = fromLanguage;

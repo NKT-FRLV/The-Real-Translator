@@ -1,198 +1,291 @@
-// app/api/translate-stream/route.ts - Simplified streaming API (Edge)
+// app/api/translate-stream/route.ts
 import { NextRequest } from "next/server";
+import { createOpenRouter } from "@openrouter/ai-sdk-provider";
+import { streamText } from "ai";
 import { LanguageShort, Tone } from "@/shared/types/types";
 import { isLanguageShort, isTone } from "@/shared/config/translation";
-import { translateEventsStream } from "@/app/services/openAI-stream";
-import { runStreamingOrchestrator, sse } from "@/app/utils/stream";
+import { createLogger } from "@/shared/utils/logger";
 
 export const runtime = "edge";
 
-// Types sourced from shared/config. Local duplication removed.
+// ───────────────────────────────────────────────────────────────────────────────
+// OpenRouter provider (только chat, без completion/Responses API)
+// ───────────────────────────────────────────────────────────────────────────────
+const openrouter = createOpenRouter({
+  apiKey: process.env.OPENROUTER_API_KEY,
+  // (не обязательно) атрибуция приложения:
+  // headers: {
+  //   "HTTP-Referer": process.env.OPENROUTER_SITE_URL ?? "",
+  //   "X-Title": process.env.OPENROUTER_APP_NAME ?? "translator-app",
+  // },
+});
 
-const allowedModels = new Set([
-	"gpt-5-nano",
-	"gpt-4.1-nano",
-	"gpt-4o-mini",
-	"gpt-4o",
-	"gpt-4.1",
-]);
-
-const envModel = process.env.OPENAI_MODEL;
-const MODEL =
-	envModel && allowedModels.has(envModel) ? envModel : "gpt-4.1-nano";
-
-function getToneInstructions(tone: Tone): string {
+// Поддерживаемые модели на OpenRouter (chat-ветка)
+const SUPPORTED_MODELS = {
+	"gpt-5-nano": "openai/gpt-5-nano",
+	"gpt-4o-mini": "openai/gpt-4o-mini",
+	"gpt-4o": "openai/gpt-4o",
+	"gpt-4.1-mini": "openai/gpt-4.1-mini",
+	"gpt-4.1-nano": "openai/gpt-4.1-nano",
+	"claude-3-5-sonnet": "anthropic/claude-3.5-sonnet",
+	"claude-3-5-haiku": "anthropic/claude-3.5-haiku",
+	"llama-3.1-70b": "meta-llama/llama-3.1-70b-instruct",
+	"llama-3.1-8b": "meta-llama/llama-3.1-8b-instruct",
+	"mistral-large": "mistralai/mistral-large-2407",
+  } as const;
+  
+  // Временно используем модель без reasoning для тестирования
+  const envModel = process.env.TRANSLATION_MODEL || "gpt-4.1-nano"; // Изменено с gpt-5-nano
+  const MODEL_KEY = (Object.keys(SUPPORTED_MODELS) as Array<
+	keyof typeof SUPPORTED_MODELS
+  >).includes(envModel as keyof typeof SUPPORTED_MODELS)
+	? (envModel as keyof typeof SUPPORTED_MODELS)
+	: "gpt-4.1-nano"; // Изменено с gpt-5-nano
+  const MODEL = SUPPORTED_MODELS[MODEL_KEY];
+  
+  // ───────────────────────────────────────────────────────────────────────────────
+  // Prompt helpers
+  // ───────────────────────────────────────────────────────────────────────────────
+  function getToneInstructions(tone: Tone): string {
 	const map: Record<Tone, string> = {
-		natural:
-			"Use neutral, simple, everyday language. Avoid overly formal or slang expressions.",
-		intellectual:
-			"Use sophisticated, formal language with richer vocabulary and precise phrasing.",
-		poetic: `Translate the following text into chosen language. The translation must be a poem, written in the recognizable style of Alexander Pushkin.
-
-
-Focus on emulating Pushkin's elegance, clarity, and classical rhythm, often characterized by iambic or trochaic meter. The rhymes should be clear and traditional (e.g., AABB or ABAB schemes), avoiding overly complex or modern structures. The tone should be lyrical and perhaps slightly melancholic or reflective, typical of his descriptive pieces.
-
-
-Please preserve the original meaning while transforming it into a poetic form that evokes the essence of Pushkin's verse.
-
-## EXAMPLE:
-# Original text in Russian: Я иду по улице и вижу старый дом, в окне горит свет, и кажется, что кто-то ждет.
-
-- Translation to English: Along the street my path I keep,
-And there a mansion, old and deep,
-With window lit, a gleam so faint,
-As if some soul awaits, a saint.
-- Translation to Spanish: Por la calle mi paso llevo yo,
-Y un viejo hogar allí contemplo,
-Con luz que en su ventana se encendió,
-Cual si alguien la espera en su templo.
-`,
-		street: "Use informal, conversational style with slang where natural, concise phrasing.",
+	  natural:
+		"Use neutral, simple, everyday language. Avoid overly formal or slang expressions.",
+	  intellectual:
+		"Use sophisticated, formal language with richer vocabulary and precise phrasing.",
+	  poetic: `Translate the following text into chosen language. The translation must be a poem, written in the recognizable style of Alexander Pushkin.
+  
+  Focus on emulating Pushkin's elegance, clarity, and classical rhythm, often characterized by iambic or trochaic meter. The rhymes should be clear and traditional (e.g., AABB or ABAB schemes), avoiding overly complex or modern structures. The tone should be lyrical and perhaps slightly melancholic or reflective, typical of his descriptive pieces.
+  
+  Please preserve the original meaning while transforming it into a poetic form that evokes the essence of Pushkin's verse.`,
+	  street:
+		"Use informal, conversational style with slang where natural, concise phrasing.",
 	};
 	return map[tone] ?? map.natural;
-}
-
-function buildInstructions(
-	fromLang: LanguageShort,
-	toLang: LanguageShort,
-	tone: Tone
-): string {
+  }
+  
+  function buildSystem(fromLang: LanguageShort, toLang: LanguageShort, tone: Tone) {
 	return `You are a machine translator that ONLY translates text. Do not explain, do not answer questions.
-
-TRANSLATION TASK:
-- Source language: ${fromLang}
-- Target language: ${toLang}
-- Style: ${getToneInstructions(tone)}
-
-STRICT RULES:
-- Translate ONLY from ${fromLang} to ${toLang}
-- Never provide explanations or extra text
-- Output ONLY the translated text
-`;
-}
-
-// SSE helpers and metric calculation are provided by utils/stream
-
+  
+  TRANSLATION TASK:
+  - Source language: ${fromLang}
+  - Target language: ${toLang}
+  - Style: ${getToneInstructions(tone)}
+  
+  STRICT RULES:
+  - Translate ONLY from ${fromLang} to ${toLang}
+  - Never provide explanations or extra text
+  - Output ONLY the translated text
+  - Preserve meaning and natural phrasing for the target language.`;
+  }
+  
+  // ───────────────────────────────────────────────────────────────────────────────
+  // HEAD — для варминга соединения
+// ───────────────────────────────────────────────────────────────────────────────
 export async function HEAD() {
+	const logger = createLogger("API:HEAD");
+	logger.debug("Warmup HEAD request received");
+	
 	return new Response(null, {
-		status: 200,
-		headers: {
-			"Content-Type": "text/event-stream",
-			"Cache-Control": "no-cache",
-		},
+	  status: 200,
+	  headers: { "Cache-Control": "no-cache" },
 	});
 }
-
-export async function POST(req: NextRequest) {
+  
+  // ───────────────────────────────────────────────────────────────────────────────
+  // GET — служебная информация
+  // ───────────────────────────────────────────────────────────────────────────────
+  export async function GET() {
+	const logger = createLogger("API:GET");
+	logger.debug("Info request received");
+	
+	const response = {
+		supportedModels: Object.keys(SUPPORTED_MODELS),
+		currentModel: MODEL_KEY,
+		provider: "OpenRouter",
+		runtime,
+	};
+	
+	logger.debug("Returning API info", response);
+	
+	return new Response(
+	  JSON.stringify(response),
+	  { headers: { "Content-Type": "application/json" } }
+	);
+  }
+  
+  // ───────────────────────────────────────────────────────────────────────────────
+  // POST — основной стриминг перевода
+  // ───────────────────────────────────────────────────────────────────────────────
+  export async function POST(req: NextRequest) {
+	const logger = createLogger("API:POST");
+	
 	try {
-		const raw = await req.json();
-		// Narrow unknown shape into a typed object without `as`.
-		const text = typeof raw?.text === "string" ? raw.text : "";
-		const fromLang = isLanguageShort(raw?.fromLang)
-			? raw.fromLang
-			: undefined;
-		const toLang = isLanguageShort(raw?.toLang) ? raw.toLang : undefined;
-		const tone: Tone = isTone(raw?.tone) ? raw.tone : "natural";
-
-		if (!text.trim()) {
-			return new Response(JSON.stringify({ error: "Text is required" }), {
-				status: 400,
-				headers: { "Content-Type": "application/json" },
-			});
+	  logger.info("Translation request received", {
+		method: req.method,
+		url: req.url,
+		headers: {
+		  'content-type': req.headers.get('content-type'),
+		  'user-agent': req.headers.get('user-agent')?.substring(0, 100)
 		}
-		if (!fromLang || !toLang) {
-			return new Response(
-				JSON.stringify({ error: "Languages are required" }),
-				{
-					status: 400,
-					headers: { "Content-Type": "application/json" },
-				}
-			);
-		}
-		if (fromLang === toLang) {
-			return new Response(
-				JSON.stringify({
-					error: "Source and target languages cannot be the same",
-				}),
-				{ status: 400, headers: { "Content-Type": "application/json" } }
-			);
-		}
+	  });
+	  
+	  	  const raw = await req.json();
+	  logger.debug("Request body parsed", { bodyKeys: Object.keys(raw) });
 
-		const instructions = buildInstructions(fromLang, toLang, tone);
-
-		const abortController = new AbortController();
-		req.signal?.addEventListener("abort", () => abortController.abort());
-
-		const stream = new ReadableStream<Uint8Array>({
-			start: async (controller) => {
-				try {
-					const source = translateEventsStream({
-						model: MODEL,
-						instructions,
-						input: text,
-						signal: abortController.signal,
-						temperature: 0,
-						topP: 1,
-						maxOutputTokens: 1000,
-					});
-
-					await runStreamingOrchestrator(source, {
-						signal: abortController.signal,
-						metricsHooks: {
-							onFirstToken: ({ ttft }) => {
-								controller.enqueue(sse({ metrics: { ttft } }));
-							},
-						},
-						onDelta: (chunk) => {
-							controller.enqueue(sse({ d: chunk }));
-						},
-						onError: (message) => {
-							controller.enqueue(sse({ error: message }));
-						},
-						onCompleted: (metrics) => {
-							controller.enqueue(
-								sse({ completed: true, metrics })
-							);
-						},
-					});
-				} catch (error) {
-					const isAbort =
-						abortController.signal.aborted ||
-						(error instanceof Error && error.name === "AbortError");
-					if (!isAbort) {
-						const message =
-							error instanceof Error
-								? error.message
-								: "Unknown error";
-						controller.enqueue(sse({ error: message }));
-					}
-				} finally {
-					try {
-						controller.close();
-					} catch {}
-				}
-			},
+	  // useCompletion может передавать данные в prompt или в body
+	  const text = typeof raw?.text === "string" ? raw.text : 
+	              typeof raw?.prompt === "string" ? raw.prompt : "";
+	  const fromLang = isLanguageShort(raw?.fromLang) ? raw.fromLang : undefined;
+	  const toLang = isLanguageShort(raw?.toLang) ? raw.toLang : undefined;
+	  const tone: Tone = isTone(raw?.tone) ? raw.tone : "natural";
+	  
+	  logger.info("Request parameters extracted", {
+		textLength: text.length,
+		textPreview: text.substring(0, 100) + (text.length > 100 ? '...' : ''),
+		fromLang,
+		toLang,
+		tone
+	  });
+  
+	  if (!text.trim()) {
+		logger.warn("Request rejected - empty text");
+		return new Response(JSON.stringify({ error: "Text is required" }), {
+		  status: 400,
+		  headers: { "Content-Type": "application/json" },
 		});
-
-		return new Response(stream, {
-			headers: {
-				"Content-Type": "text/event-stream",
-				"Cache-Control": "no-cache, no-transform",
-				Connection: "keep-alive",
-				"Access-Control-Allow-Origin": "*",
-				"Access-Control-Allow-Headers": "Cache-Control",
-				"X-Accel-Buffering": "no",
-			},
-		});
-	} catch (error) {
+	  }
+	  if (!fromLang || !toLang) {
+		logger.warn("Request rejected - missing languages", { fromLang, toLang });
 		return new Response(
-			JSON.stringify({
-				error:
-					error instanceof Error
-						? error.message
-						: "Request processing failed",
-			}),
-			{ status: 400, headers: { "Content-Type": "application/json" } }
+		  JSON.stringify({ error: "Languages are required" }),
+		  { status: 400, headers: { "Content-Type": "application/json" } }
 		);
+	  }
+	  if (fromLang === toLang) {
+		logger.warn("Request rejected - same languages", { language: fromLang });
+		return new Response(
+		  JSON.stringify({
+			error: "Source and target languages cannot be the same",
+		  }),
+		  { status: 400, headers: { "Content-Type": "application/json" } }
+		);
+	  }
+  
+	  const system = buildSystem(fromLang, toLang, tone);
+	  logger.debug("System prompt built", { systemPromptLength: system.length });
+  
+	  logger.info("Initializing OpenRouter stream", {
+		model: MODEL,
+		modelKey: MODEL_KEY,
+		temperature: 0,
+		topP: 1,
+		maxOutputTokens: MODEL.includes("gpt-5") ? 3072 : 1000,
+		hasAbortSignal: !!req.signal,
+		signalAborted: req.signal?.aborted,
+		hasApiKey: !!process.env.OPENROUTER_API_KEY,
+		apiKeyPreview: process.env.OPENROUTER_API_KEY ? 
+		  `${process.env.OPENROUTER_API_KEY.substring(0, 8)}...` : 'missing'
+	  });
+	  
+	  // Проверим сигнал аборта перед стартом
+	  if (req.signal?.aborted) {
+		logger.warn("Request already aborted before OpenRouter call");
+		return new Response(null, { status: 204 });
+	  }
+  
+	  // Chat-модель через OpenRouter + корректный text stream для useCompletion
+	  const result = streamText({
+		model: openrouter.chat(MODEL),
+		system,
+		messages: [{ role: "user", content: text }],
+		temperature: 0,
+		topP: 1,
+		// Можно дать чуть больше для длинных кусков
+		maxOutputTokens: MODEL.includes("gpt-5") ? 3072 : 1000,
+		abortSignal: req.signal,
+		onChunk: ({ chunk }) => {
+		  logger.debug("Received chunk from OpenRouter", {
+			chunkType: chunk.type,
+			hasText: 'text' in chunk && !!chunk.text,
+			textLength: 'text' in chunk ? chunk.text?.length : 0,
+			textPreview: 'text' in chunk ? chunk.text?.substring(0, 50) : 'no text'
+		  });
+		  
+		  // Логируем только text-delta chunks которые должны попасть на фронт
+		  if (chunk.type === 'text-delta' && 'text' in chunk && chunk.text) {
+			logger.info("Text chunk being sent to client", {
+			  textLength: chunk.text.length,
+			  textPreview: chunk.text.substring(0, 100)
+			});
+		  }
+		},
+		onFinish: ({ text, usage }) => {
+		  logger.success("OpenRouter stream finished", {
+			totalLength: text.length,
+			textPreview: text.substring(0, 100) + (text.length > 100 ? '...' : ''),
+			usage
+		  });
+		},
+		onError: (error) => {
+		  logger.error("OpenRouter stream error", error);
+		}
+	  });
+	  
+	  logger.streamStart({ openRouterModel: MODEL });
+  
+	  // Используем toTextStreamResponse для совместимости с useCompletion и streamProtocol: "text"
+	  const response = result.toTextStreamResponse({
+		headers: {
+		  "Cache-Control": "no-cache, no-transform",
+		  "X-Accel-Buffering": "no",
+		},
+	  });
+	  
+	  logger.success("Stream response created successfully", {
+		responseStatus: response.status,
+		responseHeaders: Object.fromEntries(response.headers.entries())
+	  });
+	  
+	  return response;
+	} catch (error: unknown) {
+	  // abort — нормальный сценарий
+	  if (
+		req.signal?.aborted ||
+		(error instanceof Error && error.name === "AbortError")
+	  ) {
+		logger.streamAbort(error);
+		logger.info("Request aborted (normal scenario)", {
+		  signalAborted: req.signal?.aborted,
+		  errorName: error instanceof Error ? error.name : 'unknown',
+		  errorMessage: error instanceof Error ? error.message : String(error)
+		});
+		return new Response(null, { status: 204 });
+	  }
+	  
+	  // Проверим тип ошибки для более детального логирования
+	  if (error instanceof Error) {
+		if (error.message.includes('ECONNRESET')) {
+		  logger.error("Connection reset by OpenRouter", error, {
+			errorCode: 'ECONNRESET',
+			possibleCause: 'Network connection issue or OpenRouter timeout'
+		  });
+		} else if (error.message.includes('fetch')) {
+		  logger.error("Fetch error to OpenRouter", error, {
+			possibleCause: 'Network or OpenRouter API issue'
+		  });
+		} else {
+		  logger.error("Unknown translation error", error);
+		}
+	  } else {
+		logger.error("Non-Error exception in translation", error);
+	  }
+  
+	  return new Response(
+		JSON.stringify({
+		  error:
+			error instanceof Error ? error.message : "Translation failed",
+		}),
+		{ status: 500, headers: { "Content-Type": "application/json" } }
+	  );
 	}
-}
+  }
