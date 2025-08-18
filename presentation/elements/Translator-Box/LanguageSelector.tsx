@@ -5,7 +5,7 @@ import LanguageSelect from "./LanguageSelect";
 import ToneSelector from "./ToneSelector";
 import { Button } from "@/shared/shadcn/ui/button";
 import { LanguageShort, Tone } from "@/shared/types/types";
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import { toneStyle } from "@/shared/constants/tone-style";
 
 interface LanguageSelectorProps {
@@ -17,9 +17,9 @@ interface LanguageSelectorProps {
 	onSwapResultToInputText: () => void;
 }
 
-const LanguageSelector: React.FC<LanguageSelectorProps> = ({
-	fromLang = "en",
-	toLang = "es",
+const LanguageSelector: React.FC<LanguageSelectorProps> = memo(({
+	fromLang = "ru",
+	toLang = "en",
 	tone = toneStyle.natural,
 	onToneChange,
 	onLanguageChange,
@@ -78,6 +78,8 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({
 			</div>
 		</div>
 	);
-};
+});
+
+LanguageSelector.displayName = "LanguageSelector";
 
 export default LanguageSelector;

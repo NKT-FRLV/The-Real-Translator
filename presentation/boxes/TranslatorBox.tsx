@@ -3,7 +3,7 @@
 
 import React, { useState, useCallback, useRef, useEffect } from "react";
 import { useCompletion } from "@ai-sdk/react";
-// import { useDebounce } from "use-debounce";
+import { useDebounce } from "use-debounce";
 import { TextArea } from "../elements/Translator-Box/TextArea";
 import LanguageSelector from "../elements/Translator-Box/LanguageSelector";
 import { LanguageShort, Tone } from "@/shared/types/types";
@@ -30,18 +30,77 @@ export const TranslatorBox: React.FC = () => {
 	const [toLang, setToLang] = useState<LanguageShort>("es");
 
 	// Дебаунс: 0 мс сразу после swap, 800 мс обычно
-	// const DEFAULT_DEBOUNCE = 800;
-	// const [debounceMs, setDebounceMs] = useState<number>(DEFAULT_DEBOUNCE);
+	const DEFAULT_DEBOUNCE = 800;
+	const [debounceMs, setDebounceMs] = useState<number>(DEFAULT_DEBOUNCE);
 
 	// Текущий активный запрос (чтобы не запускать повторно)
 	const activeKeyRef = useRef<RequestKey>("");
-	
+
 	// Logger с уникальным ID для этого компонента
 	const loggerRef = useRef(createLogger("TranslatorBox"));
-	const currentRequestLoggerRef = useRef<ReturnType<typeof createLogger> | null>(null);
+	const currentRequestLoggerRef = useRef<ReturnType<
+		typeof createLogger
+	> | null>(null);
 
 	// Swap-индикатор: вернуть дебаунс после завершения
 	const swappedOnceRef = useRef<boolean>(false);
+
+	// ────────────────────────────────────────────────────────────────────────────
+	// Стабильные callbacks для useCompletion
+	// ────────────────────────────────────────────────────────────────────────────
+	const onFinish = useCallback((prompt: string, completion: string) => {
+		if (currentRequestLoggerRef.current) {
+			currentRequestLoggerRef.current.streamEnd();
+			currentRequestLoggerRef.current.success(
+				"Translation completed successfully",
+				{
+					completionLength: completion.length,
+					completionPreview:
+						completion.substring(0, 100) +
+						(completion.length > 100 ? "..." : ""),
+				}
+			);
+		} else {
+			loggerRef.current.success(
+				"Translation completed (no active request logger)"
+			);
+		}
+
+		activeKeyRef.current = "";
+		currentRequestLoggerRef.current = null;
+
+		if (swappedOnceRef.current) {
+			swappedOnceRef.current = false;
+			setDebounceMs(DEFAULT_DEBOUNCE);
+		}
+	}, []);
+
+	const onError = useCallback((err: Error) => {
+		if (currentRequestLoggerRef.current) {
+			currentRequestLoggerRef.current.streamAbort(err);
+			currentRequestLoggerRef.current.error(
+				"Translation failed",
+				err,
+				{
+					errorName: err.name,
+					errorMessage: err.message,
+				}
+			);
+		} else {
+			loggerRef.current.error(
+				"Translation failed (no active request logger)",
+				err
+			);
+		}
+
+		activeKeyRef.current = "";
+		currentRequestLoggerRef.current = null;
+
+		if (swappedOnceRef.current) {
+			swappedOnceRef.current = false;
+			setDebounceMs(DEFAULT_DEBOUNCE);
+		}
+	}, []);
 
 	// ────────────────────────────────────────────────────────────────────────────
 	// Vercel AI SDK
@@ -59,47 +118,11 @@ export const TranslatorBox: React.FC = () => {
 	} = useCompletion({
 		api: "/api/translate-stream",
 		streamProtocol: "text",
-		onFinish: (prompt, completion) => {
-			if (currentRequestLoggerRef.current) {
-				currentRequestLoggerRef.current.streamEnd();
-				currentRequestLoggerRef.current.success("Translation completed successfully", {
-					completionLength: completion.length,
-					completionPreview: completion.substring(0, 100) + (completion.length > 100 ? '...' : '')
-				});
-			} else {
-				loggerRef.current.success("Translation completed (no active request logger)");
-			}
-			
-			activeKeyRef.current = "";
-			currentRequestLoggerRef.current = null;
-			
-			if (swappedOnceRef.current) {
-				swappedOnceRef.current = false;
-				// setDebounceMs(DEFAULT_DEBOUNCE);
-			}
-		},
-		onError: (err: Error) => {
-			if (currentRequestLoggerRef.current) {
-				currentRequestLoggerRef.current.streamAbort(err);
-				currentRequestLoggerRef.current.error("Translation failed", err, {
-					errorName: err.name,
-					errorMessage: err.message
-				});
-			} else {
-				loggerRef.current.error("Translation failed (no active request logger)", err);
-			}
-			
-			activeKeyRef.current = "";
-			currentRequestLoggerRef.current = null;
-			
-			if (swappedOnceRef.current) {
-				swappedOnceRef.current = false;
-				// setDebounceMs(DEFAULT_DEBOUNCE);
-			}
-		},
+		onFinish,
+		onError,
 	});
 
-	// const [debouncedInputText] = useDebounce(input, debounceMs);
+	const [debouncedInputText] = useDebounce(input, debounceMs);
 
 	// ────────────────────────────────────────────────────────────────────────────
 	// Monitoring completion updates
@@ -108,8 +131,10 @@ export const TranslatorBox: React.FC = () => {
 		if (currentRequestLoggerRef.current && completion) {
 			currentRequestLoggerRef.current.debug("Completion updated", {
 				completionLength: completion.length,
-				completionPreview: completion.substring(0, 100) + (completion.length > 100 ? '...' : ''),
-				isLoading
+				completionPreview:
+					completion.substring(0, 100) +
+					(completion.length > 100 ? "..." : ""),
+				isLoading,
 			});
 		}
 	}, [completion, isLoading]);
@@ -130,14 +155,16 @@ export const TranslatorBox: React.FC = () => {
 
 	const handleClearInput = useCallback(() => {
 		loggerRef.current.info("Clearing input", { wasLoading: isLoading });
-		
+
 		if (isLoading) {
 			if (currentRequestLoggerRef.current) {
-				currentRequestLoggerRef.current.streamAbort("User cleared input");
+				currentRequestLoggerRef.current.streamAbort(
+					"User cleared input"
+				);
 			}
 			stop();
 		}
-		
+
 		activeKeyRef.current = "";
 		currentRequestLoggerRef.current = null;
 		setInput("");
@@ -146,19 +173,21 @@ export const TranslatorBox: React.FC = () => {
 
 	const handleLanguageChange = useCallback(
 		(from: LanguageShort, to: LanguageShort) => {
-			loggerRef.current.info("Language change", { 
-				from: { old: fromLang, new: from }, 
+			loggerRef.current.info("Language change", {
+				from: { old: fromLang, new: from },
 				to: { old: toLang, new: to },
-				wasLoading: isLoading
+				wasLoading: isLoading,
 			});
-			
+
 			if (isLoading) {
 				if (currentRequestLoggerRef.current) {
-					currentRequestLoggerRef.current.streamAbort("Language changed during translation");
+					currentRequestLoggerRef.current.streamAbort(
+						"Language changed during translation"
+					);
 				}
 				stop();
 			}
-			
+
 			activeKeyRef.current = "";
 			currentRequestLoggerRef.current = null;
 			setCompletion(""); // обнулим результат, чтобы не путал
@@ -171,25 +200,29 @@ export const TranslatorBox: React.FC = () => {
 	const handleSwapResultToInputText = useCallback(() => {
 		const translatedText = completion?.trim() ?? "";
 		if (!translatedText) {
-			loggerRef.current.warn("Attempted to swap but no translation text available");
+			loggerRef.current.warn(
+				"Attempted to swap but no translation text available"
+			);
 			return;
 		}
 
-		loggerRef.current.info("Swapping result to input", { 
+		loggerRef.current.info("Swapping result to input", {
 			translatedTextLength: translatedText.length,
 			currentDirection: `${fromLang} -> ${toLang}`,
 			newDirection: `${toLang} -> ${fromLang}`,
-			wasLoading: isLoading
+			wasLoading: isLoading,
 		});
 
 		// Остановим текущий стрим и подготовим новый
 		if (isLoading) {
 			if (currentRequestLoggerRef.current) {
-				currentRequestLoggerRef.current.streamAbort("User swapped languages");
+				currentRequestLoggerRef.current.streamAbort(
+					"User swapped languages"
+				);
 			}
 			stop();
 		}
-		
+
 		activeKeyRef.current = "";
 		currentRequestLoggerRef.current = null;
 		setCompletion("");
@@ -205,33 +238,48 @@ export const TranslatorBox: React.FC = () => {
 		// Один немедленный перевод без debounce, потом вернём дефолт
 		swappedOnceRef.current = true;
 		// setDebounceMs(0);
-	}, [completion, isLoading, stop, setCompletion, toLang, fromLang, setInput]);
+	}, [
+		completion,
+		isLoading,
+		stop,
+		setCompletion,
+		toLang,
+		fromLang,
+		setInput,
+	]);
+
+	// ────────────────────────────────────────────────────────────────────────────
+	// Стабильная функция для запуска перевода
+	// ────────────────────────────────────────────────────────────────────────────
+	const startTranslation = useCallback((prompt: string, fromLang: LanguageShort, toLang: LanguageShort, tone: Tone) => {
+		const key = makeRequestKey(prompt, fromLang, toLang, tone);
+
+		// Если уже стартовали этот же запрос — выходим
+		if (activeKeyRef.current === key) return;
+
+		// Обновим ключ до старта, чтобы повторный ререндер не начал второй раз
+		activeKeyRef.current = key;
+
+		// Запускаем стрим. Сервер читает body, prompt игнорируется.
+		void complete(prompt, {
+			body: { fromLang, toLang, tone },
+		});
+	}, [complete]);
 
 	// ────────────────────────────────────────────────────────────────────────────
 	// Оркестратор перевода — без зацикливания
 	// ────────────────────────────────────────────────────────────────────────────
-	// useEffect(() => {
-	// 	const text = debouncedInputText.trim();
+	useEffect(() => {
+		const prompt = debouncedInputText.trim();
 
-	// 	// Ничего не переводим при пустом вводе
-	// 	if (!text) return;
+		// Ничего не переводим при пустом вводе
+		if (!prompt) return;
 
-	// 	// Нельзя переводить в тот же язык
-	// 	if (fromLang === toLang) return;
+		// Нельзя переводить в тот же язык
+		if (fromLang === toLang) return;
 
-	// 	const key = makeRequestKey(text, fromLang, toLang, tone);
-
-	// 	// Если уже стартовали этот же запрос — выходим
-	// 	if (activeKeyRef.current === key) return;
-
-	// 	// Обновим ключ до старта, чтобы повторный ререндер не начал второй раз
-	// 	activeKeyRef.current = key;
-
-	// 	// Запускаем стрим. Сервер читает body, prompt игнорируется.
-	// 	void complete("", {
-	// 		body: { text, fromLang, toLang, tone },
-	// 	});
-	// }, [debouncedInputText, fromLang, toLang, tone, complete]);
+		startTranslation(prompt, fromLang, toLang, tone);
+	}, [debouncedInputText, fromLang, toLang, tone, startTranslation]);
 
 	// ────────────────────────────────────────────────────────────────────────────
 	// UI
@@ -254,85 +302,6 @@ export const TranslatorBox: React.FC = () => {
 				onLanguageChange={handleLanguageChange}
 				onSwapResultToInputText={handleSwapResultToInputText}
 			/>
-			<div className="flex justify-end">
-					<button
-						onClick={() => {
-							const text = input.trim();
-					
-							// Ничего не переводим при пустом вводе
-							if (!text) {
-								loggerRef.current.warn("Translation attempted with empty text");
-								return;
-							}
-					
-							// Нельзя переводить в тот же язык
-							if (fromLang === toLang) {
-								loggerRef.current.warn("Translation attempted with same source and target language", {
-									language: fromLang
-								});
-								return;
-							}
-					
-							const key = makeRequestKey(text, fromLang, toLang, tone);
-					
-							// Если уже стартовали этот же запрос — выходим
-							if (activeKeyRef.current === key) {
-								loggerRef.current.warn("Duplicate translation request ignored", { requestKey: key });
-								return;
-							}
-					
-							// Создаем новый logger для этого запроса
-							const requestLogger = createLogger("Translation");
-							currentRequestLoggerRef.current = requestLogger;
-							
-							requestLogger.info("Starting translation request", {
-								textLength: text.length,
-								textPreview: text.substring(0, 100) + (text.length > 100 ? '...' : ''),
-								fromLang,
-								toLang,
-								tone,
-								requestKey: key
-							});
-					
-							// Обновим ключ до старта, чтобы повторный ререндер не начал второй раз
-							activeKeyRef.current = key;
-							
-							requestLogger.streamStart({
-								endpoint: "/api/translate-stream",
-								method: "POST"
-							});
-					
-							// Запускаем стрим. Сервер читает body, prompt игнорируется.
-							void complete("", {
-								body: { text, fromLang, toLang, tone },
-							});
-						}}
-						className="px-3 py-1 rounded-md bg-green-600 hover:bg-green-700 text-white text-sm"
-					>
-						Translate
-					</button>
-				</div>
-
-			
-				<div className="flex justify-end">
-					<button
-						onClick={() => {
-							if (currentRequestLoggerRef.current) {
-								currentRequestLoggerRef.current.streamAbort("User manually stopped translation");
-								currentRequestLoggerRef.current.warn("Translation manually stopped by user");
-							} else {
-								loggerRef.current.warn("Stop translation clicked but no active request logger");
-							}
-							stop();
-						}}
-						disabled={!isLoading}
-						className="px-3 py-1 rounded-md bg-red-600 hover:bg-red-700 text-white text-sm"
-					>
-						Stop Translation
-					</button>
-				</div>
-			
-
 			<div className="w-full flex-1 grid grid-cols-1 gap-3 md:gap-4 mb-4 md:mb-8 lg:grid-cols-2 bg-gradient-to-t from-red-900/20 to-[90%] from-[#121214] rounded-xl px-3 md:px-4 pb-3 md:pb-4">
 				<TextArea
 					value={input}
@@ -340,7 +309,7 @@ export const TranslatorBox: React.FC = () => {
 					onClear={handleClearInput}
 					placeholder="Enter text to translate..."
 					isInput={true}
-					maxLength={10000}
+					maxLength={100000}
 				/>
 
 				<TextArea

@@ -10,6 +10,7 @@ import {
 	ThumbsUp,
 	ThumbsDown,
 } from "lucide-react";
+import { toast } from "sonner";
 
 interface TextAreaProps {
 	value?: string;
@@ -32,7 +33,30 @@ export const TextArea: React.FC<TextAreaProps> = ({
 	maxLength = 10000,
 	className,
 }) => {
-
+	const onCopy = async () => {
+		try {
+			if (value.length === 0) {
+				throw new Error("No text to copy");
+			}
+			await navigator.clipboard.writeText(value);
+			toast.success("Copied", {
+				action: {
+					label: "Undo",
+					onClick: () => toast.dismiss(),
+				},
+			});
+		} catch (error: unknown) {
+			if (error instanceof Error) {
+				toast.error(error.message, {
+					description: "Enter some text before.",
+					action: {
+						label: "Undo",
+						onClick: () => toast.dismiss(),
+					},
+				});
+			}
+		}
+	};
 
 	return (
 		<div className="flex flex-col w-full rounded-lg border border-gray-700 bg-accent/30">
@@ -46,15 +70,15 @@ export const TextArea: React.FC<TextAreaProps> = ({
 					placeholder={placeholder}
 					readOnly={readOnly}
 					className={`w-full h-full bg-transparent text-foreground placeholder-gray-500 border-none outline-none resize-none ${
-						value.length < 30 
-							? "text-xl md:text-3xl lg:text-4xl" 
+						value.length < 30
+							? "text-xl md:text-3xl lg:text-4xl"
 							: "text-base md:text-lg lg:text-2xl"
 					} font-medium placeholder:text-base md:placeholder:text-lg lg:placeholder:text-2xl ${className}`}
 					maxLength={maxLength}
 					style={{
-						// height: "auto",
-						minHeight: "80px",
-						maxHeight: "70vh",
+						height: "100%",
+						minHeight: "100%",
+						maxHeight: "100%",
 						overflow: "auto",
 					}}
 					onInput={(e) => {
@@ -77,7 +101,10 @@ export const TextArea: React.FC<TextAreaProps> = ({
 						</button>
 					)}
 
-					<button className="p-1.5 md:p-2 hover:bg-gray-600 rounded-lg transition-colors">
+					<button
+						onClick={onCopy}
+						className="p-1.5 md:p-2 hover:bg-gray-600 rounded-lg transition-colors"
+					>
 						<Copy className="w-3.5 h-3.5 md:w-4 md:h-4 text-gray-400" />
 					</button>
 				</div>
@@ -111,7 +138,10 @@ export const TextArea: React.FC<TextAreaProps> = ({
 							<button className="p-1.5 md:p-2 hover:bg-gray-600 rounded-lg transition-colors">
 								<ThumbsDown className="w-3.5 h-3.5 md:w-4 md:h-4 text-gray-400" />
 							</button>
-							<button className="p-1.5 md:p-2 hover:bg-gray-600 rounded-lg transition-colors">
+							<button
+								onClick={onCopy}
+								className="p-1.5 md:p-2 hover:bg-gray-600 rounded-lg transition-colors"
+							>
 								<Copy className="w-3.5 h-3.5 md:w-4 md:h-4 text-gray-400" />
 							</button>
 						</>

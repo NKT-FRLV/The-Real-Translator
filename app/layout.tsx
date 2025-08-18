@@ -6,6 +6,7 @@ import "./globals.css";
 
 import Footer from "@/presentation/components/footer/Footer";
 import ThemeProvider from "@/presentation/providers/ThemeProvider";
+import { Toaster } from "@/shared/shadcn/ui/sonner";
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
@@ -65,6 +66,7 @@ export default function RootLayout({
 						<Footer />
 					</div>
 				</ThemeProvider>
+				<Toaster />
 			</body>
 		</html>
 	);
