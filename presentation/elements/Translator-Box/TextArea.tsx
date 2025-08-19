@@ -67,6 +67,11 @@ export const TextArea: React.FC<TextAreaProps> = ({
 				<textarea
 					value={value}
 					onChange={onChange}
+					onClick={() => {
+						if (readOnly) {
+							onCopy()
+						}
+					}}
 					placeholder={placeholder}
 					readOnly={readOnly}
 					className={`w-full h-full bg-transparent text-foreground placeholder-gray-500 border-none outline-none resize-none ${
