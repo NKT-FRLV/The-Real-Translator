@@ -39,7 +39,7 @@ const toneDescriptionsMap = {
         tone: "poetic",
         new: true,
         description:
-            "Poetic translation, written in the recognizable style of Russian poet Alexander Pushkin",
+            "Recognizable style of Russian poet Alexander Pushkin",
     },
     street: {
         name: "Street Slang",

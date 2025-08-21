@@ -10,6 +10,7 @@ import {
 	ThumbsUp,
 	ThumbsDown,
 } from "lucide-react";
+import { Textarea } from "@/shared/shadcn/ui/textarea";
 import { toast } from "sonner";
 
 interface TextAreaProps {
@@ -17,6 +18,7 @@ interface TextAreaProps {
 	onChange?: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
 	onClear?: () => void;
 	placeholder?: string;
+	customPlaceholder?: React.ReactNode;
 	isInput?: boolean;
 	readOnly?: boolean;
 	maxLength?: number;
@@ -28,16 +30,19 @@ export const TextArea: React.FC<TextAreaProps> = ({
 	onChange,
 	onClear,
 	placeholder,
+	customPlaceholder = null,
 	isInput = false,
 	readOnly = false,
 	maxLength = 10000,
 	className,
 }) => {
+
+
 	const onCopy = async () => {
+		if (value.length === 0) {
+			return;
+		}
 		try {
-			if (value.length === 0) {
-				throw new Error("No text to copy");
-			}
 			await navigator.clipboard.writeText(value);
 			toast.success("Copied", {
 				action: {
@@ -57,24 +62,25 @@ export const TextArea: React.FC<TextAreaProps> = ({
 			}
 		}
 	};
+	
 
 	return (
-		<div className="flex flex-col w-full rounded-lg border border-gray-700 bg-accent/30">
+		<div className="flex flex-col w-full h-full rounded-lg border border-gray-700 bg-accent/30">
 			<label
-				className="p-3 md:p-4 min-h-[150px] md:min-h-[200px] flex-1"
+				className="p-3 md:p-4 min-h-[150px] md:min-h-[200px] flex-1 relative"
 				style={{ height: "fit-content" }}
 			>
-				<textarea
+				<Textarea
 					value={value}
 					onChange={onChange}
 					onClick={() => {
 						if (readOnly) {
-							onCopy()
+							onCopy();
 						}
 					}}
-					placeholder={placeholder}
+					placeholder={readOnly ? undefined : placeholder}
 					readOnly={readOnly}
-					className={`w-full h-full bg-transparent text-foreground placeholder-gray-500 border-none outline-none resize-none ${
+					className={`w-full bg-transparent text-foreground placeholder-gray-500 border-none outline-none resize-none ${
 						value.length < 30
 							? "text-xl md:text-3xl lg:text-4xl"
 							: "text-base md:text-lg lg:text-2xl"
@@ -86,12 +92,9 @@ export const TextArea: React.FC<TextAreaProps> = ({
 						maxHeight: "100%",
 						overflow: "auto",
 					}}
-					onInput={(e) => {
-						const target = e.target as HTMLTextAreaElement;
-						target.style.height = "auto";
-						target.style.height = target.scrollHeight + "px";
-					}}
 				/>
+
+				{customPlaceholder}
 			</label>
 
 			<div className="border-t border-gray-700 p-2 md:p-3 flex justify-between items-center">

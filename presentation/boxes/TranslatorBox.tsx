@@ -9,6 +9,7 @@ import LanguageSelector from "../elements/Translator-Box/LanguageSelector";
 import { LanguageShort, Tone } from "@/shared/types/types";
 import { toneStyle } from "@/shared/constants/tone-style";
 import { createLogger } from "@/shared/utils/logger";
+import CustomPlaceholder from "../components/Header/CustomPlaceholder";
 
 type RequestKey = string;
 
@@ -78,14 +79,10 @@ export const TranslatorBox: React.FC = () => {
 	const onError = useCallback((err: Error) => {
 		if (currentRequestLoggerRef.current) {
 			currentRequestLoggerRef.current.streamAbort(err);
-			currentRequestLoggerRef.current.error(
-				"Translation failed",
-				err,
-				{
-					errorName: err.name,
-					errorMessage: err.message,
-				}
-			);
+			currentRequestLoggerRef.current.error("Translation failed", err, {
+				errorName: err.name,
+				errorMessage: err.message,
+			});
 		} else {
 			loggerRef.current.error(
 				"Translation failed (no active request logger)",
@@ -251,20 +248,28 @@ export const TranslatorBox: React.FC = () => {
 	// ────────────────────────────────────────────────────────────────────────────
 	// Стабильная функция для запуска перевода
 	// ────────────────────────────────────────────────────────────────────────────
-	const startTranslation = useCallback((prompt: string, fromLang: LanguageShort, toLang: LanguageShort, tone: Tone) => {
-		const key = makeRequestKey(prompt, fromLang, toLang, tone);
+	const startTranslation = useCallback(
+		(
+			prompt: string,
+			fromLang: LanguageShort,
+			toLang: LanguageShort,
+			tone: Tone
+		) => {
+			const key = makeRequestKey(prompt, fromLang, toLang, tone);
 
-		// Если уже стартовали этот же запрос — выходим
-		if (activeKeyRef.current === key) return;
+			// Если уже стартовали этот же запрос — выходим
+			if (activeKeyRef.current === key) return;
 
-		// Обновим ключ до старта, чтобы повторный ререндер не начал второй раз
-		activeKeyRef.current = key;
+			// Обновим ключ до старта, чтобы повторный ререндер не начал второй раз
+			activeKeyRef.current = key;
 
-		// Запускаем стрим. Сервер читает body, prompt игнорируется.
-		void complete(prompt, {
-			body: { fromLang, toLang, tone },
-		});
-	}, [complete]);
+			// Запускаем стрим. Сервер читает body, prompt игнорируется.
+			void complete(prompt, {
+				body: { fromLang, toLang, tone },
+			});
+		},
+		[complete]
+	);
 
 	// ────────────────────────────────────────────────────────────────────────────
 	// Оркестратор перевода — без зацикливания
@@ -307,14 +312,29 @@ export const TranslatorBox: React.FC = () => {
 					value={input}
 					onChange={handleInputChange}
 					onClear={handleClearInput}
-					placeholder="Enter text to translate..."
+					className="peer"
+					// placeholder="Enter text to translate..."
+					customPlaceholder={
+						<CustomPlaceholder
+							showLightBeam={false}
+							placeholder="Enter text to translate..."
+							value={input}
+						/>
+					}
 					isInput={true}
 					maxLength={100000}
 				/>
 
 				<TextArea
 					value={displayText}
-					placeholder={placeholder}
+					// placeholder={placeholder}
+					customPlaceholder={
+						<CustomPlaceholder
+							showLightBeam={isLoading}
+							placeholder={placeholder}
+							value={displayText}
+						/>
+					}
 					isInput={false}
 					readOnly={true}
 					className={error ? "text-red-400" : ""}

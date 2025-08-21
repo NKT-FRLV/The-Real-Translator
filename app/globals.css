@@ -137,3 +137,36 @@ body {
     @apply bg-background text-foreground;
 	}
 }
+
+/* Shimmer анимация для плейсхолдера перевода */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Плавная shimmer анимация для текста */
+@keyframes textShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Дополнительная анимация с паузами для более естественного вида */
+@keyframes gentleShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  50% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}

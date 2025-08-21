@@ -97,7 +97,7 @@ export default function RootLayout({
 					{/* Just widgets temporals*/}
 					<ClientWarmer />
 					<PerformanceMonitor />
-					<div className="h-max-content flex flex-col justify-between items-center font-sans py-4 px-0 md:pb-20 md:p-8">
+					<div className="h-max-content flex flex-col justify-between items-center font-sans py-4 px-0 md:pb-20">
 						<main className="flex flex-col items-center justify-center flex-1 sm:items-start w-full">
 							{children}
 						</main>

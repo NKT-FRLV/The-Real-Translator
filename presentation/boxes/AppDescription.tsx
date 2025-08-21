@@ -9,8 +9,8 @@ export const AppDescription: React.FC = () => {
 
   return (
     <div className="w-full">
-      <div className="p-2 md:p-4 pb-0">
-        <div className="grid grid-cols-1 md:grid-rows-2 lg:grid-cols-2 gap-8 items-center md:items-start">
+      <div className="py-0 px-2 md:px-4 ">
+        <div className="grid grid-cols-1 md:grid-rows-2 lg:grid-cols-2 gap-4 items-center md:items-start">
           {/* Left Content */}
           <div className="space-y-6">
             <div>
@@ -29,7 +29,7 @@ export const AppDescription: React.FC = () => {
 
             {/* Translation Styles */}
             <div>
-              <h3 className="text-2xl font-semibold text-foreground mb-2">
+              <h3 className="text-2xl font-semibold text-foreground m-0">
                 Choose Your Translation Style:
               </h3>
               

@@ -1,85 +1,15 @@
 // app/api/translate-stream/route.ts
 import { NextRequest } from "next/server";
-import { createOpenRouter } from "@openrouter/ai-sdk-provider";
-import { streamText, UIMessage, convertToModelMessages } from 'ai';
-import { LanguageShort, Tone } from "@/shared/types/types";
+import { streamText } from 'ai';
+import { openrouter } from "@/app/services/openRouter";
+import { Tone } from "@/shared/types/types";
 import { isLanguageShort, isTone } from "@/shared/config/translation";
 import { createLogger } from "@/shared/utils/logger";
+import { MODEL, MODEL_KEY, SUPPORTED_MODELS } from "@/app/services/modelConfig";
+import { buildSystem } from "@/app/utils/prompt-build";
 
 export const runtime = "edge";
 
-// ───────────────────────────────────────────────────────────────────────────────
-// OpenRouter provider (только chat, без completion/Responses API)
-// ───────────────────────────────────────────────────────────────────────────────
-const openrouter = createOpenRouter({
-	apiKey: process.env.OPENROUTER_API_KEY,
-	// (не обязательно) атрибуция приложения:
-	// headers: {
-	//   "HTTP-Referer": process.env.OPENROUTER_SITE_URL ?? "",
-	//   "X-Title": process.env.OPENROUTER_APP_NAME ?? "translator-app",
-	// },
-});
-
-// Поддерживаемые модели на OpenRouter (chat-ветка)
-const SUPPORTED_MODELS = {
-	"gpt-5-nano": "openai/gpt-5-nano",
-	"gpt-4o-mini": "openai/gpt-4o-mini",
-	"gpt-4o": "openai/gpt-4o",
-	"gpt-4.1-mini": "openai/gpt-4.1-mini",
-	"gpt-4.1-nano": "openai/gpt-4.1-nano",
-	"claude-3-5-sonnet": "anthropic/claude-3.5-sonnet",
-	"claude-3-5-haiku": "anthropic/claude-3.5-haiku",
-	"llama-3.1-70b": "meta-llama/llama-3.1-70b-instruct",
-	"llama-3.1-8b": "meta-llama/llama-3.1-8b-instruct",
-	"mistral-large": "mistralai/mistral-large-2407",
-} as const;
-
-// Временно используем модель без reasoning для тестирования
-const envModel = process.env.TRANSLATION_MODEL || "gpt-4.1-nano"; // Изменено с gpt-5-nano
-const MODEL_KEY = (
-	Object.keys(SUPPORTED_MODELS) as Array<keyof typeof SUPPORTED_MODELS>
-).includes(envModel as keyof typeof SUPPORTED_MODELS)
-	? (envModel as keyof typeof SUPPORTED_MODELS)
-	: "gpt-4.1-nano"; // Изменено с gpt-5-nano
-const MODEL = SUPPORTED_MODELS[MODEL_KEY];
-
-// ───────────────────────────────────────────────────────────────────────────────
-// Prompt helpers
-// ───────────────────────────────────────────────────────────────────────────────
-function getToneInstructions(tone: Tone): string {
-	const map: Record<Tone, string> = {
-		natural:
-			"Use neutral, simple, everyday language. Avoid overly formal or slang expressions.",
-		intellectual:
-			"Use sophisticated, formal language with richer vocabulary and precise phrasing.",
-		poetic: `Translate the following text into chosen language. The translation must be a poem, written in the recognizable style of Alexander Pushkin.
-  
-  Focus on emulating Pushkin's elegance, clarity, and classical rhythm, often characterized by iambic or trochaic meter. The rhymes should be clear and traditional (e.g., AABB or ABAB schemes), avoiding overly complex or modern structures. The tone should be lyrical and perhaps slightly melancholic or reflective, typical of his descriptive pieces.
-  
-  Please preserve the original meaning while transforming it into a poetic form that evokes the essence of Pushkin's verse.`,
-		street: "Use informal, conversational style with slang where natural, concise phrasing.",
-	};
-	return map[tone] ?? map.natural;
-}
-
-function buildSystem(
-	fromLang: LanguageShort,
-	toLang: LanguageShort,
-	tone: Tone
-) {
-	return `You are a machine translator that ONLY translates text. Do not explain, do not answer questions.
-  
-  TRANSLATION TASK:
-  - Source language: ${fromLang}
-  - Target language: ${toLang}
-  - Style: ${getToneInstructions(tone)}
-  
-  STRICT RULES:
-  - Translate ONLY from ${fromLang} to ${toLang}
-  - Never provide explanations or extra text
-  - Output ONLY the translated text
-  - Preserve meaning and natural phrasing for the target language.`;
-}
 
 // ───────────────────────────────────────────────────────────────────────────────
 // HEAD — для варминга соединения
@@ -120,7 +50,7 @@ export async function GET() {
 // ───────────────────────────────────────────────────────────────────────────────
 export async function POST(req: NextRequest) {
 	// TODO: remove logger after testing
-	const logger = createLogger("API:POST", undefined, true);
+	const logger = createLogger("API:POST");
 
 	try {
 		logger.info("Translation request received", {
@@ -133,7 +63,8 @@ export async function POST(req: NextRequest) {
 		});
 
 		const raw = await req.json();
-		
+
+		console.log('CHOOSED MODEL: ', MODEL)
 		console.log('raw', raw);
 
 		logger.debug("Request body parsed", { bodyKeys: Object.keys(raw) });
@@ -206,9 +137,6 @@ export async function POST(req: NextRequest) {
 			hasAbortSignal: !!req.signal,
 			signalAborted: req.signal?.aborted,
 			hasApiKey: !!process.env.OPENROUTER_API_KEY,
-			apiKeyPreview: process.env.OPENROUTER_API_KEY
-				? `${process.env.OPENROUTER_API_KEY.substring(0, 8)}...`
-				: "missing",
 		});
 
 		// Проверим сигнал аборта перед стартом
@@ -217,15 +145,26 @@ export async function POST(req: NextRequest) {
 			return new Response(null, { status: 204 });
 		}
 
+		const reasoningOptions = MODEL.includes("gpt-5") ? {
+			extraBody: {
+			  reasoning: { effort: "low", exclude: true }
+			}
+		  } : {};
+
 		// Chat-модель через OpenRouter + корректный text stream для useCompletion
 		const result = streamText({
-			model: openrouter.chat(MODEL),
+			model: openrouter.chat(MODEL, reasoningOptions),
 			system,
 			messages: [{ role: "user", content: text }],
 			temperature: 0,
 			topP: 1,
+			providerOptions: {
+				openrouter: {
+				  reasoning: { effort: "low", exclude: true }
+				},
+			  },
 			// Можно дать чуть больше для длинных кусков
-			maxOutputTokens: MODEL.includes("gpt-5") ? 3072 : 1000,
+			maxOutputTokens: 1000,
 			abortSignal: req.signal,
 			onChunk: ({ chunk }) => {
 				logger.debug("Received chunk from OpenRouter", {
