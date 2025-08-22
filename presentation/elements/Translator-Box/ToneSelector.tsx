@@ -1,6 +1,6 @@
-// import React from "react";
+import React from "react";
 import { toneStyle } from "@/shared/constants/tone-style";
-import {  Tone } from "@/shared/types/types";
+import { Tone } from "@/shared/types/types";
 import {
 	Select,
 	SelectContent,
@@ -9,16 +9,29 @@ import {
 	SelectValue,
 } from "@/shared/shadcn/ui/select";
 import { cn } from "@/shared/shadcn/";
+import { useTone, useSetTone } from "@/presentation/stores/translatorStore";
 
 interface ToneSelectorProps {
-	value: Tone;
+	value?: Tone;
 	className?: string;
-	onToneChange: (value: Tone) => void;
+	onToneChange?: (value: Tone) => void;
+	useStore?: boolean;
 }
 
-const ToneSelector = ({ value, className, onToneChange }: ToneSelectorProps) => {
+const ToneSelector = ({ 
+	value, 
+	className, 
+	onToneChange,
+	useStore = false 
+}: ToneSelectorProps) => {
+	const tone = useTone();
+	const setTone = useSetTone();
+	
+	// Используем стор если useStore = true, иначе пропсы
+	const currentTone = useStore ? tone : value || 'natural';
+	const handleToneChange = useStore ? setTone : (onToneChange || (() => {}));
 	return (
-		<Select value={value} onValueChange={onToneChange}>
+		<Select value={currentTone} onValueChange={handleToneChange}>
 			<SelectTrigger size="max" className={cn("flex justify-center text-foreground font-semibold text-sm md:text-xl bg-transparent border-none focus:ring-0 hover:bg-background-hover transition-colors duration-300", className)} icon={false}>
 				<SelectValue placeholder="Select a Tone" />
 			</SelectTrigger>

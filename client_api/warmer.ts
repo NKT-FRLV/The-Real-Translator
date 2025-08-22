@@ -1,5 +1,5 @@
 // client_api/warmer.ts
-import { createLogger } from "@/shared/utils/logger";
+// import { createLogger } from "@/shared/utils/logger";
 
 /**
  * Создаёт AbortSignal, который автоматически абортится через ms миллисекунд.
@@ -28,10 +28,9 @@ export const warmupServerConnection = async (
 	url: string = "/api/translate-stream",
 	timeout: number = 800
 ) => {
-	const logger = createLogger("Warmer");
 	const { signal, cancel } = createTimeoutSignal(timeout);
 	
-	logger.debug("Starting warmup request", { url, timeout });
+	console.log("Starting warmup request", { url, timeout });
 	
 	try {
 	  const startTime = Date.now();
@@ -42,17 +41,16 @@ export const warmupServerConnection = async (
 	  });
 	  
 	  const duration = Date.now() - startTime;
-	  logger.success("Warmup request completed", {
+	  console.log("Warmup request completed", {
 		status: response.status,
 		duration: `${duration}ms`,
-		headers: Object.fromEntries(response.headers.entries())
 	  });
 	  
 	} catch (error) {
 	  if (signal.aborted) {
-		logger.warn("Warmup request timed out", { timeout, url });
+		console.log("Warmup request timed out", { timeout, url });
 	  } else {
-		logger.warn("Warmup request failed (ignored)", {
+		console.log("Warmup request failed (ignored)", {
 		  error: error instanceof Error ? {
 			name: error.name,
 			message: error.message
@@ -61,8 +59,8 @@ export const warmupServerConnection = async (
 		});
 	  }
 	} finally {
-	  cancel(); // снимаем таймер, чтобы не текли
-	  logger.debug("Warmup request cleanup completed");
+	  cancel();
+	  console.log("Warmup request cleanup completed");
 	}
 };
   

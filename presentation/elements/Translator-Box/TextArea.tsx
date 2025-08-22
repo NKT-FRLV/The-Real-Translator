@@ -18,7 +18,7 @@ interface TextAreaProps {
 	onChange?: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
 	onClear?: () => void;
 	placeholder?: string;
-	customPlaceholder?: React.ReactNode;
+	renderCustomPlaceholder?: () => React.ReactNode;
 	isInput?: boolean;
 	readOnly?: boolean;
 	maxLength?: number;
@@ -30,7 +30,7 @@ export const TextArea: React.FC<TextAreaProps> = ({
 	onChange,
 	onClear,
 	placeholder,
-	customPlaceholder = null,
+	renderCustomPlaceholder,
 	isInput = false,
 	readOnly = false,
 	maxLength = 10000,
@@ -94,7 +94,7 @@ export const TextArea: React.FC<TextAreaProps> = ({
 					}}
 				/>
 
-				{customPlaceholder}
+				{renderCustomPlaceholder && renderCustomPlaceholder()}
 			</label>
 
 			<div className="border-t border-gray-700 p-2 md:p-3 flex justify-between items-center">

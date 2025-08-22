@@ -7,6 +7,7 @@
 
 	--myCard: #f0f0f074;
 	--radius: 0.65rem;
+	--success: oklch(0.373 0.231 153.595);
 	--background: oklch(1 0 0);
 	--background-hover: #00000063;
 	--foreground: oklch(0.141 0.005 285.823);
@@ -77,6 +78,7 @@
   --color-card: var(--card);
   --color-myCard: var(--myCard);
   --color-background-hover: var(--background-hover);
+  --color-success: var(--success);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -94,6 +96,7 @@ body {
 }
 
 .dark {
+	--success: oklch(0.373 0.231 153.595);
 	--background: oklch(0.141 0.005 285.823);
 	--background-hover: #00000063;
 	--foreground: oklch(0.985 0 0);
