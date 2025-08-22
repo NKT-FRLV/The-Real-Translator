@@ -12,13 +12,13 @@ export const AppDescription: React.FC = () => {
 					{/* Left Content */}
 					<div className="space-y-6">
 						<div>
-							<h2 className="text-3xl md:text-6xl font-bold text-foreground mb-6 text-center md:text-left">
+							<h2 className="text-2xl md:text-4xl font-bold text-foreground mb-6 text-center md:text-left">
 								AI-Powered Translator
-								<span className="block text-2xl md:text-4xl font-semibold text-foreground my-6 md:my-4">
+								<span className="block text-2xl md:text-2xl font-semibold text-foreground my-6 md:my-4">
 									for 100+ Languages
 								</span>
 							</h2>
-							<p className="text-foreground text-xl md:text-3xl font-semibold leading-relaxed">
+							<p className="text-foreground text-mdl md:text-xl font-semibold leading-relaxed">
 								Experience translation that goes beyond
 								word-for-word accuracy. Our AI understands
 								context, culture, and nuance to deliver
@@ -42,7 +42,7 @@ export const AppDescription: React.FC = () => {
 
 						{/* Translation Styles */}
 						<div>
-							<h3 className="text-3xl font-semibold text-foreground m-0 mb-6">
+							<h3 className="text-2xl font-semibold text-foreground m-0 mb-6">
 								Choose Your Translation Style:
 							</h3>
 						</div>

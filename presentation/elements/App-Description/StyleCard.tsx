@@ -12,7 +12,7 @@ export const StyleCard: React.FC<StyleCardProps> = ({ style, isSelected, onClick
   return (
     <div
       className={[
-        'relative flex flex-col rounded-lg p-4 border cursor-pointer transition-all duration-200 ease-in-out',
+        'relative flex flex-col rounded-lg px-4 py-2 border cursor-pointer transition-all duration-200 ease-in-out',
         style.new
           ? 'bg-gradient-to-br from-primary/10 via-accent/30 to-transparent border-primary/60 ring-1 ring-primary/30 shadow-md shadow-primary/10 hover:shadow-lg hover:shadow-primary/20'
           : 'bg-accent/50 border-border hover:border-gray-500 hover:bg-accent/70',
@@ -24,7 +24,7 @@ export const StyleCard: React.FC<StyleCardProps> = ({ style, isSelected, onClick
           NEW
         </span>
       )}
-	  {isSelected && (
+      {isSelected && (
         <div className="absolute top-4 right-4 flex items-center gap-2 select-none text-success md:text-md font-bold">
           Active <div className="w-4 h-4 bg-success rounded-full"><CheckIcon className="w-4 h-4" /></div>
         </div>
