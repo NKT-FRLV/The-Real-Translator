@@ -1,2 +1,2 @@
-// Re-export domain constants for presentation layer compatibility
-export { languages } from "../../domain/constants/languages";
+// Re-export for presentation layer compatibility
+export { languages } from "../config/translation";

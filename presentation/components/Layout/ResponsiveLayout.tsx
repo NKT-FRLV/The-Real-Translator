@@ -39,7 +39,7 @@ const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({ children }) => {
         <DesktopSideMenu />
         
         {/* Content */}
-        <div className="m-0 px-0 md:ml-30 flex flex-col gap-4 w-full h-full items-center justify-start md:justify-center">
+        <div className="m-0 px-0 md:ml-26 flex flex-col gap-0 w-full h-full items-center justify-start md:justify-center">
           {children}
         </div>
       </div>

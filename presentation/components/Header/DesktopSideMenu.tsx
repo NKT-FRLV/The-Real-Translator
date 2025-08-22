@@ -13,7 +13,7 @@ import ThemeSwitcher from './ThemeSwitcher'
 
 const DesktopSideMenu = () => {
   return (
-	<header className="hidden md:flex fixed top-0 bottom-0 flex flex-col items-center justify-between py-8 pr-8 border-r border-gray-700">
+	<header className="hidden md:flex fixed top-0 bottom-0 flex flex-col items-center justify-between p-4 border-r border-gray-700">
 		{/* Логотип сверху */}
 		<div className="flex items-center gap-2">
 			<Logo responsive/>
