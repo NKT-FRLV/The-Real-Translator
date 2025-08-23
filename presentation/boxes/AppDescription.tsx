@@ -7,18 +7,18 @@ import { Illustration } from "@/presentation/elements/App-Description/Illustrati
 export const AppDescription: React.FC = () => {
 	return (
 		<div className="w-full">
-			<div className="py-0 px-2 md:px-4 ">
-				<div className="grid grid-cols-1 md:grid-rows-2 lg:grid-cols-2 gap-4 items-center md:items-start">
+			<div className="py-0 px-2 md:px-3 ">
+				<div className="grid grid-cols-1 md:grid-rows-2 lg:grid-cols-2 gap-3 md:gap-2 items-center md:items-start">
 					{/* Left Content */}
-					<div className="space-y-6">
+					<div className="space-y-4 md:space-y-3">
 						<div>
-							<h2 className="text-2xl md:text-4xl font-bold text-foreground mb-6 text-center md:text-left">
+							<h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4 md:mb-3 text-center md:text-left">
 								AI-Powered Translator
-								<span className="block text-2xl md:text-2xl font-semibold text-foreground my-6 md:my-4">
+								<span className="block text-xl md:text-xl font-semibold text-foreground my-4 md:my-2">
 									for 100+ Languages
 								</span>
 							</h2>
-							<p className="text-foreground text-mdl md:text-xl font-semibold leading-relaxed">
+							<p className="text-foreground text-sm md:text-lg font-semibold leading-relaxed">
 								Experience translation that goes beyond
 								word-for-word accuracy. Our AI understands
 								context, culture, and nuance to deliver
@@ -42,7 +42,7 @@ export const AppDescription: React.FC = () => {
 
 						{/* Translation Styles */}
 						<div>
-							<h3 className="text-2xl font-semibold text-foreground m-0 mb-6">
+							<h3 className="text-xl md:text-lg font-semibold text-foreground m-0 mb-4 md:mb-3">
 								Choose Your Translation Style:
 							</h3>
 						</div>

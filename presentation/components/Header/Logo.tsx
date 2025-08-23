@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 
 interface LogoProps {
 	className?: string;
@@ -14,9 +13,9 @@ const Logo: React.FC<LogoProps> = ({
 	href = "/", 
 	responsive = false 
 }) => {
-	// Адаптивные размеры через Tailwind классы
+	// Адаптивные размеры через Tailwind классы (уменьшены для desktop в 1.5 раза)
 	const responsiveClasses = responsive 
-		? "w-10 h-10 sm:w-14 sm:h-14 md:w-16 md:h-16" 
+		? "w-10 h-10 sm:w-14 sm:h-14 md:w-12 md:h-12" 
 		: "";
 
 	return (
