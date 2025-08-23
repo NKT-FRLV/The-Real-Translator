@@ -47,7 +47,7 @@ export const TranslatorBox: React.FC = () => {
 	// ────────────────────────────────────────────────────────────────────────────
 	// Стабильные callbacks для useCompletion
 	// ────────────────────────────────────────────────────────────────────────────
-	const onFinish = useCallback((_prompt: string, _completion: string) => {
+	const onFinish = useCallback(() => {
 		activeKeyRef.current = "";
 		if (swappedOnceRef.current) {
 			swappedOnceRef.current = false;
@@ -55,7 +55,7 @@ export const TranslatorBox: React.FC = () => {
 		}
 	}, []);
 
-	const onError = useCallback((_err: Error) => {
+	const onError = useCallback(() => {
 		activeKeyRef.current = "";
 		if (swappedOnceRef.current) {
 			swappedOnceRef.current = false;
@@ -177,12 +177,12 @@ export const TranslatorBox: React.FC = () => {
 		: "Translation will appear here...";
 
 	return (
-		<div className="w-full min-h-[40vh] max-h-content mx-auto space-y-2 md:space-y-3 flex flex-col">
+		<div className="w-full min-h-[50vh] max-h-content mx-auto space-y-2 md:space-y-4 flex flex-col">
 			<LanguageSelector
 				isTranslating={isLoading}
 				onSwapResultToInputText={handleSwapResultToInputText}
 			/>
-			<div className="w-full flex-1 grid grid-cols-1 gap-3 md:gap-3 mb-4 md:mb-6 lg:grid-cols-2 bg-gradient-to-t from-red-900/20 to-[90%] from-[#121214] rounded-xl px-3 md:px-3 pb-3 md:pb-3">
+			<div className="w-full flex-1 grid grid-cols-1 gap-3 md:gap-4 mb-4 md:mb-8 lg:grid-cols-2 bg-gradient-to-t from-red-900/20 to-[90%] from-[#121214] rounded-xl px-3 md:px-4 pb-3 md:pb-4">
 				<TextArea
 					value={input}
 					onChange={handleInputChange}

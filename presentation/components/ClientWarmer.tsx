@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { warmupServerConnection } from "@/client_api/warmer";
+import { warmupServerConnection } from "@/presentation/API/warmer/warmer";
 
 /**
  * Лёгкий «вармер» API: через 120мс после маунта шлёт HEAD, чтобы
