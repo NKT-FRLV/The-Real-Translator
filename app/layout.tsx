@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+export { viewport } from "./viewport";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ClientWarmer } from "@/presentation/components/ClientWarmer";
 import { PerformanceMonitor } from "@/presentation/components/PerformanceMonitor";
@@ -6,6 +7,7 @@ import "./globals.css";
 
 import Footer from "@/presentation/components/footer/Footer";
 import ThemeProvider from "@/presentation/providers/ThemeProvider";
+import { PWAThemeManager } from "@/presentation/components/PWAThemeManager";
 import { Toaster } from "@/shared/shadcn/ui/sonner";
 
 const geistSans = Geist({
@@ -56,7 +58,7 @@ export const metadata: Metadata = {
 			{
 				rel: "mask-icon",
 				url: "/safari-pinned-tab.svg",
-				color: "#0ea5e9",
+				color: "#0b0b0b",
 			},
 		],
 	},
@@ -68,14 +70,10 @@ export const metadata: Metadata = {
 		statusBarStyle: "default",
 	},
 
-	// Цвет темы для адресной строки
-	themeColor: [
-		{ media: "(prefers-color-scheme: light)", color: "#ffffff" },
-		{ media: "(prefers-color-scheme: dark)", color: "#0b0b0b" },
-	],
+
 
 	// Подключение веб-манифеста
-	manifest: "/manifest.json",
+	manifest: "/manifest.webmanifest",
 };
 
 export default function RootLayout({
@@ -97,6 +95,7 @@ export default function RootLayout({
 					{/* Just widgets temporals*/}
 					<ClientWarmer />
 					<PerformanceMonitor />
+					<PWAThemeManager />
 					<div className="h-max-content flex flex-col justify-between items-center font-sans py-4 px-0 md:pb-20">
 						<main className="flex flex-col items-center justify-center flex-1 sm:items-start w-full">
 							{children}

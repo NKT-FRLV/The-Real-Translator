@@ -4,7 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-
+	--pwa-background: #ffffff;
 	--myCard: #f0f0f074;
 	--radius: 0.65rem;
 	--success: oklch(0.373 0.231 153.595);
@@ -93,9 +93,12 @@
 
 body {
 	height: 100%;
+	/* PWA фон для iOS */
+	background-color: var(--pwa-background);
 }
 
 .dark {
+	--pwa-background: #0b0b0b;
 	--success: oklch(0.373 0.231 153.595);
 	--background: oklch(0.141 0.005 285.823);
 	--background-hover: #00000063;

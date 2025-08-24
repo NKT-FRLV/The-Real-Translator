@@ -44,6 +44,11 @@ export async function GET() {
 export async function POST(req: NextRequest) {
 
 	try {
+		// Проверим сигнал аборта в самом начале
+		if (req.signal?.aborted) {
+			return new Response(null, { status: 204 });
+		}
+
 		const raw = await req.json();
 		// console.log('CHOOSED MODEL: ', MODEL)
 		// console.log('raw', raw);
@@ -64,6 +69,13 @@ export async function POST(req: NextRequest) {
 
 		const tone: Tone = isTone(raw?.tone) ? raw.tone : "natural";
 
+		// Проверим текст на пустоту
+		if (!text.trim()) {
+			return new Response(
+				JSON.stringify({ error: "Text to translate is required" }),
+				{ status: 400, headers: { "Content-Type": "application/json" } }
+			);
+		}
 	
 		if (!fromLang || !toLang) {
 			return new Response(
@@ -80,12 +92,12 @@ export async function POST(req: NextRequest) {
 			);
 		}
 
-		const system = buildSystem(fromLang, toLang, tone);
-
-		// Проверим сигнал аборта перед стартом
+		// Проверим сигнал аборта перед тяжелыми операциями
 		if (req.signal?.aborted) {
 			return new Response(null, { status: 204 });
 		}
+
+		const system = buildSystem(fromLang, toLang, tone);
 
 		const reasoningOptions = MODEL.includes("gpt-5") ? {
 			extraBody: {

@@ -47,7 +47,7 @@ export const TranslatorBox: React.FC = () => {
 	// ────────────────────────────────────────────────────────────────────────────
 	// Стабильные callbacks для useCompletion
 	// ────────────────────────────────────────────────────────────────────────────
-	const onFinish = useCallback((_prompt: string, _completion: string) => {
+	const onFinish = useCallback(() => {
 		activeKeyRef.current = "";
 		if (swappedOnceRef.current) {
 			swappedOnceRef.current = false;
@@ -55,7 +55,7 @@ export const TranslatorBox: React.FC = () => {
 		}
 	}, []);
 
-	const onError = useCallback((_err: Error) => {
+	const onError = useCallback(() => {
 		activeKeyRef.current = "";
 		if (swappedOnceRef.current) {
 			swappedOnceRef.current = false;
