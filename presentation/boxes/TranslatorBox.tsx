@@ -8,7 +8,7 @@ import { TextArea } from "../elements/Translator-Box/TextArea";
 import LanguageSelector from "../elements/Translator-Box/BoxTranslateOptions";
 import { LanguageShort, Tone } from "@/shared/types/types";
 // import { createLogger } from "@/shared/utils/logger";
-import CustomPlaceholder from "../components/Header/CustomPlaceholder";
+import CustomPlaceholder from "../components/textArea/CustomPlaceholder";
 import { useFromLang, useToLang, useTone } from "../stores/translatorStore";
 
 type RequestKey = string;
