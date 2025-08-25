@@ -26,7 +26,7 @@ export const AppDescription: React.FC = () => {
 								<span className="text-foreground"> — </span>
 								
 								<span 
-									className="font-bold bg-clip-text text-transparent"
+									className="font-bold bg-clip-text text-transparent text-nowrap z-0"
 									style={{
 										background: 'linear-gradient(45deg, #3b82f6, #c084fc, #db2777)',
 										WebkitBackgroundClip: 'text',

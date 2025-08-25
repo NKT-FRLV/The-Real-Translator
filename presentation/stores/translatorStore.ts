@@ -1,6 +1,5 @@
 import { create } from 'zustand';
-import { Tone } from '@/shared/types/types';
-import { LanguageShort } from '@/shared/types/types';
+import { Tone, LanguageShort } from '@/shared/config/translation';
 
 interface TranslatorState {
   // Language settings
