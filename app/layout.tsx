@@ -1,13 +1,18 @@
 import type { Metadata } from "next";
 export { viewport } from "./viewport";
 import { Geist, Geist_Mono } from "next/font/google";
-import { ClientWarmer } from "@/presentation/components/ClientWarmer";
+import { PWAThemeManager } from "@/presentation/components/PWAThemeManager";
 import { PerformanceMonitor } from "@/presentation/components/PerformanceMonitor";
+import { SessionProvider } from "next-auth/react";
+import { auth } from "@/app/auth";
 import "./globals.css";
 
-import Footer from "@/presentation/components/footer/Footer";
+// import Footer from "@/presentation/components/footer/Footer";
 import ThemeProvider from "@/presentation/providers/ThemeProvider";
-import { PWAThemeManager } from "@/presentation/components/PWAThemeManager";
+
+import HeaderShell from "@/presentation/components/Header/HeaderShell";
+import SideNavShell from "@/presentation/components/Header/SideNavShell";
+
 import { Toaster } from "@/shared/shadcn/ui/sonner";
 
 const geistSans = Geist({
@@ -48,10 +53,26 @@ export const metadata: Metadata = {
 			{ url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
 		],
 		apple: [
-			{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
-			{ url: "/apple-touch-icon-167.png", sizes: "167x167", type: "image/png" },
-			{ url: "/apple-touch-icon-152.png", sizes: "152x152", type: "image/png" },
-			{ url: "/apple-touch-icon-120.png", sizes: "120x120", type: "image/png" },
+			{
+				url: "/apple-touch-icon.png",
+				sizes: "180x180",
+				type: "image/png",
+			},
+			{
+				url: "/apple-touch-icon-167.png",
+				sizes: "167x167",
+				type: "image/png",
+			},
+			{
+				url: "/apple-touch-icon-152.png",
+				sizes: "152x152",
+				type: "image/png",
+			},
+			{
+				url: "/apple-touch-icon-120.png",
+				sizes: "120x120",
+				type: "image/png",
+			},
 		],
 		shortcut: "/favicon.ico",
 		other: [
@@ -76,16 +97,19 @@ export const metadata: Metadata = {
 	manifest: "/manifest.webmanifest",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
 	children,
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
+	const session = await auth();
+
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
 			>
+				<SessionProvider session={session}>
 				<ThemeProvider
 					attribute="class"
 					defaultTheme="system"
@@ -93,17 +117,26 @@ export default function RootLayout({
 					disableTransitionOnChange
 				>
 					{/* Just widgets temporals*/}
-					<ClientWarmer />
-					<PerformanceMonitor />
 					<PWAThemeManager />
-					<div className="h-max-content flex flex-col justify-between items-center font-sans py-4 px-0 md:pb-20">
-						<main className="flex flex-col items-center justify-center flex-1 sm:items-start w-full">
+					<PerformanceMonitor />
+
+					<div className="min-h-dvh grid grid-rows-[auto_1fr_auto] md:grid-rows-[1fr_auto] md:grid-cols-[72px_1fr]">
+						<HeaderShell />
+
+						{/* Десктопный сайдбар */}
+						<SideNavShell />
+
+						{/* <div className="h-max-content flex flex-col justify-between items-center font-sans py-4 px-0 md:pb-20"> */}
+						<main className="row-start-1 md:col-start-2 px-0 md:px-2 py-16 md:py-2 flex flex-col items-center sm:items-start">
+
 							{children}
 						</main>
-						<Footer />
 					</div>
+
+					{/* </div> */}
 				</ThemeProvider>
 				<Toaster />
+				</SessionProvider>
 			</body>
 		</html>
 	);

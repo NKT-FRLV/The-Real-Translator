@@ -4,12 +4,14 @@
 import React, { useState, useCallback, useRef, useEffect } from "react";
 import { useCompletion } from "@ai-sdk/react";
 import { useDebounce } from "use-debounce";
+import { useSession } from "next-auth/react";
 import { TextArea } from "../elements/Translator-Box/TextArea";
 import LanguageSelector from "../elements/Translator-Box/BoxTranslateOptions";
-import { LanguageShort, Tone } from "@/shared/types/types";
+import { LanguageShort, Tone } from "@/shared/config/translation";
 // import { createLogger } from "@/shared/utils/logger";
-import CustomPlaceholder from "../components/Header/CustomPlaceholder";
-import { useFromLang, useToLang, useTone } from "../stores/translatorStore";
+import CustomPlaceholder from "../components/textArea/CustomPlaceholder";
+import { useFromLang, useToLang, useTone, useSetFromLang, useSetToLang, useSetTone } from "../stores/translatorStore";
+import { useDefaultSourceLang, useDefaultTargetLang, useTranslationStyle, useLoadSettings } from "../stores/settingsStore";
 
 type RequestKey = string;
 
@@ -29,10 +31,42 @@ export const TranslatorBox: React.FC = () => {
 	const fromLang = useFromLang();
 	const toLang = useToLang();
 	const tone = useTone();
+	const { data: session } = useSession();
+
+	// Settings store hooks for loading user preferences
+	const defaultSourceLang = useDefaultSourceLang();
+	const defaultTargetLang = useDefaultTargetLang();
+	const defaultTranslationStyle = useTranslationStyle();
+	const loadSettings = useLoadSettings();
+
+	// Translator store setters
+	const setFromLang = useSetFromLang();
+	const setToLang = useSetToLang();
+	const setTone = useSetTone();
 
 	// ────────────────────────────────────────────────────────────────────────────
 	// UI state
 	// ────────────────────────────────────────────────────────────────────────────
+
+	// Load user settings and apply to translator store
+	useEffect(() => {
+		if (session?.user?.id) {
+			void loadSettings();
+		}
+	}, [session?.user?.id, loadSettings]);
+
+	// Apply loaded settings to translator store
+	useEffect(() => {
+		if (defaultSourceLang && defaultSourceLang !== "auto") {
+			setFromLang(defaultSourceLang as LanguageShort);
+		}
+		if (defaultTargetLang) {
+			setToLang(defaultTargetLang);
+		}
+		if (defaultTranslationStyle) {
+			setTone(defaultTranslationStyle);
+		}
+	}, [defaultSourceLang, defaultTargetLang, defaultTranslationStyle, setFromLang, setToLang, setTone]);
 
 	// Дебаунс: 0 мс сразу после swap, 800 мс обычно
 	const DEFAULT_DEBOUNCE = 800;
@@ -43,6 +77,51 @@ export const TranslatorBox: React.FC = () => {
 
 	// Swap-индикатор: вернуть дебаунс после завершения
 	const swappedOnceRef = useRef<boolean>(false);
+
+	// Translation ID for likes
+	const [currentTranslationId, setCurrentTranslationId] = useState<string | null>(null);
+	
+	// Track saved translations to avoid duplicates
+	const savedTranslationsRef = useRef<Set<string>>(new Set());
+
+	// ────────────────────────────────────────────────────────────────────────────
+	// Translation saving
+	// ────────────────────────────────────────────────────────────────────────────
+	const saveTranslation = useCallback(async (
+		sourceText: string,
+		resultText: string,
+		fromLang: LanguageShort,
+		toLang: LanguageShort,
+		tone: Tone
+	) => {
+		try {
+			const sessionId = !session?.user?.id ? 
+				crypto.randomUUID().slice(0, 8) : undefined;
+
+			const response = await fetch("/api/translations", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					sourceText,
+					resultText,
+					sourceLang: fromLang,
+					targetLang: toLang,
+					tone,
+					model: "default",
+					sessionId,
+				}),
+			});
+
+			if (response.ok) {
+				const data = await response.json();
+				setCurrentTranslationId(data.translation.id);
+			}
+		} catch (error) {
+			console.error("Failed to save translation:", error);
+		}
+	}, [session?.user?.id]);
 
 	// ────────────────────────────────────────────────────────────────────────────
 	// Стабильные callbacks для useCompletion
@@ -92,6 +171,8 @@ export const TranslatorBox: React.FC = () => {
 		}
 
 		activeKeyRef.current = "";
+		setCurrentTranslationId(null);
+		savedTranslationsRef.current.clear();
 		setInput("");
 		setCompletion("");
 	}, [isLoading, stop, setCompletion, setInput]);
@@ -110,6 +191,8 @@ export const TranslatorBox: React.FC = () => {
 		}
 
 		activeKeyRef.current = "";
+		setCurrentTranslationId(null);
+		savedTranslationsRef.current.clear();
 		setCompletion("");
 		setInput(translatedText);
 
@@ -151,6 +234,23 @@ export const TranslatorBox: React.FC = () => {
 	);
 
 	// ────────────────────────────────────────────────────────────────────────────
+	// Auto-save completed translations
+	// ────────────────────────────────────────────────────────────────────────────
+	useEffect(() => {
+		const sourceText = input.trim();
+		const resultText = completion.trim();
+		
+		// Создаем уникальный ключ для этого перевода
+		const translationKey = `${sourceText}|${resultText}|${fromLang}|${toLang}|${tone}`;
+		
+		// Сохраняем только если есть и исходный текст, и результат, перевод завершен, и мы еще не сохраняли этот перевод
+		if (sourceText && resultText && !isLoading && !error && !savedTranslationsRef.current.has(translationKey)) {
+			savedTranslationsRef.current.add(translationKey);
+			void saveTranslation(sourceText, resultText, fromLang, toLang, tone);
+		}
+	}, [completion, isLoading, error, input, fromLang, toLang, tone, saveTranslation]);
+
+	// ────────────────────────────────────────────────────────────────────────────
 	// Оркестратор перевода — без зацикливания
 	// ────────────────────────────────────────────────────────────────────────────
 	useEffect(() => {
@@ -161,6 +261,10 @@ export const TranslatorBox: React.FC = () => {
 
 		// Нельзя переводить в тот же язык
 		if (fromLang === toLang) return;
+
+		// Сбрасываем ID предыдущего перевода и очищаем кеш сохраненных переводов при начале нового
+		setCurrentTranslationId(null);
+		savedTranslationsRef.current.clear();
 
 		startTranslation(prompt, fromLang, toLang, tone);
 	}, [debouncedInputText, fromLang, toLang, tone, startTranslation]);
@@ -217,6 +321,8 @@ export const TranslatorBox: React.FC = () => {
 					isInput={false}
 					readOnly={true}
 					className={error ? "text-red-400" : ""}
+					translationId={currentTranslationId}
+					isTranslationComplete={!!displayText && !isLoading && !error}
 				/>
 			</div>
 		</div>
