@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+export { viewport } from "./viewport";
 import { Geist, Geist_Mono } from "next/font/google";
 import { PWAThemeManager } from "@/presentation/components/PWAThemeManager";
 import { PerformanceMonitor } from "@/presentation/components/PerformanceMonitor";
@@ -8,6 +9,7 @@ import "./globals.css";
 
 // import Footer from "@/presentation/components/footer/Footer";
 import ThemeProvider from "@/presentation/providers/ThemeProvider";
+
 import HeaderShell from "@/presentation/components/Header/HeaderShell";
 import SideNavShell from "@/presentation/components/Header/SideNavShell";
 
@@ -77,7 +79,7 @@ export const metadata: Metadata = {
 			{
 				rel: "mask-icon",
 				url: "/safari-pinned-tab.svg",
-				color: "#0ea5e9",
+				color: "#0b0b0b",
 			},
 		],
 	},
@@ -89,14 +91,10 @@ export const metadata: Metadata = {
 		statusBarStyle: "default",
 	},
 
-	// Цвет темы для адресной строки
-	themeColor: [
-		{ media: "(prefers-color-scheme: light)", color: "#ffffff" },
-		{ media: "(prefers-color-scheme: dark)", color: "#0b0b0b" },
-	],
+
 
 	// Подключение веб-манифеста
-	manifest: "/manifest.json",
+	manifest: "/manifest.webmanifest",
 };
 
 export default async function RootLayout({
@@ -121,6 +119,7 @@ export default async function RootLayout({
 					{/* Just widgets temporals*/}
 					<PWAThemeManager />
 					<PerformanceMonitor />
+
 					<div className="min-h-dvh grid grid-rows-[auto_1fr_auto] md:grid-rows-[1fr_auto] md:grid-cols-[72px_1fr]">
 						<HeaderShell />
 
@@ -129,6 +128,7 @@ export default async function RootLayout({
 
 						{/* <div className="h-max-content flex flex-col justify-between items-center font-sans py-4 px-0 md:pb-20"> */}
 						<main className="row-start-1 md:col-start-2 px-0 md:px-2 py-16 md:py-2 flex flex-col items-center sm:items-start">
+
 							{children}
 						</main>
 					</div>
