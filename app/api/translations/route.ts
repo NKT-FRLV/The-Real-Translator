@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/app/auth";
 import { prisma } from "@/app/prismaClient/prisma";
 import { isLanguageShort, isTone } from "@/shared/config/translation";
-import { Tone, LanguageShort } from "@/shared/types/types";
 
 export const runtime = "nodejs";
 
