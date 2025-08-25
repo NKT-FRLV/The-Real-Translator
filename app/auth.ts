@@ -13,6 +13,23 @@ const requireEnv = (k: string) => {
 	return v;
 };
 
+// Расширяем типы NextAuth
+declare module "next-auth" {
+	interface User {
+	  role?: string;
+	}
+	
+	interface Session {
+	  user: {
+		id: string;
+		role?: string;
+		name?: string | null;
+		email?: string | null;
+		image?: string | null;
+	  };
+	}
+  }
+
 export const authConfig: NextAuthConfig = {
 	trustHost: true,
 
@@ -47,6 +64,7 @@ export const authConfig: NextAuthConfig = {
 				});
 				if (found) {
 					session.user.id = found.id;
+					session.user.role = found.role;
 					return session;
 				}
 			}
@@ -59,6 +77,7 @@ export const authConfig: NextAuthConfig = {
 				});
 				if (foundById) {
 					session.user.id = foundById.id;
+					session.user.role = foundById.role;
 				}
 			}
 

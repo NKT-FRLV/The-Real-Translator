@@ -1,4 +1,7 @@
-import React from "react";
+// presentation/components/Layout/DesktopSidebarClient.tsx
+
+import ThemeSwitcher from "../Header/ThemeSwitcher";
+import Logo from "../Header/Logo";
 import {
 	NavigationMenu,
 	NavigationMenuList,
@@ -7,22 +10,27 @@ import {
 	NavigationMenuContent,
 	NavigationMenuLink,
 } from "@/shared/shadcn/ui/navigation-menu";
-import Logo from "./Logo";
-import AvatarElement from "@/presentation/elements/Layout-Elements/AvatarElement";
-import ThemeSwitcher from "./ThemeSwitcher";
+import ProfileButton from "./ProfileButton";
 
-const DesktopSideMenu = () => {
+export default function DesktopSideNavClient({
+	isAuth,
+	userName,
+	avatarSrc,
+}: {
+	isAuth: boolean;
+	userName?: string;
+	avatarSrc: string;
+}) {
+
 	return (
-		<header className="hidden md:flex fixed top-0 bottom-0 flex flex-col items-center justify-between p-3 border-r border-gray-700">
-			{/* Логотип сверху */}
-			<div className="flex items-center gap-2">
+		<header className="hidden md:flex fixed top-0 bottom-0 flex-col items-center justify-between p-3 w-[72px]">
+			<div className="flex items-center">
 				<Logo responsive />
 			</div>
 
-			{/* Навигационные иконки в центре */}
 			<div className="flex-1 flex flex-col items-center justify-center">
 				<ThemeSwitcher className="mt-10" />
-				<NavigationMenu viewport={false} className="flex-col">
+				<NavigationMenu viewport={false} className="flex-col mt-6">
 					<NavigationMenuList className="flex-col gap-6">
 						{/* Иконка перевода с будущим дропдауном */}
 						<NavigationMenuItem>
@@ -208,17 +216,9 @@ const DesktopSideMenu = () => {
 				</NavigationMenu>
 			</div>
 
-			{/* Аватарка снизу */}
-			<div className="flex items-center gap-2">
-				<AvatarElement
-					link_href="/login"
-					avatar_src="https://github.com/shadcn.png"
-					fallback="RT"
-					className="w-10 h-10 sm:w-10 sm:h-10 md:w-12 md:h-12"
-				/>
+			<div className="flex items-center">
+			<ProfileButton isAuth={isAuth} avatarSrc={avatarSrc} userName={userName} size="desktop" />
 			</div>
 		</header>
 	);
-};
-
-export default DesktopSideMenu;
+}
