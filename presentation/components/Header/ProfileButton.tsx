@@ -7,10 +7,15 @@ interface ProfileButtonProps {
 	isAuth?: boolean;
 	avatarSrc?: string;
 	userName?: string;
-	size: 'mobile' | 'desktop';
+	size: "mobile" | "desktop";
 }
 
-const ProfileButton = ({ isAuth, avatarSrc, userName, size }: ProfileButtonProps) => {
+const ProfileButton = ({
+	isAuth,
+	avatarSrc,
+	userName,
+	size,
+}: ProfileButtonProps) => {
 	return (
 		<>
 			{isAuth ? (
@@ -18,11 +23,15 @@ const ProfileButton = ({ isAuth, avatarSrc, userName, size }: ProfileButtonProps
 					link_href={"/profile"}
 					avatar_src={avatarSrc}
 					fallback={(userName?.slice(0, 2) ?? "RT").toUpperCase()}
-					className={size === 'mobile' ? "w-8 h-8" : "w-12 h-12 mb-6"}
+					className={size === "mobile" ? "w-8 h-8" : "w-12 h-12 mb-6"}
 				/>
 			) : (
-				<Button variant="outline" size="icon" className={size === 'mobile' ?  "px-6" : "p-6 mb-6"}>
-					<Link href="/login">Login</Link>
+				<Button
+					variant="outline"
+					size="icon"
+					className={size === "mobile" ? "px-6" : "p-6 mb-6"}
+				>
+					<Link href="/login">Sign in</Link>
 				</Button>
 			)}
 		</>

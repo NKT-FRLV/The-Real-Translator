@@ -14,63 +14,64 @@ enum Role {
 }
 
 model User {
-	id            String           @id @default(cuid())
-	email         String           @unique
-	name          String?
-	image         String?          
-	emailVerified DateTime?        
-	role          Role             @default(USER)
-	passwordHash  String?
-	createdAt     DateTime         @default(now())
-	updatedAt     DateTime         @updatedAt
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  image         String?
+  emailVerified DateTime?
+  role          Role      @default(USER)
+  passwordHash  String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
-	accounts      Account[]
-	sessions      Session[]
+  accounts Account[]
+  sessions Session[]
 
-	settings      UserSettings?
-	translations  Translation[]
-	subscriptions Subscription[]
-	usageMonthly  UsageMonthly[]
-	}
+  settings      UserSettings?
+  translations  Translation[]
+  subscriptions Subscription[]
+  usageMonthly  UsageMonthly[]
+}
 
 model UserSettings {
-  userId               String   @id
-  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @id
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   uiLanguage           String?
   defaultSourceLang    String?
   defaultTargetLang    String?
-  preferredLLM         String   @default("kimi-k2:free")
+  translationStyle     String?
+  preferredLLM         String  @default("kimi-k2:free")
   reviewDailyTarget    Int?
-  notificationsEnabled Boolean  @default(false)
+  notificationsEnabled Boolean @default(false)
   timezone             String?
 }
 
 model Translation {
-  id                 String    @id @default(cuid())
+  id String @id @default(cuid())
 
   // Владелец: либо userId (авторизован), либо sessionId (гость)
-  userId             String?
-  user               User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  sessionId          String?   @db.VarChar(64)
+  userId    String?
+  user      User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionId String? @db.VarChar(64)
 
-  sourceLang         String
-  targetLang         String
-  sourceText         String    @db.Text
-  resultText         String    @db.Text
-  tone               String
-  model              String
+  sourceLang String
+  targetLang String
+  sourceText String @db.Text
+  resultText String @db.Text
+  tone       String
+  model      String
 
-  isLiked            Boolean   @default(false)
-  isPinned           Boolean   @default(false)
+  isLiked  Boolean @default(false)
+  isPinned Boolean @default(false)
 
   nextReviewAt       DateTime?
   reviewIntervalDays Int?
   ease               Float?
 
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
-  deletedAt          DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
   @@index([userId, createdAt])
   @@index([sessionId, createdAt])
@@ -80,22 +81,22 @@ model Translation {
 }
 
 model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   provider          String
   providerAccountId String
-  type              String   // "oauth" (резерв на будущее)
-  refresh_token     String?  @db.Text
-  access_token      String?  @db.Text
+  type              String // "oauth" (резерв на будущее)
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String?  @db.Text
+  id_token          String? @db.Text
   session_state     String?
 
-  createdAt         DateTime @default(now())
+  createdAt DateTime @default(now())
 
   @@unique([provider, providerAccountId])
   @@index([userId])
@@ -115,27 +116,27 @@ model Session {
 // Подписка — необязательно сейчас, но готово к Stripe webhook'ам
 
 model Subscription {
-  id            String   @id @default(cuid())
-  userId        String
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  provider      String   // "stripe"
-  plan          String   // "free" | "pro" | ...
-  status        String   // "active" | "canceled" | "past_due" | ...
+  id               String   @id @default(cuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider         String // "stripe"
+  plan             String // "free" | "pro" | ...
+  status           String // "active" | "canceled" | "past_due" | ...
   currentPeriodEnd DateTime
-  meta          Json?
-  createdAt     DateTime @default(now())
+  meta             Json?
+  createdAt        DateTime @default(now())
 
   @@index([userId, status])
 }
 
 // Учёт квот/лимитов (символы в месяц и т.п.)
 model UsageMonthly {
-  id        String   @id @default(cuid())
+  id        String  @id @default(cuid())
   userId    String?
-  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  sessionId String?  @db.VarChar(64)
-  period    String   // "2025-08"
-  charsUsed Int      @default(0)
+  user      User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionId String? @db.VarChar(64)
+  period    String // "2025-08"
+  charsUsed Int     @default(0)
 
   @@unique([userId, period])
   @@index([sessionId, period])

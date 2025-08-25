@@ -18,9 +18,41 @@ export const languages = {
     label: "French",
     code: "fr",
   },
+  it: {
+    label: "Italian",
+    code: "it",
+  },
+  sv: {
+    label: "Swedish",
+    code: "sv",
+  },
   de: {
     label: "German",
     code: "de",
+  },
+  ua: {
+    label: "Ukrainian",
+    code: "ua",
+  },
+  pt: {
+    label: "Portuguese",
+    code: "pt",
+  },
+  tr: {
+    label: "Turkish",
+    code: "tr",
+  },
+  ar: {
+    label: "Arabic",
+    code: "ar",
+  },
+  zh: {
+    label: "Chinese",
+    code: "zh",
+  },
+  ja: {
+    label: "Japanese",
+    code: "ja",
   },
 } as const;
 

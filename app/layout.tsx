@@ -119,7 +119,7 @@ export default async function RootLayout({
 					disableTransitionOnChange
 				>
 					{/* Just widgets temporals*/}
-					<ClientWarmer />
+					
 					<PerformanceMonitor />
 					<div className="min-h-dvh grid grid-rows-[auto_1fr_auto] md:grid-rows-[1fr_auto] md:grid-cols-[72px_1fr]">
 						<HeaderShell />

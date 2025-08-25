@@ -1,4 +1,3 @@
-
 import ProfileButton from "./_components/ProfileButton";
 
 export default function ProfileLayout({
@@ -8,11 +7,14 @@ export default function ProfileLayout({
 }) {
 	return (
 		<>
-			<div className="w-full flex items-center justify-between bg-transparent px-12 py-4">
+			{/* Header with navigation buttons - mobile first */}
+			<div className="w-full flex items-center justify-between bg-transparent px-4 py-3 sm:px-6 sm:py-4 md:px-8 lg:px-12">
 				<ProfileButton action="goBack" />
-				<ProfileButton action="logout" />
+				<ProfileButton action="sign-out" />
 			</div>
-			<div className="min-w-[600px] h-full m-auto flex items-center justify-between gap-4">
+			
+			{/* Main content area - mobile first layout */}
+			<div className="w-full h-full mx-auto flex flex-col gap-4 px-4 pb-4 sm:px-6 sm:pb-6 md:flex-row md:px-8 md:pb-8 lg:px-12 lg:pb-12">
 				{children}
 			</div>
 		</>

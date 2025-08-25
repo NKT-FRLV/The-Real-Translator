@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import {
 	X,
 	Volume2,
@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { Textarea } from "@/shared/shadcn/ui/textarea";
 import { toast } from "sonner";
+import { useSession } from "next-auth/react";
 
 interface TextAreaProps {
 	value?: string;
@@ -23,6 +24,8 @@ interface TextAreaProps {
 	readOnly?: boolean;
 	maxLength?: number;
 	className?: string;
+	translationId?: string | null;
+	isTranslationComplete?: boolean;
 }
 
 export const TextArea: React.FC<TextAreaProps> = ({
@@ -35,7 +38,12 @@ export const TextArea: React.FC<TextAreaProps> = ({
 	readOnly = false,
 	maxLength = 10000,
 	className,
+	translationId,
+	isTranslationComplete = false,
 }) => {
+	const { data: session } = useSession();
+	const [isLiked, setIsLiked] = useState(false);
+	const [isLiking, setIsLiking] = useState(false);
 
 
 	const onCopy = async () => {
@@ -60,6 +68,53 @@ export const TextArea: React.FC<TextAreaProps> = ({
 					},
 				});
 			}
+		}
+	};
+
+	const onLike = async () => {
+		if (!session?.user?.id) {
+			toast.error("Please sign in to like translations");
+			return;
+		}
+
+		if (!translationId || !isTranslationComplete) {
+			toast.error("Translation is not ready yet");
+			return;
+		}
+
+		if (isLiking) return;
+
+		setIsLiking(true);
+		try {
+			const response = await fetch(`/api/translations/${translationId}/like`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					liked: !isLiked,
+				}),
+			});
+
+			if (response.ok) {
+				setIsLiked(!isLiked);
+				toast.success(
+					isLiked ? "Translation unliked" : "Translation liked",
+					{
+						action: {
+							label: "Undo",
+							onClick: () => toast.dismiss(),
+						},
+					}
+				);
+			} else {
+				toast.error("Failed to update like status");
+			}
+		} catch (error) {
+			console.error("Error liking translation:", error);
+			toast.error("Failed to like translation");
+		} finally {
+			setIsLiking(false);
 		}
 	};
 	
@@ -140,8 +195,18 @@ export const TextArea: React.FC<TextAreaProps> = ({
 							<button className="p-1.5 md:p-1.5 hover:bg-gray-600 rounded-lg transition-colors">
 								<Share className="w-3.5 h-3.5 md:w-4 md:h-4 text-gray-400" />
 							</button>
-							<button className="p-1.5 md:p-1.5 hover:bg-gray-600 rounded-lg transition-colors">
-								<ThumbsUp className="w-3.5 h-3.5 md:w-4 md:h-4 text-gray-400" />
+							<button 
+								onClick={onLike}
+								disabled={isLiking || !translationId || !isTranslationComplete}
+								className={`p-1.5 md:p-1.5 hover:bg-gray-600 rounded-lg transition-colors ${
+									isLiked ? "bg-blue-600 hover:bg-blue-700" : ""
+								} ${
+									isLiking || !translationId || !isTranslationComplete ? "opacity-50 cursor-not-allowed" : ""
+								}`}
+							>
+								<ThumbsUp className={`w-3.5 h-3.5 md:w-4 md:h-4 ${
+									isLiked ? "text-red-500" : "text-gray-400"
+								}`} />
 							</button>
 							<button className="p-1.5 md:p-1.5 hover:bg-gray-600 rounded-lg transition-colors">
 								<ThumbsDown className="w-3.5 h-3.5 md:w-4 md:h-4 text-gray-400" />

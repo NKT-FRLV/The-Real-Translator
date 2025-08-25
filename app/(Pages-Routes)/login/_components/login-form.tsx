@@ -1,5 +1,6 @@
 // import { GalleryVerticalEnd } from "lucide-react";
 'use client'
+import { useState } from "react";
 import { cn } from "@/shared/shadcn/utils";
 import { Button } from "@/shared/shadcn/ui/button";
 import Logo from "@/presentation/components/Header/Logo";
@@ -10,11 +11,21 @@ export function LoginForm({
 	...props
 }: React.ComponentProps<"div">) {
 
-	const handleSignIn = (provider: string) => {
-		signIn(provider, { redirectTo: "/" });
+	const [isLoading, setIsLoading] = useState(false);
+
+	const handleSignIn = async (provider: string) => {
+		setIsLoading(true);
+		await signIn(provider, { redirectTo: "/" });
+		setIsLoading(false);
 	}
 
 	return (
+			<>
+			{isLoading && (
+				<div className="flex items-center justify-center h-screen">
+					<div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-primary"></div>
+				</div>
+			)}
 		<div className={cn("flex flex-col gap-6", className)} {...props}>
 			<form>
 				<div className="flex flex-col gap-6">
@@ -97,5 +108,6 @@ export function LoginForm({
 				<a href="#">Privacy Policy</a>.
 			</div>
 		</div>
+		</>
 	);
 }
