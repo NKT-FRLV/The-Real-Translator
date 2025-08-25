@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { ClientWarmer } from "@/presentation/components/ClientWarmer";
+import { PWAThemeManager } from "@/presentation/components/PWAThemeManager";
 import { PerformanceMonitor } from "@/presentation/components/PerformanceMonitor";
 import { SessionProvider } from "next-auth/react";
 import { auth } from "@/app/auth";
@@ -119,7 +119,7 @@ export default async function RootLayout({
 					disableTransitionOnChange
 				>
 					{/* Just widgets temporals*/}
-					
+					<PWAThemeManager />
 					<PerformanceMonitor />
 					<div className="min-h-dvh grid grid-rows-[auto_1fr_auto] md:grid-rows-[1fr_auto] md:grid-cols-[72px_1fr]">
 						<HeaderShell />
