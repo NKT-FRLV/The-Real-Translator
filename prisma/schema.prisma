@@ -14,19 +14,24 @@ enum Role {
 }
 
 model User {
-  id            String           @id @default(cuid())
-  email         String           @unique
-  name          String?
-  role          Role             @default(USER)
-  passwordHash  String?
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
+	id            String           @id @default(cuid())
+	email         String           @unique
+	name          String?
+	image         String?          
+	emailVerified DateTime?        
+	role          Role             @default(USER)
+	passwordHash  String?
+	createdAt     DateTime         @default(now())
+	updatedAt     DateTime         @updatedAt
 
-  settings      UserSettings?
-  translations  Translation[]
-  subscriptions Subscription[]
-  usageMonthly  UsageMonthly[]
-}
+	accounts      Account[]
+	sessions      Session[]
+
+	settings      UserSettings?
+	translations  Translation[]
+	subscriptions Subscription[]
+	usageMonthly  UsageMonthly[]
+	}
 
 model UserSettings {
   userId               String   @id
@@ -74,7 +79,41 @@ model Translation {
   @@index([userId, isPinned, createdAt])
 }
 
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  provider          String
+  providerAccountId String
+  type              String   // "oauth" (резерв на будущее)
+  refresh_token     String?  @db.Text
+  access_token      String?  @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?  @db.Text
+  session_state     String?
+
+  createdAt         DateTime @default(now())
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionToken String   @unique
+  expires      DateTime
+  createdAt    DateTime @default(now())
+
+  @@index([userId])
+}
+
 // Подписка — необязательно сейчас, но готово к Stripe webhook'ам
+
 model Subscription {
   id            String   @id @default(cuid())
   userId        String
