@@ -14,6 +14,7 @@ enum Role {
 }
 
 model User {
+
   id            String    @id @default(cuid())
   email         String    @unique
   name          String?
@@ -26,6 +27,7 @@ model User {
 
   accounts Account[]
   sessions Session[]
+
 
   settings      UserSettings?
   translations  Translation[]
@@ -48,6 +50,7 @@ model UserSettings {
 }
 
 model Translation {
+
   id String @id @default(cuid())
 
   // Владелец: либо userId (авторизован), либо sessionId (гость)
@@ -69,6 +72,7 @@ model Translation {
   reviewIntervalDays Int?
   ease               Float?
 
+
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
@@ -79,6 +83,7 @@ model Translation {
   @@index([sessionId, nextReviewAt])
   @@index([userId, isPinned, createdAt])
 }
+
 
 model Account {
   id     String @id @default(cuid())
@@ -126,11 +131,13 @@ model Subscription {
   meta             Json?
   createdAt        DateTime @default(now())
 
+
   @@index([userId, status])
 }
 
 // Учёт квот/лимитов (символы в месяц и т.п.)
 model UsageMonthly {
+
   id        String  @id @default(cuid())
   userId    String?
   user      User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
