@@ -10,12 +10,8 @@ import LanguageSelector from "../elements/Translator-Box/BoxTranslateOptions";
 import { LanguageShort, Tone } from "@/shared/config/translation";
 // import { createLogger } from "@/shared/utils/logger";
 import CustomPlaceholder from "../components/textArea/CustomPlaceholder";
-<<<<<<< HEAD
-import { useFromLang, useToLang, useTone } from "../stores/translatorStore";
-=======
 import { useFromLang, useToLang, useTone, useSetFromLang, useSetToLang, useSetTone } from "../stores/translatorStore";
 import { useDefaultSourceLang, useDefaultTargetLang, useTranslationStyle, useLoadSettings } from "../stores/settingsStore";
->>>>>>> feature/translations_history
 
 type RequestKey = string;
 
@@ -169,7 +165,6 @@ export const TranslatorBox: React.FC = () => {
 	const [debouncedInputText] = useDebounce(input, debounceMs);
 
 	const handleClearInput = useCallback(() => {
-
 		if (isLoading) {
 			stop();
 		}
@@ -180,8 +175,6 @@ export const TranslatorBox: React.FC = () => {
 		setInput("");
 		setCompletion("");
 	}, [isLoading, stop, setCompletion, setInput]);
-
-
 
 	const handleSwapResultToInputText = useCallback(() => {
 		const translatedText = completion?.trim() ?? "";
