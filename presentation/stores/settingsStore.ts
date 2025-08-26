@@ -4,13 +4,13 @@ import { LanguageShort, Tone } from '@/shared/config/translation';
 interface UserSettings {
   defaultSourceLang: string | null; // "auto" или LanguageShort
   defaultTargetLang: LanguageShort | null;
+  translationStyle: Tone;
   uiLanguage: string | null;
   preferredLLM: string;
   reviewDailyTarget: number | null;
   notificationsEnabled: boolean;
   timezone: string | null;
   // Дополнительные настройки для UI
-  translationStyle: Tone;
   emailNotifications: boolean;
   translationReminders: boolean;
 }
