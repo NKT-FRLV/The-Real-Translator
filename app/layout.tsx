@@ -7,7 +7,6 @@ import { SplashScreenManager } from "@/presentation/components/SplashScreenManag
 import { SessionProvider } from "next-auth/react";
 import { auth } from "@/app/auth";
 import "./globals.css";
-import "./splash-screen.css";
 
 // import Footer from "@/presentation/components/footer/Footer";
 import ThemeProvider from "@/presentation/providers/ThemeProvider";
