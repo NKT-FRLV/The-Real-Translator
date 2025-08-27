@@ -10,7 +10,7 @@
 		left: 0;
 		width: 100%;
 		height: 100%;
-		background: #000000;
+		background: var(--pwa-background, #ffffff);
 		z-index: 9999;
 		opacity: 1;
 		transition: opacity 0.3s ease-out;
@@ -20,6 +20,13 @@
 	body.loaded::before {
 		opacity: 0;
 		pointer-events: none;
+	}
+}
+
+/* Темная тема для splash screen */
+@media (prefers-color-scheme: dark) {
+	body::before {
+		background: var(--pwa-background, #0b0b0b);
 	}
 }
 

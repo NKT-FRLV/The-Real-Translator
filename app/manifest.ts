@@ -8,8 +8,8 @@ export default function manifest(): MetadataRoute.Manifest {
 			"Fast AI-powered translation with custom styles of translation.",
 		start_url: "/",
 		display: "standalone",
-		background_color: "#000000",
-		theme_color: "#000000",
+		background_color: "#ffffff",
+		theme_color: "#ffffff",
 		icons: [
 			{
 				src: "/icon-192.png",
