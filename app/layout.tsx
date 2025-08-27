@@ -9,8 +9,8 @@ import "./globals.css";
 
 // import Footer from "@/presentation/components/footer/Footer";
 import ThemeProvider from "@/presentation/providers/ThemeProvider";
-import HeaderShell from "@/presentation/components/Header/HeaderShell";
-import SideNavShell from "@/presentation/components/Header/SideNavShell";
+import HeaderShell from "@/presentation/components/Navigation_Header-SideBar/mobile-header/HeaderShell";
+import SideNavShell from "@/presentation/components/Navigation_Header-SideBar/desctop-sidebar/SideNavShell";
 
 import { Toaster } from "@/shared/shadcn/ui/sonner";
 
@@ -118,14 +118,14 @@ export default async function RootLayout({
 					{/* Just widgets temporals*/}
 					<PWAThemeManager />
 					<PerformanceMonitor />
-					<div className="min-h-dvh grid grid-rows-[auto_1fr_auto] md:grid-rows-[1fr_auto] md:grid-cols-[72px_1fr]">
+					<div className="min-h-dvh grid grid-rows-[auto_1fr] md:grid-cols-[72px_1fr]">
 						<HeaderShell />
 
 						{/* Десктопный сайдбар */}
 						<SideNavShell />
 
 						{/* <div className="h-max-content flex flex-col justify-between items-center font-sans py-4 px-0 md:pb-20"> */}
-						<main className="row-start-1 md:col-start-2 px-0 md:px-2 py-16 md:py-2 flex flex-col items-center sm:items-start">
+						<main className="row-start-2 md:row-start-1 md:col-start-2 px-0 md:px-2 py-16 md:py-2 flex flex-col items-center sm:items-start">
 							{children}
 						</main>
 					</div>

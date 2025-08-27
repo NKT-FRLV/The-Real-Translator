@@ -5,7 +5,7 @@ import React, { useState, useCallback, useRef, useEffect } from "react";
 import { useCompletion } from "@ai-sdk/react";
 import { useDebounce } from "use-debounce";
 import { useSession } from "next-auth/react";
-import { TextArea } from "../elements/Translator-Box/TextArea";
+import { TextWindow } from "../elements/Translator-Box/TextWindow";
 import LanguageSelector from "../elements/Translator-Box/BoxTranslateOptions";
 import { LanguageShort, Tone } from "@/shared/config/translation";
 // import { createLogger } from "@/shared/utils/logger";
@@ -310,13 +310,13 @@ export const TranslatorBox: React.FC = () => {
 		: "Translation will appear here...";
 
 	return (
-		<div className="w-full min-h-[40vh] max-h-content mx-auto space-y-2 md:space-y-3 flex flex-col">
+		<div className="w-full min-h-[40vh] mx-auto space-y-2 md:space-y-3 flex flex-col">
 			<LanguageSelector
 				isTranslating={isLoading}
 				onSwapResultToInputText={handleSwapResultToInputText}
 			/>
-			<div className="w-full flex-1 grid grid-cols-1 gap-3 md:gap-3 mb-4 md:mb-6 lg:grid-cols-2 bg-gradient-to-t from-red-900/20 to-[90%] from-[#121214] rounded-xl px-3 md:px-3 pb-3 md:pb-3">
-				<TextArea
+			<div className="w-full grid grid-cols-1 gap-3 md:gap-3 mb-4 md:mb-6 lg:grid-cols-2 bg-gradient-to-t from-red-900/20 to-[90%] from-[#121214] rounded-xl px-3 md:px-3 pb-3 md:pb-3">
+				<TextWindow
 					value={input}
 					onChange={handleUserInputChange}
 					onClear={handleClearInput}
@@ -333,7 +333,7 @@ export const TranslatorBox: React.FC = () => {
 					maxLength={100000}
 				/>
 
-				<TextArea
+				<TextWindow
 					value={displayText}
 					// placeholder={placeholder}
 					renderCustomPlaceholder={() => (

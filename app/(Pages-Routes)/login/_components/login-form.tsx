@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { cn } from "@/shared/shadcn/utils";
 import { Button } from "@/shared/shadcn/ui/button";
-import Logo from "@/presentation/components/Header/Logo";
+import Logo from "@/presentation/components/Navigation_Header-SideBar/Logo";
 import { signIn } from "next-auth/react";
 
 export function LoginForm({

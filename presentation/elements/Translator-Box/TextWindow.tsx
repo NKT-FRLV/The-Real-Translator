@@ -7,14 +7,14 @@ import {
 	Copy,
 	Bookmark,
 	Share,
-	ThumbsUp,
-	ThumbsDown,
+	Heart,
 } from "lucide-react";
 import { Textarea } from "@/shared/shadcn/ui/textarea";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
+import { TextAreaIcon } from "@/presentation/components/textArea/TextAreaIcon";
 
-interface TextAreaProps {
+interface TextWindowProps {
 	value?: string;
 	onChange?: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
 	onClear?: () => void;
@@ -28,7 +28,7 @@ interface TextAreaProps {
 	isTranslationComplete?: boolean;
 }
 
-export const TextArea: React.FC<TextAreaProps> = ({
+export const TextWindow: React.FC<TextWindowProps> = ({
 	value = "",
 	onChange,
 	onClear,
@@ -120,10 +120,9 @@ export const TextArea: React.FC<TextAreaProps> = ({
 	
 
 	return (
-		<div className="flex flex-col w-full h-full rounded-lg border border-gray-700 bg-accent/30">
+		<div className="flex flex-col w-full rounded-lg border border-gray-700 bg-accent/30">
 			<label
-				className="p-3 md:p-3 min-h-[120px] md:min-h-[180px] flex-1 relative"
-				style={{ height: "fit-content" }}
+				className="p-3 md:p-3 min-h-[120px] md:min-h-[180px] relative block flex-1"
 			>
 				<Textarea
 					value={value}
@@ -135,41 +134,46 @@ export const TextArea: React.FC<TextAreaProps> = ({
 					}}
 					placeholder={readOnly ? undefined : placeholder}
 					readOnly={readOnly}
-					className={`w-full bg-transparent text-foreground placeholder-gray-500 border-none outline-none resize-none ${
+					className={`w-full min-h-full field-sizing-content pr-6 md:pr-10 bg-transparent text-foreground placeholder-gray-500 border-none outline-none resize-none ${
 						value.length < 30
 							? "text-lg md:text-2xl lg:text-3xl"
 							: "text-sm md:text-base lg:text-lg"
 					} font-medium placeholder:text-sm md:placeholder:text-base lg:placeholder:text-lg ${className}`}
 					maxLength={maxLength}
-					style={{
-						height: "100%",
-						minHeight: "100%",
-						maxHeight: "100%",
-						overflow: "auto",
-					}}
 				/>
 
 				{renderCustomPlaceholder && renderCustomPlaceholder()}
+				{(isInput && value.length > 0) && (
+								<TextAreaIcon 
+									icon={X} 
+									className="absolute top-2 right-2"
+									onClick={onClear}
+									size="big"
+								/>
+							)}
 			</label>
 
 			<div className="border-t border-gray-700 p-2 md:p-2 flex justify-between items-center">
 				<div className="flex items-center space-x-1 md:space-x-2">
-					<button className="p-1.5 md:p-1.5 hover:bg-gray-700 rounded-lg transition-colors">
-						<Volume2 className="w-3.5 h-3.5 md:w-4 md:h-4 text-gray-400" />
-					</button>
+					<TextAreaIcon 
+						icon={Volume2} 
+						tip="Text to speech - Coming soon"
+						disabled={true}
+					/>
 
 					{isInput && (
-						<button className="p-1.5 md:p-1.5 hover:bg-gray-600 rounded-lg transition-colors">
-							<Mic className="w-3.5 h-3.5 md:w-4 md:h-4 text-gray-400" />
-						</button>
+						<TextAreaIcon 
+							icon={Mic} 
+							tip="Voice input - Coming soon"
+							disabled={true}
+						/>
 					)}
 
-					<button
+					<TextAreaIcon 
+						icon={Copy} 
 						onClick={onCopy}
-						className="p-1.5 md:p-1.5 hover:bg-gray-600 rounded-lg transition-colors"
-					>
-						<Copy className="w-3.5 h-3.5 md:w-4 md:h-4 text-gray-400" />
-					</button>
+						tip="Copy text"
+					/>
 				</div>
 
 				<div className="flex items-center space-x-1 md:space-x-2">
@@ -179,44 +183,37 @@ export const TextArea: React.FC<TextAreaProps> = ({
 								{value.length}/{maxLength}
 							</span>
 							{value.length > 0 && (
-								<button
+								<TextAreaIcon 
+									icon={X} 
 									onClick={onClear}
-									className="p-1.5 md:p-1.5 hover:bg-gray-600 rounded-lg transition-colors"
-								>
-									<X className="w-3.5 h-3.5 md:w-4 md:h-4 text-gray-400" />
-								</button>
+									tip="Clear text"
+								/>
 							)}
 						</>
 					) : (
 						<>
-							<button className="p-1.5 md:p-1.5 hover:bg-gray-600 rounded-lg transition-colors">
-								<Bookmark className="w-3.5 h-3.5 md:w-4 md:h-4 text-gray-400" />
-							</button>
-							<button className="p-1.5 md:p-1.5 hover:bg-gray-600 rounded-lg transition-colors">
-								<Share className="w-3.5 h-3.5 md:w-4 md:h-4 text-gray-400" />
-							</button>
-							<button 
+							<TextAreaIcon 
+								icon={Bookmark} 
+								tip="Save translation - Coming soon"
+								disabled={true}
+							/>
+							<TextAreaIcon 
+								icon={Share} 
+								tip="Share translation - Coming soon"
+								disabled={true}
+							/>
+							<TextAreaIcon 
+								icon={Heart} 
 								onClick={onLike}
 								disabled={isLiking || !translationId || !isTranslationComplete}
-								className={`p-1.5 md:p-1.5 hover:bg-gray-600 rounded-lg transition-colors ${
-									isLiked ? "bg-blue-600 hover:bg-blue-700" : ""
-								} ${
-									isLiking || !translationId || !isTranslationComplete ? "opacity-50 cursor-not-allowed" : ""
-								}`}
-							>
-								<ThumbsUp className={`w-3.5 h-3.5 md:w-4 md:h-4 ${
-									isLiked ? "text-red-500" : "text-gray-400"
-								}`} />
-							</button>
-							<button className="p-1.5 md:p-1.5 hover:bg-gray-600 rounded-lg transition-colors">
-								<ThumbsDown className="w-3.5 h-3.5 md:w-4 md:h-4 text-gray-400" />
-							</button>
-							<button
+								isActive={isLiked}
+								tip={isLiked ? "Unlike translation" : "Like translation"}
+							/>
+							<TextAreaIcon 
+								icon={Copy} 
 								onClick={onCopy}
-								className="p-1.5 md:p-1.5 hover:bg-gray-600 rounded-lg transition-colors"
-							>
-								<Copy className="w-3.5 h-3.5 md:w-4 md:h-4 text-gray-400" />
-							</button>
+								tip="Copy text"
+							/>
 						</>
 					)}
 				</div>

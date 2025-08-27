@@ -2,10 +2,11 @@
 "use client";
 
 import { useState } from "react";
-import ThemeSwitcher from "../Header/ThemeSwitcher";
-import Logo from "../Header/Logo";
-import BurgerMenu from "../Header/BurgerMenu";
-import ProfileButton from "./ProfileButton";
+import ThemeSwitcher from "../ThemeSwitcher";
+import Logo from "../Logo";
+import BurgerMenu from "./BurgerMenu";
+import ProfileButton from "../ProfileButton";
+import Link from "next/link";
 
 export default function MobileHeaderClient({
   isAuth,
@@ -38,7 +39,9 @@ export default function MobileHeaderClient({
 
             <div className="flex items-center gap-6">
               <Logo size={32} />
-              <h1 className="text-lg font-semibold text-foreground">Real-Translator</h1>
+              <Link href="/">
+                <h1 className="text-lg font-semibold text-foreground">Real-Translator</h1>
+              </Link>
             </div>
           </div>
 
