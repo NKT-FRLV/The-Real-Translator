@@ -40,6 +40,36 @@ export default function manifest(): MetadataRoute.Manifest {
 		// iOS использует appleWebApp.startupImage в layout.tsx
 		// Эти изображения должны быть точно такого же размера как указано
 		// и соответствовать размерам экранов устройств
+		screenshots: [
+			{
+				src: "/splash-640x1136.png",
+				sizes: "640x1136",
+				type: "image/png",
+				form_factor: "narrow",
+				label: "Splash Screen - iPhone SE",
+			},
+			{
+				src: "/splash-750x1334.png",
+				sizes: "750x1334",
+				type: "image/png",
+				form_factor: "narrow",
+				label: "Splash Screen - iPhone 6/7/8",
+			},
+			{
+				src: "/splash-1242x2688.png",
+				sizes: "1242x2688",
+				type: "image/png",
+				form_factor: "narrow",
+				label: "Splash Screen - iPhone X/XS/11 Pro",
+			},
+			{
+				src: "/splash-1536x2048.png",
+				sizes: "1536x2048",
+				type: "image/png",
+				form_factor: "wide",
+				label: "Splash Screen - iPad",
+			},
+		],
 		categories: ["productivity", "utilities"],
 		orientation: "portrait-primary",
 		scope: "/",
