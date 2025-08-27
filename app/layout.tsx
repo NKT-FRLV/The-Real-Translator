@@ -3,9 +3,11 @@ export { viewport } from "./viewport";
 import { Geist, Geist_Mono } from "next/font/google";
 import { PWAThemeManager } from "@/presentation/components/PWAThemeManager";
 import { PerformanceMonitor } from "@/presentation/components/PerformanceMonitor";
+import { SplashScreenManager } from "@/presentation/components/SplashScreenManager";
 import { SessionProvider } from "next-auth/react";
 import { auth } from "@/app/auth";
 import "./globals.css";
+import "./splash-screen.css";
 
 // import Footer from "@/presentation/components/footer/Footer";
 import ThemeProvider from "@/presentation/providers/ThemeProvider";
@@ -88,6 +90,24 @@ export const metadata: Metadata = {
 		capable: true,
 		title: "The Real Translator",
 		statusBarStyle: "default",
+		startupImage: [
+			{
+				url: "/splash-640x1136.png",
+				media: "(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)",
+			},
+			{
+				url: "/splash-750x1334.png",
+				media: "(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)",
+			},
+			{
+				url: "/splash-1242x2688.png",
+				media: "(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)",
+			},
+			{
+				url: "/splash-1536x2048.png",
+				media: "(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2)",
+			},
+		],
 	},
 
 
@@ -118,6 +138,7 @@ export default async function RootLayout({
 					{/* Just widgets temporals*/}
 					<PWAThemeManager />
 					<PerformanceMonitor />
+					<SplashScreenManager />
 					<div className="min-h-dvh grid grid-rows-[auto_1fr] md:grid-cols-[72px_1fr]">
 						<HeaderShell />
 

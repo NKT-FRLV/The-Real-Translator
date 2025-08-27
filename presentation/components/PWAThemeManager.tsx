@@ -13,13 +13,13 @@ export function PWAThemeManager() {
 		// Цвета для светлой и темной темы
 		const colors = {
 			light: {
-				background: "#ffffff",
-				theme: "#ffffff",
-				statusBar: "default"
+				background: "#000000",
+				theme: "#000000",
+				statusBar: "black-translucent"
 			},
 			dark: {
-				background: "#0b0b0b", 
-				theme: "#0b0b0b",
+				background: "#000000", 
+				theme: "#000000",
 				statusBar: "black-translucent"
 			}
 		};

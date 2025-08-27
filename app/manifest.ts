@@ -8,8 +8,8 @@ export default function manifest(): MetadataRoute.Manifest {
 			"Fast AI-powered translation with custom styles of translation.",
 		start_url: "/",
 		display: "standalone",
-		background_color: "#ffffff",
-		theme_color: "#ffffff",
+		background_color: "#000000",
+		theme_color: "#000000",
 		icons: [
 			{
 				src: "/icon-192.png",
@@ -34,6 +34,32 @@ export default function manifest(): MetadataRoute.Manifest {
 				sizes: "512x512",
 				type: "image/png",
 				purpose: "maskable",
+			},
+		],
+		screenshots: [
+			{
+				src: "/splash-640x1136.png",
+				sizes: "640x1136",
+				type: "image/png",
+				form_factor: "narrow",
+			},
+			{
+				src: "/splash-750x1334.png",
+				sizes: "750x1334",
+				type: "image/png",
+				form_factor: "narrow",
+			},
+			{
+				src: "/splash-1242x2688.png",
+				sizes: "1242x2688",
+				type: "image/png",
+				form_factor: "narrow",
+			},
+			{
+				src: "/splash-1536x2048.png",
+				sizes: "1536x2048",
+				type: "image/png",
+				form_factor: "wide",
 			},
 		],
 		categories: ["productivity", "utilities"],
