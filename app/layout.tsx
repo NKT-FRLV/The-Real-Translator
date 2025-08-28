@@ -138,16 +138,15 @@ export default async function RootLayout({
 					<PWAThemeManager />
 					<PerformanceMonitor />
 					<SplashScreenManager />
-					<div className="min-h-dvh grid grid-rows-[auto_1fr] md:grid-cols-[72px_1fr]">
+					<div className="min-h-dvh grid grid-rows-[auto_1fr] md:md:grid-cols-[72px_1fr]">
 						<HeaderShell />
 
 						{/* Десктопный сайдбар */}
 						<SideNavShell />
 
-						{/* <div className="h-max-content flex flex-col justify-between items-center font-sans py-4 px-0 md:pb-20"> */}
-						<main className="row-start-2 md:row-start-1 md:col-start-2 px-0 md:px-2 py-16 md:py-2 flex flex-col items-center sm:items-start">
+						{/* НАДО НАСТРАИВАТЬ GRID ДЛЯ КАЖДОЙ СТРАНИЦЫ */}
 							{children}
-						</main>
+						
 					</div>
 
 					{/* </div> */}

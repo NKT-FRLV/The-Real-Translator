@@ -19,7 +19,7 @@ export default async function HeaderShell() {
     "https://api.dicebear.com/9.x/shapes/svg?seed=rt&size=128";
 
   return (
-    <div className="md:hidden sticky top-0 z-50">
+    <div className="md:hidden row-start-1 row-end-2 col-span-full sticky top-0 z-50">
       <MobileHeaderClient
         isAuth={!!user}
         userName={user?.name ?? undefined}

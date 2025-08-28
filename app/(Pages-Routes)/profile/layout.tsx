@@ -6,9 +6,9 @@ export default function ProfileLayout({
 	children: React.ReactNode;
 }) {
 	return (
-		<>
+		<main className="row-start-2 md:row-start-1 md:row-end-3 md:col-start-2 md:col-end-3 px-0 md:px-2 md:py-2 flex flex-col items-center sm:items-start">
 			{/* Header with navigation buttons - mobile first */}
-			<div className="sticky top-[55px] md:top-0 z-40 w-full flex items-center justify-between bg-background/50 backdrop-blur-sm px-4 py-3 sm:px-6 sm:py-4 md:px-8 lg:px-12 border-b border-border/50">
+			<div className="sticky top-0 md:top-0 z-40 w-full flex items-center justify-between bg-background/50 backdrop-blur-sm px-4 py-3 sm:px-6 sm:py-4 md:px-8 lg:px-12 border-b border-border/50">
 				<ProfileButton action="goBack" />
 				<ProfileButton action="sign-out" />
 			</div>
@@ -17,6 +17,6 @@ export default function ProfileLayout({
 			<div className="relative w-full h-full mx-auto flex flex-col gap-4 px-4 pb-4 sm:px-6 sm:pb-6 md:flex-row">
 				{children}
 			</div>
-		</>
+		</main>
 	);
 }

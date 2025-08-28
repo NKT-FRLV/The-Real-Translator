@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
 	X,
 	Volume2,
@@ -13,6 +13,8 @@ import { Textarea } from "@/shared/shadcn/ui/textarea";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 import { TextAreaIcon } from "@/presentation/components/textArea/TextAreaIcon";
+import { useRouter } from "next/navigation";
+import { likeTranslation } from "@/presentation/API/like/likeApi";
 
 interface TextWindowProps {
 	value?: string;
@@ -44,6 +46,10 @@ export const TextWindow: React.FC<TextWindowProps> = ({
 	const { data: session } = useSession();
 	const [isLiked, setIsLiked] = useState(false);
 	const [isLiking, setIsLiking] = useState(false);
+	const router = useRouter();
+	useEffect(() => {
+		setIsLiked(false);
+	}, [translationId]);
 
 
 	const onCopy = async () => {
@@ -73,7 +79,12 @@ export const TextWindow: React.FC<TextWindowProps> = ({
 
 	const onLike = async () => {
 		if (!session?.user?.id) {
-			toast.error("Please sign in to like translations");
+			toast.error("Please sign in to like translations", {
+				action: {
+					label: "Sign in",
+					onClick: () => router.push("/login"),
+				},
+			});
 			return;
 		}
 
@@ -86,17 +97,9 @@ export const TextWindow: React.FC<TextWindowProps> = ({
 
 		setIsLiking(true);
 		try {
-			const response = await fetch(`/api/translations/${translationId}/like`, {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					liked: !isLiked,
-				}),
-			});
+			const result = await likeTranslation(translationId, !isLiked);
 
-			if (response.ok) {
+			if (result.success) {
 				setIsLiked(!isLiked);
 				toast.success(
 					isLiked ? "Translation unliked" : "Translation liked",
@@ -108,11 +111,18 @@ export const TextWindow: React.FC<TextWindowProps> = ({
 					}
 				);
 			} else {
-				toast.error("Failed to update like status");
+				// Обрабатываем специфические ошибки
+				if (result.error?.includes("Authentication required")) {
+					toast.error("Please sign in to like translations", {
+						action: {
+							label: "Sign in",
+							onClick: () => router.push("/login"),
+						},
+					});
+				} else {
+					toast.error(result.error || "Failed to update like status");
+				}
 			}
-		} catch (error) {
-			console.error("Error liking translation:", error);
-			toast.error("Failed to like translation");
 		} finally {
 			setIsLiking(false);
 		}
@@ -208,6 +218,7 @@ export const TextWindow: React.FC<TextWindowProps> = ({
 								disabled={isLiking || !translationId || !isTranslationComplete}
 								isActive={isLiked}
 								tip={isLiked ? "Unlike translation" : "Like translation"}
+								isLoading={isLiking}
 							/>
 							<TextAreaIcon 
 								icon={Copy} 

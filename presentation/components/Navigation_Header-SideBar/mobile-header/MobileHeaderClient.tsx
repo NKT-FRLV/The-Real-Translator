@@ -21,7 +21,7 @@ export default function MobileHeaderClient({
 
   return (
     <>
-      <header className="md:hidden fixed top-0 left-0 right-0 z-50 bg-background border-b border-gray-700 px-4 py-3">
+      <header className="md:hidden bg-background border-b border-gray-700 px-4 py-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button

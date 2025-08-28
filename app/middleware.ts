@@ -9,21 +9,21 @@ export default async function middleware(req: Request) {
 
   if (url.pathname.startsWith("/app")) {
     if (!session?.user?.id) {
-      url.pathname = "/sign-in";
+      url.pathname = "/login";
       return NextResponse.redirect(url);
     }
   }
 
   if (url.pathname.startsWith("/admin")) {
     if (!session?.user?.id) {
-      url.pathname = "/sign-in";
+      url.pathname = "/login";
       return NextResponse.redirect(url);
     }
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
       select: { role: true },
     });
-    if (!user || user.role !== "ADMIN") {
+    if (!user || user.role.toLowerCase() !== "admin") {
       url.pathname = "/403";
       return NextResponse.redirect(url);
     }
