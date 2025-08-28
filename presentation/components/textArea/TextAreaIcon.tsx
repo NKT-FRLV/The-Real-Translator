@@ -7,7 +7,7 @@ import {
 	TooltipTrigger,
 	TooltipContent,
 } from "@/shared/shadcn/ui/tooltip";
-
+import { cn } from "@/shared/shadcn/";
 
 interface TextAreaIconProps {
 	icon: LucideIcon;
@@ -30,7 +30,6 @@ export const TextAreaIcon: React.FC<TextAreaIconProps> = ({
 	size = "small",
 	isLoading = false,
 }) => {
-
 	const iconSizes = {
 		big: "w-5 h-5 md:w-7 md:h-7",
 		small: "w-3.5 h-3.5 md:w-4 md:h-4",
@@ -40,16 +39,27 @@ export const TextAreaIcon: React.FC<TextAreaIconProps> = ({
 		<button
 			onClick={onClick}
 			disabled={disabled}
-			className={`p-1.5 md:p-1.5 hover:bg-gray-600 rounded-lg transition-colors ${
-				isActive ? "bg-blue-600 hover:bg-blue-700" : ""
-			} ${disabled ? "opacity-50 cursor-not-allowed" : ""} ${className}`}
+			className={cn(
+				"p-1.5 md:p-1.5 hover:bg-gray-600 rounded-lg transition-colors",
+				disabled ? "opacity-50 cursor-not-allowed" : "",
+				className
+			)}
 		>
-			{!isLoading ? <Icon
-				size={undefined}
-				className={`${iconSizes[size]} ${
-					isActive ? "text-red-500" : "text-gray-400"
-				}`}
-			/> : <Loader2 className="w-4 h-4 animate-spin" />}
+			{!isLoading ? (
+				<Icon
+					size={undefined}
+					className={cn(
+						iconSizes[size],
+						"text-gray-300",
+						isActive && "text-red-500 fill-red-500"
+					)}
+				/>
+			) : (
+				<Loader2
+					className={cn(iconSizes[size], "animate-spin")}
+					size={undefined}
+				/>
+			)}
 		</button>
 	);
 
