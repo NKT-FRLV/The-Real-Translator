@@ -2,7 +2,7 @@ import React from "react";
 
 const loading = () => {
 	return (
-		<div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-background to-muted/20">
+		<div className="row-start-2 row-end-3 col-start-1 col-span-full md:row-start-1 md:col-start-2 flex items-center justify-center bg-gradient-to-br from-background to-muted/20">
 			<div className="flex flex-col items-center space-y-6">
 				{/* Main spinner with glow effect */}
 				<div className="relative">

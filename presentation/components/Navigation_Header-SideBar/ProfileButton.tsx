@@ -27,6 +27,7 @@ const ProfileButton = ({
 				/>
 			) : (
 				<Button
+					asChild
 					variant="outline"
 					size="icon"
 					className={size === "mobile" ? "px-6" : "p-6 mb-6"}
