@@ -12,7 +12,7 @@ import {
 import { Textarea } from "@/shared/shadcn/ui/textarea";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
-import { TextAreaIcon } from "@/presentation/components/textArea/TextAreaIcon";
+import { IconButton } from "@/presentation/components/textArea/IconButton";
 import { useRouter } from "next/navigation";
 import { likeTranslation } from "@/presentation/API/like/likeApi";
 
@@ -154,7 +154,7 @@ export const TextWindow: React.FC<TextWindowProps> = ({
 
 				{renderCustomPlaceholder && renderCustomPlaceholder()}
 				{(isInput && value.length > 0) && (
-								<TextAreaIcon 
+								<IconButton 
 									icon={X} 
 									className="absolute top-2 right-2"
 									onClick={onClear}
@@ -165,21 +165,21 @@ export const TextWindow: React.FC<TextWindowProps> = ({
 
 			<div className="border-t border-gray-700 p-2 md:p-2 flex justify-between items-center">
 				<div className="flex items-center space-x-1 md:space-x-2">
-					<TextAreaIcon 
+					<IconButton 
 						icon={Volume2} 
 						tip="Text to speech - Coming soon"
 						disabled={true}
 					/>
 
 					{isInput && (
-						<TextAreaIcon 
+						<IconButton 
 							icon={Mic} 
 							tip="Voice input - Coming soon"
 							disabled={true}
 						/>
 					)}
 
-					<TextAreaIcon 
+					<IconButton 
 						icon={Copy} 
 						onClick={onCopy}
 						tip="Copy text"
@@ -193,7 +193,7 @@ export const TextWindow: React.FC<TextWindowProps> = ({
 								{value.length}/{maxLength}
 							</span>
 							{value.length > 0 && (
-								<TextAreaIcon 
+								<IconButton 
 									icon={X} 
 									onClick={onClear}
 									tip="Clear text"
@@ -202,17 +202,17 @@ export const TextWindow: React.FC<TextWindowProps> = ({
 						</>
 					) : (
 						<>
-							<TextAreaIcon 
+							<IconButton 
 								icon={Bookmark} 
 								tip="Save translation - Coming soon"
 								disabled={true}
 							/>
-							<TextAreaIcon 
+							<IconButton 
 								icon={Share} 
 								tip="Share translation - Coming soon"
 								disabled={true}
 							/>
-							<TextAreaIcon 
+							<IconButton 
 								icon={Heart} 
 								onClick={onLike}
 								disabled={isLiking || !translationId || !isTranslationComplete}
@@ -220,7 +220,7 @@ export const TextWindow: React.FC<TextWindowProps> = ({
 								tip={isLiked ? "Unlike translation" : "Like translation"}
 								isLoading={isLiking}
 							/>
-							<TextAreaIcon 
+							<IconButton 
 								icon={Copy} 
 								onClick={onCopy}
 								tip="Copy text"

@@ -9,7 +9,7 @@ import {
 } from "@/shared/shadcn/ui/tooltip";
 import { cn } from "@/shared/shadcn/";
 
-interface TextAreaIconProps {
+interface IconButtonProps {
 	icon: LucideIcon;
 	onClick?: () => void;
 	tip?: string;
@@ -20,7 +20,7 @@ interface TextAreaIconProps {
 	isLoading?: boolean;
 }
 
-export const TextAreaIcon: React.FC<TextAreaIconProps> = ({
+export const IconButton: React.FC<IconButtonProps> = ({
 	icon: Icon,
 	onClick,
 	tip,
