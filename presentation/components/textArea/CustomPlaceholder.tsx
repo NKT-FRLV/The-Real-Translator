@@ -25,15 +25,7 @@ const CustomPlaceholder: React.FC<Props> = ({ showLightBeam, placeholder, value 
     return (
       <div className={containerCls} aria-hidden="true">
         <div
-          className={`relative inline-block ${textSize} font-medium text-gray-500 select-none`}
-          style={{
-            background: "linear-gradient(90deg, #9ca3af 0%, #ffffff 50%, #9ca3af 100%)",
-            backgroundSize: "200% 100%",
-            backgroundClip: "text",
-            WebkitBackgroundClip: "text",
-            color: "transparent",
-            animation: "gentleShimmer 3s ease-in-out infinite",
-          }}
+          className={`relative inline-block h-full w-full ${textSize} font-medium text-foreground select-none shimmer-text`}
         >
           {placeholder}
         </div>

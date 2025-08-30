@@ -176,3 +176,13 @@ body {
     background-position: 200% 0;
   }
 }
+
+/* Кастомные классы для shimmer эффекта для компонента CustomPlaceholder в TextArea */
+.shimmer-text {
+  background: linear-gradient(90deg, var(--foreground) 0%, var(--background) 50%, var(--foreground) 100%);
+  background-size: 200% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: gentleShimmer 6s linear infinite;
+}

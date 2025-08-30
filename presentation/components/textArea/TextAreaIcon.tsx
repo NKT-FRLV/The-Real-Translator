@@ -50,7 +50,7 @@ export const TextAreaIcon: React.FC<TextAreaIconProps> = ({
 					size={undefined}
 					className={cn(
 						iconSizes[size],
-						"text-gray-300",
+						"text-foreground",
 						isActive && "text-red-500 fill-red-500"
 					)}
 				/>
