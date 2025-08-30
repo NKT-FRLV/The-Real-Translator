@@ -18,6 +18,7 @@ interface IconButtonProps {
 	className?: string;
 	size?: "big" | "small";
 	isLoading?: boolean;
+	iconClassName?: string;
 }
 
 export const IconButton: React.FC<IconButtonProps> = ({
@@ -29,6 +30,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
 	className = "",
 	size = "small",
 	isLoading = false,
+	iconClassName = "",
 }) => {
 	const iconSizes = {
 		big: "w-5 h-5 md:w-7 md:h-7",
@@ -51,7 +53,8 @@ export const IconButton: React.FC<IconButtonProps> = ({
 					className={cn(
 						iconSizes[size],
 						"text-foreground",
-						isActive && "text-red-500 fill-red-500"
+						isActive && "text-red-500 fill-red-500",
+						iconClassName
 					)}
 				/>
 			) : (

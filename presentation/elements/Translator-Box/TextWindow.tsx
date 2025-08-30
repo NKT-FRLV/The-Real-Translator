@@ -1,20 +1,13 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import {
-	X,
-	Volume2,
-	Mic,
-	Copy,
-	Bookmark,
-	Share,
-	Heart,
-} from "lucide-react";
+import { X, Volume2, Mic, Copy, Bookmark, Share, Heart } from "lucide-react";
 import { Textarea } from "@/shared/shadcn/ui/textarea";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 import { IconButton } from "@/presentation/components/textArea/IconButton";
 import { useRouter } from "next/navigation";
 import { likeTranslation } from "@/presentation/API/like/likeApi";
+import { cn } from '@/shared/shadcn/utils'
 
 interface TextWindowProps {
 	value?: string;
@@ -28,6 +21,11 @@ interface TextWindowProps {
 	className?: string;
 	translationId?: string | null;
 	isTranslationComplete?: boolean;
+	// speech to text
+	isSpeechSupported?: boolean;
+	isBrowserSupportSpeech?: boolean;
+	listening?: boolean;
+	onVoiceInput?: () => void;
 }
 
 export const TextWindow: React.FC<TextWindowProps> = ({
@@ -42,15 +40,24 @@ export const TextWindow: React.FC<TextWindowProps> = ({
 	className,
 	translationId,
 	isTranslationComplete = false,
+	isSpeechSupported,
+	isBrowserSupportSpeech,
+	listening,
+	onVoiceInput,
 }) => {
 	const { data: session } = useSession();
 	const [isLiked, setIsLiked] = useState(false);
 	const [isLiking, setIsLiking] = useState(false);
 	const router = useRouter();
+
+	const [hydrated, setHydrated] = useState(false);
+	useEffect(() => setHydrated(true), []);
+
+	const disabledMic = !hydrated || !isSpeechSupported || !isBrowserSupportSpeech;
+
 	useEffect(() => {
 		setIsLiked(false);
 	}, [translationId]);
-
 
 	const onCopy = async () => {
 		if (value.length === 0) {
@@ -127,13 +134,22 @@ export const TextWindow: React.FC<TextWindowProps> = ({
 			setIsLiking(false);
 		}
 	};
-	
+
+	const getVoiceInputTip = () => {
+		if (!isBrowserSupportSpeech) {
+			return "Your Browser doesn't support speech input";
+		}
+		if (!isSpeechSupported) {
+			return "Not Supported for this language";
+		}
+		return "Voice input";
+	};
+
+	const voiceInputTip = getVoiceInputTip();
 
 	return (
 		<div className="flex flex-col w-full rounded-lg border border-gray-700 bg-accent/30">
-			<label
-				className="p-3 md:p-3 min-h-[120px] md:min-h-[180px] relative block flex-1"
-			>
+			<label className="p-3 md:p-3 min-h-[120px] md:min-h-[180px] relative block flex-1">
 				<Textarea
 					value={value}
 					onChange={onChange}
@@ -153,37 +169,37 @@ export const TextWindow: React.FC<TextWindowProps> = ({
 				/>
 
 				{renderCustomPlaceholder && renderCustomPlaceholder()}
-				{(isInput && value.length > 0) && (
-								<IconButton 
-									icon={X} 
-									className="absolute top-2 right-2"
-									onClick={onClear}
-									size="big"
-								/>
-							)}
+				{isInput && value.length > 0 && (
+					<IconButton
+						icon={X}
+						className="absolute top-2 right-2"
+						onClick={onClear}
+						size="big"
+					/>
+				)}
 			</label>
 
 			<div className="border-t border-gray-700 p-2 md:p-2 flex justify-between items-center">
 				<div className="flex items-center space-x-1 md:space-x-2">
-					<IconButton 
-						icon={Volume2} 
+					<IconButton
+						icon={Volume2}
 						tip="Text to speech - Coming soon"
 						disabled={true}
 					/>
 
 					{isInput && (
-						<IconButton 
-							icon={Mic} 
-							tip="Voice input - Coming soon"
-							disabled={true}
+						<IconButton
+							icon={Mic}
+							tip={voiceInputTip}
+							disabled={disabledMic}
+							onClick={onVoiceInput}
+							className={cn(
+								listening && 'relative before:absolute before:inset-0 before:bg-red-500/30 before:rounded-full before:animate-ping after:absolute after:inset-0 after:bg-red-500/30 after:rounded-full'
+							)}
 						/>
 					)}
 
-					<IconButton 
-						icon={Copy} 
-						onClick={onCopy}
-						tip="Copy text"
-					/>
+					<IconButton icon={Copy} onClick={onCopy} tip="Copy text" />
 				</div>
 
 				<div className="flex items-center space-x-1 md:space-x-2">
@@ -193,8 +209,8 @@ export const TextWindow: React.FC<TextWindowProps> = ({
 								{value.length}/{maxLength}
 							</span>
 							{value.length > 0 && (
-								<IconButton 
-									icon={X} 
+								<IconButton
+									icon={X}
 									onClick={onClear}
 									tip="Clear text"
 								/>
@@ -202,26 +218,34 @@ export const TextWindow: React.FC<TextWindowProps> = ({
 						</>
 					) : (
 						<>
-							<IconButton 
-								icon={Bookmark} 
+							<IconButton
+								icon={Bookmark}
 								tip="Save translation - Coming soon"
 								disabled={true}
 							/>
-							<IconButton 
-								icon={Share} 
+							<IconButton
+								icon={Share}
 								tip="Share translation - Coming soon"
 								disabled={true}
 							/>
-							<IconButton 
-								icon={Heart} 
+							<IconButton
+								icon={Heart}
 								onClick={onLike}
-								disabled={isLiking || !translationId || !isTranslationComplete}
+								disabled={
+									isLiking ||
+									!translationId ||
+									!isTranslationComplete
+								}
 								isActive={isLiked}
-								tip={isLiked ? "Unlike translation" : "Like translation"}
+								tip={
+									isLiked
+										? "Unlike translation"
+										: "Like translation"
+								}
 								isLoading={isLiking}
 							/>
-							<IconButton 
-								icon={Copy} 
+							<IconButton
+								icon={Copy}
 								onClick={onCopy}
 								tip="Copy text"
 							/>

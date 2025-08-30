@@ -8,6 +8,9 @@ import { useSession } from "next-auth/react";
 import { TextWindow } from "../elements/Translator-Box/TextWindow";
 import LanguageSelector from "../elements/Translator-Box/BoxTranslateOptions";
 import { LanguageShort, Tone } from "@/shared/config/translation";
+import SpeechRecognition, {
+	useSpeechRecognition,
+} from "react-speech-recognition";
 // import { createLogger } from "@/shared/utils/logger";
 import CustomPlaceholder from "../components/textArea/CustomPlaceholder";
 import {
@@ -37,7 +40,8 @@ function makeRequestKey(
 }
 
 export const TranslatorBox: React.FC = () => {
-	// ────────────────────────────────────────────────────────────────────────────
+
+		// ────────────────────────────────────────────────────────────────────────────
 	// Store state
 	// ────────────────────────────────────────────────────────────────────────────
 	const fromLang = useFromLang();
@@ -55,6 +59,38 @@ export const TranslatorBox: React.FC = () => {
 	const setFromLang = useSetFromLang();
 	const setToLang = useSetToLang();
 	const setTone = useSetTone();
+
+
+	// ────────────────────────────────────────────────────────────────────────────
+	// Speech-to-text logic
+	// ────────────────────────────────────────────────────────────────────────────
+
+	const {
+		transcript,
+		listening,
+		resetTranscript,
+		browserSupportsSpeechRecognition,
+	} = useSpeechRecognition();
+
+	const handleClickMicroPhone = () => {
+
+		const speechLanguages = {
+			en: "en-US",
+			ru: "ru",
+			es: "es-ES"
+		}
+
+		if (listening) {
+			SpeechRecognition.stopListening();
+			return;
+		} else {
+			if (fromLang !== "en" && fromLang !== "ru" && fromLang !== "es") return
+			SpeechRecognition.startListening({
+				// continuous: true,
+				language: speechLanguages[fromLang],
+			});
+		}
+	};
 
 	// ────────────────────────────────────────────────────────────────────────────
 	// UI state
@@ -202,15 +238,18 @@ export const TranslatorBox: React.FC = () => {
 
 	const [debouncedInputText] = useDebounce(input, debounceMs);
 
+	useEffect(() => {
+		if (swappedOnceRef.current) return
+		setInput(transcript || '');
+	}, [transcript, swappedOnceRef]);
 
 	// если начался перевод, а юзер сного печататет, останавливаем перевод
 	const handleUserInputChange = useCallback(
 		(e: React.ChangeEvent<HTMLTextAreaElement>) => {
-
 			if (isLoading) {
 				stop();
 				setCompletion("");
-			};
+			}
 
 			handleInputChange(e);
 		},
@@ -225,8 +264,9 @@ export const TranslatorBox: React.FC = () => {
 		activeKeyRef.current = "";
 		setCurrentTranslationId(null);
 		setInput("");
+		resetTranscript();
 		setCompletion("");
-	}, [isLoading, stop, setCompletion, setInput]);
+	}, [isLoading, stop, setCompletion, setInput, resetTranscript]);
 
 	const handleSwapResultToInputText = useCallback(() => {
 		const translatedText = completion?.trim() ?? "";
@@ -240,6 +280,7 @@ export const TranslatorBox: React.FC = () => {
 		}
 
 		activeKeyRef.current = "";
+		resetTranscript();
 		setCurrentTranslationId(null);
 		setCompletion("");
 		setInput(translatedText);
@@ -247,7 +288,7 @@ export const TranslatorBox: React.FC = () => {
 		// Один немедленный перевод без debounce, потом вернём дефолт
 		swappedOnceRef.current = true;
 		// setDebounceMs(0);
-	}, [completion, isLoading, stop, setCompletion, setInput]);
+	}, [completion, isLoading, stop, setCompletion, setInput, resetTranscript]);
 
 	// ────────────────────────────────────────────────────────────────────────────
 	// Стабильная функция для запуска перевода
@@ -326,11 +367,15 @@ export const TranslatorBox: React.FC = () => {
 						<CustomPlaceholder
 							showLightBeam={false}
 							placeholder="Enter text to translate..."
-							value={input}
+							value={transcript || input}
 						/>
 					)}
 					isInput={true}
 					maxLength={100000}
+					isSpeechSupported={fromLang === "ru" || fromLang === "en"}
+					isBrowserSupportSpeech={browserSupportsSpeechRecognition}
+					onVoiceInput={handleClickMicroPhone}
+					listening={listening}
 				/>
 
 				<TextWindow
@@ -350,6 +395,7 @@ export const TranslatorBox: React.FC = () => {
 					isTranslationComplete={
 						!!displayText && !isLoading && !error
 					}
+					listening={false}
 				/>
 			</div>
 		</div>
