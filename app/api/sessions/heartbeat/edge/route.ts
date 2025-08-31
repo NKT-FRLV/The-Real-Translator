@@ -4,25 +4,25 @@ export const runtime = "edge";
 import { geolocation, ipAddress } from "@vercel/functions";
 
 export async function POST(req: Request) {
-  const ip = ipAddress(req);
-  const { city, country, region } = geolocation(req);
+  const ip = ipAddress(req) ?? null;
+  const { city = null, country = null, region = null } = geolocation(req) ?? {};
 
-  console.log("Edge heartbeat - Geo data:", { ip, city, country, region });
+  const cookie = req.headers.get("cookie") ?? "";
+  const ua = req.headers.get("user-agent") ?? "";
 
-  // передаем данные через заголовки, так как Edge может не поддерживать внутренние fetch
-  const response = await fetch(new URL("/api/sessions/heartbeat/write", req.url), {
+  await fetch(new URL("/api/sessions/heartbeat/write", req.url), {
     method: "POST",
-    headers: { 
+    headers: {
       "content-type": "application/json",
-      "x-geo-ip": ip || "",
-      "x-geo-city": city || "",
-      "x-geo-country": country || "",
-      "x-geo-region": region || "",
+      // 👇 важно: прокидываем куки, иначе Node-роут не найдёт токен
+      cookie,
+      // не обязательно, но пусть Node-роут видит оригинальный UA
+      "user-agent": ua,
     },
-    body: JSON.stringify({}),
+    cache: "no-store",
+    body: JSON.stringify({ ip, city, country, region, ua }),
   });
 
-  console.log("Write route response status:", response.status);
-
-  return new Response(JSON.stringify({ ok: true }), { headers: { "content-type": "application/json" } });
+  // 204 -> без тела
+  return new Response(null, { status: 204 });
 }
