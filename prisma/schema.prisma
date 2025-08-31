@@ -104,14 +104,24 @@ model Account {
 }
 
 model Session {
-  id           String   @id @default(cuid())
-  userId       String
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  sessionToken String   @unique
-  expires      DateTime
-  createdAt    DateTime @default(now())
+	id           String   @id @default(cuid())
+	userId       String
+	user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+	sessionToken String   @unique
+	expires      DateTime
+	createdAt    DateTime @default(now())
 
-  @@index([userId])
+	// GEO
+	lastSeenAt   DateTime @default(now())
+	ip           String?  @db.VarChar(45) // IPv4/IPv6
+	userAgent    String?  @db.Text
+	device       String?  // "Desktop • Chrome 128 • Windows 11"
+	country      String?  @db.VarChar(2) // ISO-2
+	region       String?
+	city         String?
+
+  @@index([userId, expires])
+  @@index([userId, lastSeenAt])
 }
 
 // Подписка — необязательно сейчас, но готово к Stripe webhook'ам

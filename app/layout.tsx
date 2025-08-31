@@ -5,6 +5,7 @@ import { PWAThemeManager } from "@/presentation/components/PWAThemeManager";
 import { PerformanceMonitor } from "@/presentation/components/PerformanceMonitor";
 import { SplashScreenManager } from "@/presentation/components/SplashScreenManager";
 import { SessionProvider } from "next-auth/react";
+import SessionHeartbeat from "@/presentation/SessionHeartBeat"
 import { auth } from "@/app/auth";
 import "./globals.css";
 
@@ -127,6 +128,7 @@ export default async function RootLayout({
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
 			>
+				<SessionHeartbeat />
 				<SessionProvider session={session}>
 				<ThemeProvider
 					attribute="class"

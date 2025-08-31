@@ -2,8 +2,10 @@
 import "server-only";
 
 import NextAuth, { type NextAuthConfig } from "next-auth";
+import { headers } from "next/headers";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/app/prismaClient/prisma"; // если у тебя так
+import { TUserRole } from "@/shared/types/user";
 import GitHub from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
 
@@ -16,19 +18,19 @@ const requireEnv = (k: string) => {
 // Расширяем типы NextAuth
 declare module "next-auth" {
 	interface User {
-	  role?: string;
+		role?: TUserRole;
 	}
-	
+
 	interface Session {
-	  user: {
-		id: string;
-		role?: string;
-		name?: string | null;
-		email?: string | null;
-		image?: string | null;
-	  };
+		user: {
+			id: string;
+			role?: TUserRole;
+			name?: string | null;
+			email?: string | null;
+			image?: string | null;
+		};
 	}
-  }
+}
 
 export const authConfig: NextAuthConfig = {
 	trustHost: true,
@@ -50,6 +52,33 @@ export const authConfig: NextAuthConfig = {
 			clientSecret: requireEnv("GOOGLE_SECRET"),
 		}),
 	],
+	events: {
+		async signIn({ user }) {
+			// best-effort метка устройства/IP при входе
+			try {
+				const h = await headers(); // сработает в контексте запроса
+				const ua = h.get("user-agent") ?? null;
+				const ip =
+					(h.get("x-forwarded-for") ?? "").split(",")[0].trim() ||
+					h.get("x-real-ip") ||
+					null;
+
+				await prisma.session.updateMany({
+					// хак: зацепляем “свежесозданные” сессии за последние 5 минут
+					where: {
+						userId: user.id,
+						createdAt: {
+							gte: new Date(Date.now() - 5 * 60 * 1000),
+						},
+					},
+					data: { userAgent: ua, ip },
+				});
+			} catch (e) {
+				// вне запроса headers() бросит — это ок, пропускаем
+				console.warn("signIn event enrich skipped:", e);
+			}
+		},
+	},
 	callbacks: {
 		// При стратегии "database" коллбек вызывается при чтении сессии.
 		// Гарантируем, что session.user содержит id/role без кастов.
@@ -86,9 +115,4 @@ export const authConfig: NextAuthConfig = {
 	},
 };
 
-export const {
-	handlers,
-	auth,
-	signIn,
-	signOut,
-  } = NextAuth(authConfig);
+export const { handlers, auth, signIn, signOut } = NextAuth(authConfig);

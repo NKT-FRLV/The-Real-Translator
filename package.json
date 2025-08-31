@@ -33,6 +33,7 @@
     "axios": "^1.11.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "geoip-lite": "^1.4.10",
     "lucide-react": "^0.526.0",
     "motion": "^12.23.12",
     "next": "15.4.4",
@@ -44,12 +45,14 @@
     "regenerator-runtime": "^0.14.1",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.3.1",
+    "ua-parser-js": "^2.0.4",
     "use-debounce": "^10.0.5",
     "zustand": "^5.0.8"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
+    "@types/geoip-lite": "^1.4.4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
