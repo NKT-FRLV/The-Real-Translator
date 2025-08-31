@@ -2,9 +2,6 @@
 import { handlers } from "@/app/auth";
 export const { GET, POST } = handlers;
 
-// Именованные HTTP-методы — НИКАКОГО default export
-// export const { GET, POST } = handlers;
-
 // Prisma требует nodejs runtime (не edge)
 export const runtime = "nodejs";
 
