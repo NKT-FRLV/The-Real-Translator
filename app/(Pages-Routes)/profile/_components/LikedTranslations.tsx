@@ -22,7 +22,7 @@ interface LikedTranslationsResponse {
 const LikedTranslations = () => {
 	const { data: session } = useSession();
 	const [translations, setTranslations] = useState<Translation[]>([]);
-	const [isDeliting, setIsDeliting] = useState(false);
+	const [delitingTranslation, setDelitingTranslation] = useState<string>('');
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 	const [page, setPage] = useState(1);
@@ -81,11 +81,11 @@ const LikedTranslations = () => {
 	};
 
 	const deleteTranslation = async (translationId: string) => {
-		setIsDeliting(true);
+		setDelitingTranslation(translationId);
 		const result: LikeTranslationResult = await likeTranslation(
 			translationId,
 			false
-		).finally(() => setIsDeliting(false));
+		).finally(() => setDelitingTranslation(''));
 		if (result.success) {
 			toast.success("Translation deleted");
 			setTranslations((prev) =>
@@ -177,7 +177,7 @@ const LikedTranslations = () => {
 										translation={translation}
 										onCopy={onCopy}
 										onDelete={deleteTranslation}
-										isDeliting={isDeliting}
+										isDeliting={delitingTranslation === translation.id}
 									/>
 								</motion.li>
 							))}

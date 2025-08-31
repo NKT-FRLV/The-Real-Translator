@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import { StyleCardList } from "@/presentation/elements/App-Description/StyleCardList";
 import { Illustration } from "@/presentation/elements/App-Description/Illustration";
@@ -49,8 +47,8 @@ export const AppDescription: React.FC = () => {
 					</div>
 
 					{/* Right Content - Illustration */}
-					<Illustration />
-					<StyleCardList />
+					<Illustration priority={true} />
+					<StyleCardList/>
 				</div>
 			</div>
 		</div>

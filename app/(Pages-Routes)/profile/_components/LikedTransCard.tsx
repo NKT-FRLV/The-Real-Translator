@@ -17,6 +17,8 @@ const LikedTransCard = ({
 	onCopy,
 	onDelete,
 }: LikedTransCard) => {
+
+
 	const formatDate = (dateString: Date) => {
 		return new Date(dateString).toLocaleDateString("en-US", {
 			year: "numeric",

@@ -1,3 +1,4 @@
+'use client'
 import React, { useState } from 'react';
 import { toneDescriptions, ToneDescription } from '@/shared/constants/tone-style';
 import { Tone } from '@/shared/types/types';
