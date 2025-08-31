@@ -5,7 +5,10 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/app/prismaClient/prisma";
 import { cookies, headers } from "next/headers";
 import { UAParser } from "ua-parser-js";
-import geoip from "geoip-lite";
+
+// Prevent this route from being executed during build time
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 export async function POST() {
   // 1) Токен сессии из куки (strategy: "database")
@@ -45,13 +48,19 @@ export async function POST() {
   let region: string | null = null;
   let city: string | null = null;
 
-  if (ip) {
-    const geo = geoip.lookup(ip);
-    if (geo) {
-      country = geo.country ?? null; // ISO-2
-      // geo.region — код региона (может быть пустой строкой)
-      region = geo.region || null;
-      city = geo.city || null;
+  if (ip && ip !== '127.0.0.1' && ip !== 'localhost') {
+    try {
+      const geoip = await import('geoip-lite');
+      const geo = geoip.default.lookup(ip);
+      if (geo) {
+        country = geo.country ?? null; // ISO-2
+        // geo.region — код региона (может быть пустой строкой)
+        region = geo.region || null;
+        city = geo.city || null;
+      }
+    } catch (error) {
+      // GeoIP lookup failed - continue without geo data
+      console.warn('GeoIP lookup failed:', error);
     }
   }
 

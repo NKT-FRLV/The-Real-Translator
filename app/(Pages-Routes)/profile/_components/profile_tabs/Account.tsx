@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { MinimalUser, SessionDTO, SessionsResponse, ApiErrorResponse } from "@/shared/types/user";
-import { Session as DBSession } from "@prisma/client";
 
 interface AccountProps {
 	user: MinimalUser;
