@@ -301,6 +301,8 @@ const handleClickMicroPhone = useCallback(async () => {
 		}
 
 		activeKeyRef.current = "";
+		SpeechRecognition.abortListening();
+		SpeechRecognition.stopListening();
 		setCurrentTranslationId(null);
 		setInput("");
 		resetTranscript();
@@ -321,6 +323,7 @@ const handleClickMicroPhone = useCallback(async () => {
 		activeKeyRef.current = "";
 		resetTranscript();
 		SpeechRecognition.abortListening();
+		SpeechRecognition.stopListening();
 		setCurrentTranslationId(null);
 		setCompletion("");
 		setInput(translatedText);
@@ -367,11 +370,6 @@ const handleClickMicroPhone = useCallback(async () => {
 
 		// Нельзя переводить в тот же язык
 		if (fromLang === toLang) return;
-
-		// if (input === prompt) {
-		// 	stop();
-		// 	return;
-		// };
 
 		// Сбрасываем ID предыдущего перевода и очищаем кеш сохраненных переводов при начале нового
 		setCurrentTranslationId(null);
