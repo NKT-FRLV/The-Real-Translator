@@ -3,6 +3,9 @@
 import * as React from "react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 
+// speech to text recognition для стабильной работы пихнул сюда
+import "regenerator-runtime/runtime";
+
 function ThemeProvider({
 	children,
 	...props

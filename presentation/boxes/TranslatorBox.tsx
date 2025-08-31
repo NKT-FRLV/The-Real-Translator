@@ -30,6 +30,24 @@ import {
 
 type RequestKey = string;
 
+const BASE_LOCALES = {
+	en: "en-US",
+	ru: "ru-RU",
+  } as const;
+  
+  function resolveLocale(lang: "en" | "ru") {
+	if (typeof navigator === "undefined") return BASE_LOCALES[lang];
+	const prefs = navigator.languages ?? [navigator.language];
+  
+	if (lang === "en") {
+	  // если у юзера британская локаль — отдадим en-GB
+	  if (prefs.some(l => l.toLowerCase().startsWith("en-gb"))) return "en-GB";
+	  return "en-US";
+	}
+	return "ru-RU";
+  }
+  
+
 function makeRequestKey(
 	text: string,
 	fromLang: LanguageShort,
@@ -40,8 +58,7 @@ function makeRequestKey(
 }
 
 export const TranslatorBox: React.FC = () => {
-
-		// ────────────────────────────────────────────────────────────────────────────
+	// ────────────────────────────────────────────────────────────────────────────
 	// Store state
 	// ────────────────────────────────────────────────────────────────────────────
 	const fromLang = useFromLang();
@@ -60,7 +77,6 @@ export const TranslatorBox: React.FC = () => {
 	const setToLang = useSetToLang();
 	const setTone = useSetTone();
 
-
 	// ────────────────────────────────────────────────────────────────────────────
 	// Speech-to-text logic
 	// ────────────────────────────────────────────────────────────────────────────
@@ -69,28 +85,49 @@ export const TranslatorBox: React.FC = () => {
 		transcript,
 		listening,
 		resetTranscript,
+		isMicrophoneAvailable,
 		browserSupportsSpeechRecognition,
 	} = useSpeechRecognition();
 
-	const handleClickMicroPhone = () => {
+	const pendingRef = useRef(false);
 
-		const speechLanguages = {
-			en: "en-US",
-			ru: "ru",
-			es: "es-ES"
-		}
+const handleClickMicroPhone = useCallback(async () => {
+  if (pendingRef.current) return;
+  pendingRef.current = true;
+  try {
+    console.log('listening:', listening, 'fromLang:', fromLang);
 
-		if (listening) {
-			SpeechRecognition.stopListening();
-			return;
-		} else {
-			if (fromLang !== "en" && fromLang !== "ru" && fromLang !== "es") return
-			SpeechRecognition.startListening({
-				// continuous: true,
-				language: speechLanguages[fromLang],
-			});
-		}
-	};
+    // базовые гарды
+    if (!browserSupportsSpeechRecognition || !isMicrophoneAvailable) {
+      console.warn('Speech not supported or mic blocked');
+      return;
+    }
+    if (!["en", "ru"].includes(fromLang)) return;
+
+    if (listening) {
+      SpeechRecognition.stopListening(); // мягкая остановка
+      // НЕ вызываем abort здесь без нужды — даст лишние onend/onerror
+      return;
+    }
+
+    // чистый старт
+    const lang = resolveLocale(fromLang as "en" | "ru");
+    resetTranscript(); // очистим предыдущий текст
+    // небольшая пауза перед стартом помогает хромовому движку
+    await new Promise(r => setTimeout(r, 50));
+
+    // ВАЖНО: continuous + interimResults
+    SpeechRecognition.startListening({
+      language: lang,
+    //   continuous: true,
+      interimResults: true,
+    });
+
+  } finally {
+    pendingRef.current = false;
+  }
+}, [fromLang, listening, browserSupportsSpeechRecognition, isMicrophoneAvailable, resetTranscript]);
+
 
 	// ────────────────────────────────────────────────────────────────────────────
 	// UI state
@@ -238,10 +275,12 @@ export const TranslatorBox: React.FC = () => {
 
 	const [debouncedInputText] = useDebounce(input, debounceMs);
 
+	const safeTranscript = typeof transcript === "string" ? transcript : "";
+
 	useEffect(() => {
-		if (swappedOnceRef.current) return
-		setInput(transcript || '');
-	}, [transcript, swappedOnceRef]);
+		// синкаем только в режиме диктовки
+		if (listening) setInput(safeTranscript);
+	}, [listening, safeTranscript, setInput]);
 
 	// если начался перевод, а юзер сного печататет, останавливаем перевод
 	const handleUserInputChange = useCallback(
@@ -281,6 +320,7 @@ export const TranslatorBox: React.FC = () => {
 
 		activeKeyRef.current = "";
 		resetTranscript();
+		SpeechRecognition.abortListening();
 		setCurrentTranslationId(null);
 		setCompletion("");
 		setInput(translatedText);
@@ -372,7 +412,10 @@ export const TranslatorBox: React.FC = () => {
 					)}
 					isInput={true}
 					maxLength={100000}
-					isSpeechSupported={fromLang === "ru" || fromLang === "en"}
+					isSpeechSupported={
+						fromLang === "ru" ||
+						fromLang === "en"
+					}
 					isBrowserSupportSpeech={browserSupportsSpeechRecognition}
 					onVoiceInput={handleClickMicroPhone}
 					listening={listening}
