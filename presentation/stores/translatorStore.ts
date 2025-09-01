@@ -31,7 +31,7 @@ export const useTranslatorStore = create<TranslatorState>((set, get) => ({
   // Initial state
   fromLang: 'ru',
   toLang: 'es',
-  tone: 'natural',
+  tone: 'neutral',
   inputText: '',
   outputText: '',
   isTranslating: false,

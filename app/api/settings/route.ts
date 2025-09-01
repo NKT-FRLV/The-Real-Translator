@@ -23,9 +23,9 @@ export async function GET() {
       userSettings = await prisma.userSettings.create({
         data: {
           userId: session.user.id,
-          defaultSourceLang: "en",
-          defaultTargetLang: "ru",
-		  translationStyle: "natural",
+          defaultSourceLang: "auto",
+          defaultTargetLang: "en",
+		  translationStyle: "neutral",
           preferredLLM: "kimi-k2:free",
           notificationsEnabled: false,
         },
@@ -36,7 +36,7 @@ export async function GET() {
     return NextResponse.json({
       defaultSourceLang: userSettings.defaultSourceLang || "auto",
       defaultTargetLang: userSettings.defaultTargetLang || "en",
-	  translationStyle: userSettings.translationStyle || "natural",
+	  translationStyle: userSettings.translationStyle || "neutral",
       uiLanguage: userSettings.uiLanguage,
       preferredLLM: userSettings.preferredLLM,
       reviewDailyTarget: userSettings.reviewDailyTarget,

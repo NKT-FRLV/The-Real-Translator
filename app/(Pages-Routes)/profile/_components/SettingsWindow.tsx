@@ -178,12 +178,10 @@ const SettingsWindow = () => {
 									Preferred Translation Style
 								</label>
 								<Select
-									value={translationStyle || "natural"}
-									onValueChange={(value) =>
-										setTranslationStyle(value as Tone)
-									}
+									value={translationStyle || "neutral"}
+									onValueChange={setTranslationStyle}
 								>
-									<SelectTrigger className="w-full h-10 text-sm">
+									<SelectTrigger className="w-full">
 										<SelectValue placeholder="Select translation style" />
 									</SelectTrigger>
 									<SelectContent>
@@ -193,11 +191,11 @@ const SettingsWindow = () => {
 													string,
 													string
 												> = {
-													natural: "Natural",
-													intellectual:
-														"Intellectual",
+													neutral: "Neutral",
+													formal:
+														"Formal",
 													poetic: "Poetic",
-													street: "Street Slang",
+													informal: "Informal",
 												};
 												return (
 													<SelectItem

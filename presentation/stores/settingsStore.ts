@@ -46,7 +46,7 @@ const defaultSettings: UserSettings = {
   reviewDailyTarget: null,
   notificationsEnabled: false,
   timezone: null,
-  translationStyle: "natural",
+  translationStyle: "neutral",
   emailNotifications: false,
   translationReminders: false,
 };

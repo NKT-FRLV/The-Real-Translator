@@ -4,23 +4,23 @@ import { LanguageShort, Tone } from "@/shared/types/types";
 // ───────────────────────────────────────────────────────────────────────────────
 export const getToneInstructions = (tone: Tone): string => {
 	const map: Record<Tone, string> = {
-		natural: `Translate into neutral, simple, everyday language, as if spoken naturally by a native speaker.
+		neutral: `Translate into neutral, simple, everyday language, as if spoken naturally by a native speaker.
 Avoid bookish or overly formal expressions. Keep it clear, conversational, idiomatic, and easy to read,
 like how people talk in real life. Prefer short sentences where appropriate. Avoid marketing fluff.`,
 
-		intellectual: `Use sophisticated, precise, and formal language with richer vocabulary and clear logic,
+		formal: `Use sophisticated, precise, and formal language with richer vocabulary and clear logic,
 as suitable for a boardroom or academic context. Maintain coherence, restraint, and unambiguous phrasing.`,
 
 		poetic: `Render the translation as a poem in the recognizable style of Alexander Pushkin.
 Aim for a classical rhythm (preferably iambic, e.g., iambic tetrameter) and a clear rhyme scheme (AABB or ABAB).
-Emulate Pushkin’s elegance, clarity, and lyrical, slightly reflective tone. Preserve meaning while transforming
-the text into a compact, musical form that evokes Pushkin’s verse. Do not quote or reuse existing Pushkin lines verbatim;
+Emulate Pushkin's elegance, clarity, and lyrical, slightly reflective tone. Preserve meaning while transforming
+the text into a compact, musical form that evokes Pushkin's verse. Do not quote or reuse existing Pushkin lines verbatim;
 produce an original poem in his stylistic spirit.`,
 
-		street: `Use informal, conversational language with light slang where natural. Be concise and punchy.
+		informal: `Use informal, conversational language with light slang where natural. Be concise and punchy.
 Avoid vulgarity unless it exists in the source. Keep it readable and idiomatic, not caricatured.`,
 	};
-	return map[tone] ?? map.natural;
+	return map[tone] ?? map.neutral;
 };
 
 export const buildSystem = (
@@ -101,3 +101,4 @@ QUALITY
 // - Output ONLY the translated text, nothing else.
 // - Preserve meaning, and adapt phrasing to match the target style (${tone}).`;
 // };
+

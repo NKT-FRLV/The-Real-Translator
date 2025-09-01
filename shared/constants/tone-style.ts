@@ -24,16 +24,16 @@ export type ToneDescription = ToneDescriptionList<Tone>;
 export type ToneDescriptionMap = { [K in Tone]: ToneDescriptionList<K> };
 
 const toneDescriptionsMap = {
-    natural: {
-        name: "Natural",
-        tone: "natural",
+    neutral: {
+        name: "Neutral",
+        tone: "neutral",
         new: false,
         description: "Standard, professional translation",
-        detailedDescription: "This style provides clean, natural translations that feel native to the target language. Perfect for business communications, professional documents, and everyday conversations. The AI maintains clarity while preserving the original meaning without unnecessary complexity.",
+        detailedDescription: "This style provides clean, neutral translations that feel native to the target language. Perfect for business communications, professional documents, and everyday conversations. The AI maintains clarity while preserving the original meaning without unnecessary complexity.",
     },
-    intellectual: {
-        name: "Intelligent",
-        tone: "intellectual",
+    formal: {
+        name: "Formal",
+        tone: "formal",
         new: false,
         description: "Academic or formal talk tone",
         detailedDescription: "Elevates your text with sophisticated vocabulary and formal constructions. Ideal for academic papers, research documents, and professional presentations. This style employs complex sentence structures and precise terminology to create an authoritative, scholarly tone.",
@@ -46,12 +46,12 @@ const toneDescriptionsMap = {
         detailedDescription: "Transform your text into beautiful, rhythmic prose reminiscent of classical Russian poetry. This unique style captures the elegance and emotional depth of Pushkin's literary mastery, adding artistic flair and cultural richness to your translations.",
         image: "pushkin.png",
     },
-    street: {
-        name: "Street Slang",
-        tone: "street",
+    informal: {
+        name: "Informal",
+        tone: "informal",
         new: false,
         description: "Casual expressions and local slang, informal talk tone",
-        detailedDescription: "Brings your text to life with authentic street language and colloquialisms. Perfect for social media, casual conversations, and creative content. This style uses contemporary slang, informal abbreviations, and conversational expressions that resonate with younger audiences.",
+        detailedDescription: "Brings your text to life with authentic informal language and colloquialisms. Perfect for social media, casual conversations, and creative content. This style uses contemporary slang, informal abbreviations, and conversational expressions that resonate with younger audiences.",
         image: "bidlo.png",
     },
 } as const satisfies ToneDescriptionMap;
