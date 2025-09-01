@@ -228,12 +228,6 @@ const SettingsWindow = () => {
 											</span>
 										</>
 									)}
-									{isLoading && (
-										<>
-											<Loader2 className="w-3 h-3 animate-spin sm:w-4 sm:h-4" />
-											<span>Loading...</span>
-										</>
-									)}
 								</div>
 								<button
 									onClick={handleSaveSettings}

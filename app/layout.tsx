@@ -5,7 +5,8 @@ import { PWAThemeManager } from "@/presentation/components/PWAThemeManager";
 import { PerformanceMonitor } from "@/presentation/components/PerformanceMonitor";
 import { SplashScreenManager } from "@/presentation/components/SplashScreenManager";
 import { SessionProvider } from "next-auth/react";
-import SessionHeartbeat from "@/presentation/SessionHeartBeat"
+import QueryProvider from "@/presentation/providers/QueryProvider";
+import SessionHeartbeat from "@/presentation/SessionHeartBeat";
 import { auth } from "@/app/auth";
 import "./globals.css";
 
@@ -110,8 +111,6 @@ export const metadata: Metadata = {
 		],
 	},
 
-
-
 	// Подключение веб-манифеста
 	manifest: "/manifest.webmanifest",
 };
@@ -129,32 +128,32 @@ export default async function RootLayout({
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
 			>
 				<SessionHeartbeat />
-				<SessionProvider session={session}>
-				<ThemeProvider
-					attribute="class"
-					defaultTheme="system"
-					enableSystem
-					disableTransitionOnChange
-				>
-					{/* Just widgets temporals*/}
-					<PWAThemeManager />
-					<PerformanceMonitor />
-					<SplashScreenManager />
-					<div className="min-h-dvh grid grid-cols-1 grid-rows-[auto_1fr] md:md:grid-cols-[72px_1fr]">
-						<HeaderShell />
+				<QueryProvider>
+					<SessionProvider session={session}>
+						<ThemeProvider
+							attribute="class"
+							defaultTheme="system"
+							enableSystem
+							disableTransitionOnChange
+						>
+							{/* Just widgets temporals*/}
+							<PWAThemeManager />
+							<PerformanceMonitor />
+							<SplashScreenManager />
+							<div className="min-h-dvh grid grid-cols-1 grid-rows-[auto_1fr] md:md:grid-cols-[72px_1fr]">
+								<HeaderShell />
 
-						{/* Десктопный сайдбар */}
-						<SideNavShell />
+								{/* Десктопный сайдбар */}
+								<SideNavShell />
 
-						{/* НАДО НАСТРАИВАТЬ GRID ДЛЯ КАЖДОЙ СТРАНИЦЫ */}
-							{children}
-						
-					</div>
+								{/* НАДО НАСТРАИВАТЬ GRID ДЛЯ КАЖДОЙ СТРАНИЦЫ */}
+								{children}
+							</div>
 
-					{/* </div> */}
-				</ThemeProvider>
-				<Toaster />
-				</SessionProvider>
+						</ThemeProvider>
+						<Toaster />
+					</SessionProvider>
+				</QueryProvider>
 			</body>
 		</html>
 	);
