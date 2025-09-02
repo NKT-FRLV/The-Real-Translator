@@ -2,9 +2,9 @@
 "use client";
 
 import { useState } from "react";
-import ThemeSwitcher from "../Header/ThemeSwitcher";
-import Logo from "../Header/Logo";
-import BurgerMenu from "../Header/BurgerMenu";
+import ThemeSwitcher from "./ThemeSwitcher";
+import Logo from "./Logo";
+import BurgerMenu from "./mobile-header/BurgerMenu";
 import ProfileButton from "./ProfileButton";
 
 export default function MobileHeaderClient({

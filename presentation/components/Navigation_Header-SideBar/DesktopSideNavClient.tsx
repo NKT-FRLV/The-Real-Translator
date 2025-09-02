@@ -1,7 +1,7 @@
 // presentation/components/Layout/DesktopSidebarClient.tsx
 
-import ThemeSwitcher from "../Header/ThemeSwitcher";
-import Logo from "../Header/Logo";
+import ThemeSwitcher from "./ThemeSwitcher";
+import Logo from "./Logo";
 import {
 	NavigationMenu,
 	NavigationMenuList,

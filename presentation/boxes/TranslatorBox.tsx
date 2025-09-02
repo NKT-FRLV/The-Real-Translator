@@ -90,6 +90,7 @@ export const TranslatorBox: React.FC = () => {
 	} = useSpeechRecognition();
 
 	const pendingRef = useRef(false);
+	const savedTranslationsRef = useRef<Set<string>>(new Set());
 
 const handleClickMicroPhone = useCallback(async () => {
   if (pendingRef.current) return;
