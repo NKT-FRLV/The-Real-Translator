@@ -16,7 +16,6 @@ import {
 	languages,
 	toneStyle,
 	LanguageShort,
-	Tone,
 } from "@/shared/config/translation";
 import {
 	Select,
