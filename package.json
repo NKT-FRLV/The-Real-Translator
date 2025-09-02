@@ -68,5 +68,10 @@
     "tsx": "^4.20.4",
     "tw-animate-css": "^1.3.6",
     "typescript": "^5"
+  },
+  "optionalDependencies": {
+    "@tailwindcss/oxide-linux-x64-gnu": "^4.1.12",
+    "@tailwindcss/oxide-linux-x64-musl": "^4.1.12",
+    "@tailwindcss/oxide-wasm32-wasi": "^4.1.12"
   }
 }
