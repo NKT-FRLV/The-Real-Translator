@@ -28,7 +28,7 @@ const ToneSelector = ({
 	const setTone = useSetTone();
 	
 	// Используем стор если useStore = true, иначе пропсы
-	const currentTone = useStore ? tone : value || 'natural';
+	const currentTone = useStore ? tone : value || 'neutral';
 	const handleToneChange = useStore ? setTone : (onToneChange || (() => {}));
 	return (
 		<Select value={currentTone} onValueChange={handleToneChange}>

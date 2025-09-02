@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
 
 		const toLang = isLanguageShort(raw?.toLang) ? raw.toLang : undefined;
 
-		const tone: Tone = isTone(raw?.tone) ? raw.tone : "natural";
+		const tone: Tone = isTone(raw?.tone) ? raw.tone : "neutral";
 
 		// Проверим текст на пустоту
 		if (!text.trim()) {
