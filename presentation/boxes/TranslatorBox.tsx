@@ -360,6 +360,23 @@ const handleClickMicroPhone = useCallback(async () => {
 	);
 
 	// ────────────────────────────────────────────────────────────────────────────
+	// Auto-save completed translations
+	// ────────────────────────────────────────────────────────────────────────────
+	useEffect(() => {
+		const sourceText = input.trim();
+		const resultText = completion.trim();
+		
+		// Создаем уникальный ключ для этого перевода
+		const translationKey = `${sourceText}|${resultText}|${fromLang}|${toLang}|${tone}`;
+		
+		// Сохраняем только если есть и исходный текст, и результат, перевод завершен, и мы еще не сохраняли этот перевод
+		if (sourceText && resultText && !isLoading && !error && !savedTranslationsRef.current.has(translationKey)) {
+			savedTranslationsRef.current.add(translationKey);
+			void saveTranslation(sourceText, resultText, fromLang, toLang, tone);
+		}
+	}, [completion, isLoading, error, input, fromLang, toLang, tone, saveTranslation]);
+
+	// ────────────────────────────────────────────────────────────────────────────
 	// Оркестратор перевода — без зацикливания
 	// ────────────────────────────────────────────────────────────────────────────
 	useEffect(() => {
