@@ -26,7 +26,7 @@ export function LoginForm({
 					<div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-primary"></div>
 				</div>
 			)}
-		<div className={cn("flex flex-col gap-6", className)} {...props}>
+		<div className={cn("relative z-20 flex flex-col gap-6", className)} {...props}>
 			<form>
 				<div className="flex flex-col gap-6">
 					<div className="flex flex-col items-center gap-2">
@@ -66,7 +66,7 @@ export function LoginForm({
           </div> */}
 					<div className="grid gap-4 sm:grid-rows-2">
 						<Button
-							variant="outline"
+							variant="secondary"
 							type="button"
 							className="w-full"
 							onClick={() => handleSignIn("google")}
@@ -83,7 +83,7 @@ export function LoginForm({
 							Continue with Google
 						</Button>
 						<Button
-							variant="outline"
+							variant="secondary"
 							className="w-full"
 							type="button"
 							onClick={() => handleSignIn("github")}
