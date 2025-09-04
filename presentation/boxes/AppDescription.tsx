@@ -10,9 +10,9 @@ export const AppDescription: React.FC = () => {
 					{/* Left Content */}
 					<div className="space-y-4 md:space-y-3">
 						<div>
-							<h2 className="font-rubik-mono text-2xl md:text-3xl font-bold text-foreground mb-4 md:mb-3 text-center md:text-left">
+							<h2 className="font-rubik-mono text-lg md:text-3xl font-bold text-foreground mb-4 md:mb-3 text-center md:text-left">
 								AI-Powered Translator
-								<span className="block text-xl md:text-xl font-semibold text-foreground my-4 md:my-2">
+								<span className="block text-lg md:text-xl font-semibold text-foreground my-4 md:my-2">
 									for 100+ Languages
 								</span>
 							</h2>

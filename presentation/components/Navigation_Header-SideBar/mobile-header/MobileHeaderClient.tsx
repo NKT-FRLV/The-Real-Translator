@@ -37,10 +37,10 @@ export default function MobileHeaderClient({
               </div>
             </button>
 
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2">
               <Logo size={32} />
               <Link href="/">
-                <h1 className="text-lg font-semibold text-foreground">Real-Translator</h1>
+                <h1 className="font-orbitron text-md tracking-wider font-semibold text-foreground">Real Translator</h1>
               </Link>
             </div>
           </div>

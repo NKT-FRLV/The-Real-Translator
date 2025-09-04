@@ -43,6 +43,7 @@
 }
 
 @theme inline {
+	--font-orbitron: var(--font-orbitron); /* <-- Шрифт для заголовков */
 	--font-rubik-mono: var(--font-rubik-mono); /* <-- Шрифт для заголовков */
 	--color-background: var(--background);
 	--color-foreground: var(--foreground);

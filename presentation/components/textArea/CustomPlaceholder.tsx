@@ -18,14 +18,14 @@ const CustomPlaceholder: React.FC<Props> = ({ showLightBeam, placeholder, value 
     "peer-focus:opacity-0 group-focus-within:opacity-0";
 
   const textSize = value.length < 30
-    ? "text-lg md:text-2xl lg:text-3xl"
-    : "text-base md:text-lg lg:text-2xl";
+    ? "text-md md:text-lg lg:text-xl"
+    : "text-base md:text-md lg:text-xl";
 
   if (showLightBeam) {
     return (
       <div className={containerCls} aria-hidden="true">
         <div
-          className={`relative inline-block h-full w-full ${textSize} font-medium text-foreground select-none shimmer-text`}
+          className={`relative inline-block h-full w-full ${textSize} font-orbitron font-medium text-foreground select-none shimmer-text`}
         >
           {placeholder}
         </div>
@@ -35,7 +35,7 @@ const CustomPlaceholder: React.FC<Props> = ({ showLightBeam, placeholder, value 
 
   return (
     <div className={containerCls} aria-hidden="true">
-      <div className={`${textSize} font-medium text-gray-500 select-none`}>
+      <div className={`${textSize} font-orbitron font-medium text-gray-500 select-none`}>
         {placeholder}
       </div>
     </div>

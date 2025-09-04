@@ -19,6 +19,7 @@ interface IconButtonProps {
 	size?: "big" | "small";
 	isLoading?: boolean;
 	iconClassName?: string;
+	tooltipDelay?: number;
 }
 
 export const IconButton: React.FC<IconButtonProps> = ({
@@ -31,6 +32,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
 	size = "small",
 	isLoading = false,
 	iconClassName = "",
+	tooltipDelay = 300,
 }) => {
 	const iconSizes = {
 		big: "w-5 h-5 md:w-7 md:h-7",
@@ -68,7 +70,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
 
 	if (tip) {
 		return (
-			<Tooltip>
+			<Tooltip delayDuration={tooltipDelay}>
 				<TooltipTrigger asChild>{buttonContent}</TooltipTrigger>
 				<TooltipContent side="bottom">{tip}</TooltipContent>
 			</Tooltip>

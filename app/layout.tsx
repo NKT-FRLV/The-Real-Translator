@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 export { viewport } from "./viewport";
-import { Geist, Geist_Mono, Rubik_Mono_One  } from "next/font/google";
+import { Geist, Geist_Mono, Rubik_Mono_One, Orbitron } from "next/font/google";
 import { PWAThemeManager } from "@/presentation/components/PWAThemeManager";
 import { PerformanceMonitor } from "@/presentation/components/PerformanceMonitor";
 import { SplashScreenManager } from "@/presentation/components/SplashScreenManager";
@@ -32,7 +32,14 @@ const rubikMonoOne = Rubik_Mono_One({
 	subsets: ["latin", "cyrillic"],
 	variable: "--font-rubik-mono",
 	display: "swap",
-  });
+});
+
+const orbitron = Orbitron({
+	weight: ["400", "500", "600"],
+	subsets: ["latin"],
+	variable: "--font-orbitron",
+	display: "swap",
+});
 
 export const metadata: Metadata = {
 	title: "The Real Translator",
@@ -99,6 +106,26 @@ export const metadata: Metadata = {
 		title: "The Real Translator",
 		statusBarStyle: "default",
 		startupImage: [
+			// iPhone 16 Pro Max (6.9") – 2868×1320
+			{
+				url: "/splash-1320x2868.png",
+				media: "(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)",
+			},
+			// iPhone 16 Pro (6.3") – 2622×1206
+			{
+				url: "/splash-1206x2622.png",
+				media: "(device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)",
+			},
+			// iPhone 16 / 15 / 14 Pro (6.1") – 2556×1179
+			{
+				url: "/splash-1179x2556.png",
+				media: "(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)",
+			},
+			// iPhone 16 Plus / 15 Pro Max / 15 Plus (6.7") – 2796×1290
+			{
+				url: "/splash-1290x2796.png",
+				media: "(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)",
+			},
 			{
 				url: "/splash-640x1136.png",
 				media: "(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)",
@@ -132,7 +159,7 @@ export default async function RootLayout({
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<body
-				className={`${geistSans.variable} ${geistMono.variable} ${rubikMonoOne.variable} antialiased`}
+				className={`${geistSans.variable} ${geistMono.variable} ${rubikMonoOne.variable} ${orbitron.variable} antialiased`}
 			>
 				<SessionHeartbeat />
 				<QueryProvider>
@@ -156,7 +183,6 @@ export default async function RootLayout({
 								{/* НАДО НАСТРАИВАТЬ GRID ДЛЯ КАЖДОЙ СТРАНИЦЫ */}
 								{children}
 							</div>
-
 						</ThemeProvider>
 						<Toaster />
 					</SessionProvider>
