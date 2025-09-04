@@ -30,7 +30,7 @@ export const StyleCard: React.FC<StyleCardProps> = ({ style, isSelected, onClick
         </div>
       )}
       <h4
-        className='text-base md:text-lg font-semibold text-foreground mb-1'
+        className='font-rubik-mono tracking-widest text-sm md:text-md font-semibold text-foreground mb-1'
       >
         {style.name}
       </h4>

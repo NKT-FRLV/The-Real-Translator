@@ -1,12 +1,13 @@
 "use client";
-import { useSession } from "next-auth/react";
-import React, { useState, useEffect } from "react";
-import { Settings, Heart, User, Bell } from "lucide-react";
-import TabButton from "./TabButton";
-import GeneralTab from "./profile_tabs/GeneralTab";
-import LikedTranslationsTab from "./profile_tabs/LikedTranslationsTab";
-import Account from "./profile_tabs/Account";
-import NotifivationsTab from "./profile_tabs/NotifivationsTab";
+
+import { useState, useEffect } from "react";
+import { Settings, Heart, User as UserIcon, Bell } from "lucide-react";
+import TabButton from "../TabButton";
+import GeneralTab from "../profile_tabs/GeneralTab";
+import LikedTranslationsTab from "../profile_tabs/LikedTranslationsTab";
+import Account from "../profile_tabs/Account";
+import NotifivationsTab from "../profile_tabs/NotifivationsTab";
+import type { User } from "next-auth";
 
 import {
 	useLoadSettings,
@@ -25,14 +26,13 @@ export interface Tab {
 const tabs: Tab[] = [
 	{ id: "general", label: "General", icon: Settings },
 	{ id: "liked", label: "Liked", icon: Heart },
-	{ id: "account", label: "Account", icon: User },
+	{ id: "account", label: "Account", icon: UserIcon },
 	{ id: "notifications", label: "Alerts", icon: Bell },
 ];
 
-const SettingsWindow = () => {
-	const { data: session } = useSession();
+const SettingsWindow = ({user}: {user: User} ) => {
+
 	const [activeTab, setActiveTab] = useState<TabType>("general");
-	const user = session?.user;
 
 	// Settings actions
 	const loadSettings = useLoadSettings();
@@ -40,10 +40,10 @@ const SettingsWindow = () => {
 
 	// Load settings on mount
 	useEffect(() => {
-		if (session?.user?.id) {
+		if (user?.id) {
 			loadSettings();
 		}
-	}, [session?.user?.id, loadSettings]);
+	}, [user?.id, loadSettings]);
 
 	// Handle save settings
 	const handleSaveSettings = async () => {
@@ -54,8 +54,6 @@ const SettingsWindow = () => {
 			toast.error("Failed to save settings. Please try again.");
 		}
 	};
-
-	if (!user) return null;
 
 	const renderTabContent = () => {
 		switch (activeTab) {

@@ -1,6 +1,7 @@
 import { auth } from "@/app/auth";
 import { redirect } from "next/navigation";
-import UserInfo from "./_components/UserInfo";
+import { Separator } from "@/shared/shadcn/ui/separator";
+import UserInfo from "./_components/boxes/UserInfo";
 import ProfileButton from "./_components/ProfileButton";
 
 export default async function ProfileLayout({
@@ -26,6 +27,12 @@ export default async function ProfileLayout({
 			{/* Main content area - mobile first layout */}
 			<div className="relative w-full h-full mx-auto flex flex-col px-4 pb-4 sm:px-6 sm:pb-6 md:flex-row">
 				<UserInfo user={user} />
+				<div className="block md:hidden">
+				<Separator className="w-full mt-2 md:mt-4" orientation="horizontal" />
+			</div>
+			<div className="hidden md:block">
+				<Separator className="h-full mx-4 md:mx-6" orientation="vertical" />
+			</div>
 				{children}
 			</div>
 		</main>

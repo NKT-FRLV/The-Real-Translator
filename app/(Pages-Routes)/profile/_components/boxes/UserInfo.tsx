@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { Avatar, AvatarImage, AvatarFallback } from "@/shared/shadcn/ui/avatar";
 import type { User } from "next-auth";
 

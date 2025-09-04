@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 export { viewport } from "./viewport";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Rubik_Mono_One  } from "next/font/google";
 import { PWAThemeManager } from "@/presentation/components/PWAThemeManager";
 import { PerformanceMonitor } from "@/presentation/components/PerformanceMonitor";
 import { SplashScreenManager } from "@/presentation/components/SplashScreenManager";
@@ -26,6 +26,13 @@ const geistMono = Geist_Mono({
 	variable: "--font-geist-mono",
 	subsets: ["latin"],
 });
+
+const rubikMonoOne = Rubik_Mono_One({
+	weight: "400", // у него только один вес
+	subsets: ["latin", "cyrillic"],
+	variable: "--font-rubik-mono",
+	display: "swap",
+  });
 
 export const metadata: Metadata = {
 	title: "The Real Translator",
@@ -125,7 +132,7 @@ export default async function RootLayout({
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<body
-				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+				className={`${geistSans.variable} ${geistMono.variable} ${rubikMonoOne.variable} antialiased`}
 			>
 				<SessionHeartbeat />
 				<QueryProvider>

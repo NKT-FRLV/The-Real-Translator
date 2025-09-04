@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction } from "react";
 import type {
 	Tab,
 	TabType,
-} from "@/app/(Pages-Routes)/profile/_components/SettingsWindow";
+} from "@/app/(Pages-Routes)/profile/_components/boxes/SettingsWindow";
 
 interface TabButtonProps {
 	tab: Tab;

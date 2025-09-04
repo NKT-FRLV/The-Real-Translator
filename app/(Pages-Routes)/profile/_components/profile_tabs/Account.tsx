@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { MinimalUser, SessionDTO, SessionsResponse, ApiErrorResponse } from "@/shared/types/user";
+import { SessionDTO, SessionsResponse, ApiErrorResponse } from "@/shared/types/user";
+import type { User } from "next-auth";
 
 interface AccountProps {
-	user: MinimalUser;
+	user: User;
 }
 
 const Account = ({ user }: AccountProps) => {
