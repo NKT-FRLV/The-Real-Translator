@@ -18,26 +18,37 @@ interface ToneSelectorProps {
 	useStore?: boolean;
 }
 
-const ToneSelector = ({ 
-	value, 
-	className, 
+const ToneSelector = ({
+	value,
+	className,
 	onToneChange,
-	useStore = false 
+	useStore = false,
 }: ToneSelectorProps) => {
 	const tone = useTone();
 	const setTone = useSetTone();
-	
+
 	// Используем стор если useStore = true, иначе пропсы
-	const currentTone = useStore ? tone : value || 'neutral';
-	const handleToneChange = useStore ? setTone : (onToneChange || (() => {}));
+	const currentTone = useStore ? tone : value || "neutral";
+	const handleToneChange = useStore ? setTone : onToneChange || (() => {});
 	return (
 		<Select value={currentTone} onValueChange={handleToneChange}>
-			<SelectTrigger size="max" className={cn("flex justify-center text-foreground font-semibold text-sm md:text-xl bg-transparent border-none focus:ring-0 hover:bg-background-hover transition-colors duration-300", className)} icon={false}>
+			<SelectTrigger
+				size="max"
+				className={cn(
+					"flex justify-center text-foreground font-semibold text-sm md:text-xl bg-transparent border-none focus:ring-0 hover:bg-background-hover transition-colors duration-300",
+					className
+				)}
+				icon={false}
+			>
 				<SelectValue placeholder="Select a Tone" />
 			</SelectTrigger>
 			<SelectContent>
 				{Object.entries(toneStyle).map(([key, label]) => (
-					<SelectItem key={key} value={key} className="font-medium text-sm md:text-xl">
+					<SelectItem
+						key={key}
+						value={key}
+						className="font-medium text-sm md:text-xl"
+					>
 						{label[0].toUpperCase() + label.slice(1)}
 					</SelectItem>
 				))}

@@ -26,7 +26,7 @@ export function LoginForm({
 					<div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-primary"></div>
 				</div>
 			)}
-		<div className={cn("relative z-20 flex flex-col gap-6", className)} {...props}>
+		<div className={cn("relative z-20 flex flex-col gap-6 px-6", className)} {...props}>
 			<form>
 				<div className="flex flex-col gap-6">
 					<div className="flex flex-col items-center gap-2">
@@ -68,7 +68,7 @@ export function LoginForm({
 						<Button
 							variant="secondary"
 							type="button"
-							className="w-full"
+							className="w-full cursor-pointer"
 							onClick={() => handleSignIn("google")}
 						>
 							<svg
@@ -84,7 +84,7 @@ export function LoginForm({
 						</Button>
 						<Button
 							variant="secondary"
-							className="w-full"
+							className="w-full cursor-pointer"
 							type="button"
 							onClick={() => handleSignIn("github")}
 						>
