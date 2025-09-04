@@ -4,15 +4,22 @@ import { ArrowLeftRight } from "lucide-react";
 import LanguageSelect from "./LanguageSelector";
 import ToneSelector from "./ToneSelector";
 import { Button } from "@/shared/shadcn/ui/button";
+import { LanguageShort, Tone } from '@/shared/types/types'
 import { memo } from "react";
 import { useFromLang, useToLang, useSetFromLang, useSetToLang, useSwapLanguages, useTone, useSetTone } from "../../stores/translatorStore";
 
 interface BoxTranslateOptionsProps {
+	initialFromLang?: LanguageShort;
+	initialToLang?: LanguageShort;
+	initialTone?: Tone;
 	isTranslating: boolean;
 	onSwapResultToInputText: () => void;
 }
 
 const BoxTranslateOptions: React.FC<BoxTranslateOptionsProps> = memo(({
+	initialFromLang,
+	initialToLang,
+	initialTone,
 	isTranslating,
 	onSwapResultToInputText,
 }) => {
@@ -37,7 +44,7 @@ const BoxTranslateOptions: React.FC<BoxTranslateOptionsProps> = memo(({
 					<LanguageSelect
 						value={fromLang}
 						setValue={setFromLang}
-						disabledValue={toLang}
+						disabledValue={initialFromLang || toLang}
 						className="flex-1"
 					/>
 					<Button
@@ -56,11 +63,11 @@ const BoxTranslateOptions: React.FC<BoxTranslateOptionsProps> = memo(({
 						<LanguageSelect
 							value={toLang}
 							setValue={setToLang}
-							disabledValue={fromLang}
+							disabledValue={initialToLang || fromLang}
 							className="flex-1"
 						/>
 						<div className="text-xs p-0 md:text-base md:mx-2 h-full w-[1px] bg-foreground"></div>
-						<ToneSelector value={tone} onToneChange={setTone} />
+						<ToneSelector value={initialTone || tone} onToneChange={setTone} />
 					</div>
 				</div>
 			</div>

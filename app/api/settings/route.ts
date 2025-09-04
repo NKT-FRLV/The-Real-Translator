@@ -1,42 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/app/auth";
 import { prisma } from "@/app/prismaClient/prisma";
+import { getUserSettingsData } from "@/app/services/settingsService";
 
 // GET - Load user settings
 export async function GET() {
   try {
-    const session = await auth();
+    const userSettings = await getUserSettingsData();
     
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    // Get or create user settings
-    let userSettings = await prisma.userSettings.findUnique({
-      where: {
-        userId: session.user.id,
-      },
-    });
-
-    // If no settings exist, create default ones
-    if (!userSettings) {
-      userSettings = await prisma.userSettings.create({
-        data: {
-          userId: session.user.id,
-          defaultSourceLang: "auto",
-          defaultTargetLang: "en",
-		  translationStyle: "neutral",
-          preferredLLM: "kimi-k2:free",
-          notificationsEnabled: false,
-        },
-      });
-    }
-
     // Return settings (mapping to our store format)
     return NextResponse.json({
-      defaultSourceLang: userSettings.defaultSourceLang || "auto",
-      defaultTargetLang: userSettings.defaultTargetLang || "en",
-	  translationStyle: userSettings.translationStyle || "neutral",
+      defaultSourceLang: userSettings.defaultSourceLang,
+      defaultTargetLang: userSettings.defaultTargetLang,
+      translationStyle: userSettings.translationStyle,
       uiLanguage: userSettings.uiLanguage,
       preferredLLM: userSettings.preferredLLM,
       reviewDailyTarget: userSettings.reviewDailyTarget,
@@ -84,7 +60,7 @@ export async function POST(request: NextRequest) {
         userId: session.user.id,
       },
       update: {
-        defaultSourceLang: defaultSourceLang === "auto" ? null : defaultSourceLang,
+        defaultSourceLang,
         defaultTargetLang,
 		translationStyle,
         uiLanguage,
@@ -95,7 +71,7 @@ export async function POST(request: NextRequest) {
       },
       create: {
         userId: session.user.id,
-        defaultSourceLang: defaultSourceLang === "auto" ? null : defaultSourceLang,
+        defaultSourceLang,
         defaultTargetLang,
 		translationStyle,
         uiLanguage,
@@ -109,7 +85,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       settings: {
-        defaultSourceLang: userSettings.defaultSourceLang || "auto",
+        defaultSourceLang: userSettings.defaultSourceLang,
         defaultTargetLang: userSettings.defaultTargetLang,
 		translationStyle: userSettings.translationStyle,
         uiLanguage: userSettings.uiLanguage,

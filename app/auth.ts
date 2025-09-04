@@ -4,7 +4,7 @@ import "server-only";
 import NextAuth, { type NextAuthConfig } from "next-auth";
 import { headers } from "next/headers";
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import { prisma } from "@/app/prismaClient/prisma"; // если у тебя так
+import { prisma } from "@/app/prismaClient/prisma"; // может стоит добавить адаптера для edge runtime
 import { TUserRole } from "@/shared/types/user";
 import GitHub from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
@@ -15,7 +15,7 @@ const requireEnv = (k: string) => {
 	return v;
 };
 
-// Расширяем типы NextAuth
+// Расширяем типы NextAuth для того, чтобы использовать в адаптере
 declare module "next-auth" {
 	interface User {
 		role?: TUserRole;
@@ -38,7 +38,7 @@ export const authConfig: NextAuthConfig = {
 	adapter: PrismaAdapter(prisma),
 	session: {
 		strategy: "database",
-		maxAge: 60 * 60 * 24 * 30, // 30 дней
+		maxAge: 60 * 60 * 24 * 30, // 30 дней актуальности сессии
 		updateAge: 60 * 60 * 24, // продление раз в сутки
 	},
 	providers: [
@@ -54,7 +54,7 @@ export const authConfig: NextAuthConfig = {
 	],
 	events: {
 		async signIn({ user }) {
-			// best-effort метка устройства/IP при входе
+			// best-effort метка устройства/IP при входе для того, чтобы использовать в адаптере
 			try {
 				const h = await headers(); // сработает в контексте запроса
 				const ua = h.get("user-agent") ?? null;

@@ -2,7 +2,7 @@
 import React, { useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { useSession } from "next-auth/react";
-import LikedTransCard from "./LikedTransCard";
+import LikedTransCard from "../LikedTransCard";
 import { Heart } from "lucide-react";
 import { toast } from "sonner";
 import { Translation } from "@prisma/client";
@@ -40,7 +40,7 @@ const fetchLiked = async (page = 1): Promise<LikedTranslationsResponse> => {
   return res.json();
 };
 
-const LikedTranslations = () => {
+const LikedTranslationsTab = () => {
   const { data: session } = useSession();
   const queryClient = useQueryClient();
 
@@ -279,4 +279,4 @@ onSettled: () => {
   );
 };
 
-export default LikedTranslations;
+export default LikedTranslationsTab;

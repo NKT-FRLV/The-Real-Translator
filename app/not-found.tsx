@@ -1,14 +1,35 @@
 import Link from "next/link";
+import { cn } from "@/shared/shadcn";
 
 export default async function NotFound() {
 	return (
-		<div className="w-full h-full m-auto flex flex-col items-center justify-center gap-4">
-			<h2 className="text-3xl font-bold">404 — Not Found</h2>
-
-			<p className="text-muted-foreground">How did you get here?</p>
-			<Link href="/" className="text-blue-500 hover:text-blue-700 border-2 border-blue-500 rounded-md p-2">
-				Return Home
-			</Link>
+		<div className="w-full h-full row-start-2 md:row-start-1 md:row-end-3 md:col-start-2 md:col-end-3 m-auto flex flex-col items-center justify-center gap-4">
+			<div className="relative flex flex-col h-[50rem] w-full items-center justify-center bg-white dark:bg-black">
+				<div
+					className={cn(
+						"absolute inset-0",
+						"[background-size:40px_40px]",
+						"[background-image:linear-gradient(to_right,#e4e4e7_1px,transparent_1px),linear-gradient(to_bottom,#e4e4e7_1px,transparent_1px)]",
+						"dark:[background-image:linear-gradient(to_right,#262626_1px,transparent_1px),linear-gradient(to_bottom,#262626_1px,transparent_1px)]"
+					)}
+				/>
+				{/* Radial gradient for the container to give a faded look */}
+				<div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-white [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)] dark:bg-black"></div>
+				<p className="relative z-20 bg-gradient-to-b from-neutral-200 to-neutral-500 bg-clip-text py-8 text-4xl font-bold text-transparent sm:text-7xl">
+					404 — Not Found
+				</p>
+				<p className="relative z-20 bg-gradient-to-b from-neutral-200 to-neutral-500 bg-clip-text py-8 text-4xl font-bold text-transparent sm:text-2xl">
+					How did you get here?
+				</p>
+				<Link
+					href="/"
+					className="relative z-20 text-blue-500 hover:text-blue-700 border-2 border-blue-500 bg-foreground rounded-md p-2"
+				>
+					<span className="text-background py-8 text-4xl font-bold sm:text-2xl">
+						Return Home
+					</span>
+				</Link>
+			</div>
 		</div>
 	);
 }

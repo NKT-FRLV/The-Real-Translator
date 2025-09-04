@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { LanguageShort, Tone } from '@/shared/config/translation';
 
 interface UserSettings {
-  defaultSourceLang: string | null; // "auto" или LanguageShort
+  defaultSourceLang: LanguageShort | null; // LanguageShort
   defaultTargetLang: LanguageShort | null;
   translationStyle: Tone;
   uiLanguage: string | null;
@@ -22,7 +22,7 @@ interface SettingsState extends UserSettings {
   lastSaved: Date | null;
   
   // Actions
-  setDefaultSourceLang: (lang: string) => void;
+  setDefaultSourceLang: (lang: LanguageShort) => void;
   setDefaultTargetLang: (lang: LanguageShort) => void;
   setTranslationStyle: (style: Tone) => void;
   setNotificationsEnabled: (enabled: boolean) => void;
@@ -39,7 +39,7 @@ interface SettingsState extends UserSettings {
 }
 
 const defaultSettings: UserSettings = {
-  defaultSourceLang: "auto",
+  defaultSourceLang: "ru",
   defaultTargetLang: "en",
   uiLanguage: null,
   preferredLLM: "kimi-k2:free",

@@ -6,7 +6,7 @@ import { useCompletion } from "@ai-sdk/react";
 import { useDebounce } from "use-debounce";
 import { useSession } from "next-auth/react";
 import { TextWindow } from "../elements/Translator-Box/TextWindow";
-import LanguageSelector from "../elements/Translator-Box/BoxTranslateOptions";
+import BoxTranslateOptions from "../elements/Translator-Box/BoxTranslateOptions";
 import { LanguageShort, Tone } from "@/shared/config/translation";
 import SpeechRecognition, {
 	useSpeechRecognition,
@@ -57,6 +57,12 @@ function makeRequestKey(
 	return `${text}\u241F${fromLang}\u241F${toLang}\u241F${tone}`;
 }
 
+// interface TranslatorBoxProps {
+// 	defaultSourceLang: LanguageShort;
+// 	defaultTargetLang: LanguageShort;
+// 	translationStyle: Tone;
+// }
+
 export const TranslatorBox: React.FC = () => {
 	// ────────────────────────────────────────────────────────────────────────────
 	// Store state
@@ -96,8 +102,6 @@ const handleClickMicroPhone = useCallback(async () => {
   if (pendingRef.current) return;
   pendingRef.current = true;
   try {
-    console.log('listening:', listening, 'fromLang:', fromLang);
-
     // базовые гарды
     if (!browserSupportsSpeechRecognition || !isMicrophoneAvailable) {
       console.warn('Speech not supported or mic blocked');
@@ -143,8 +147,8 @@ const handleClickMicroPhone = useCallback(async () => {
 
 	// Apply loaded settings to translator store
 	useEffect(() => {
-		if (defaultSourceLang && defaultSourceLang !== "auto") {
-			setFromLang(defaultSourceLang as LanguageShort);
+		if (defaultSourceLang) {
+			setFromLang(defaultSourceLang);
 		}
 		if (defaultTargetLang) {
 			setToLang(defaultTargetLang);
@@ -408,7 +412,7 @@ const handleClickMicroPhone = useCallback(async () => {
 
 	return (
 		<div className="w-full min-h-[40vh] mx-auto space-y-2 md:space-y-3 flex flex-col">
-			<LanguageSelector
+			<BoxTranslateOptions
 				isTranslating={isLoading}
 				onSwapResultToInputText={handleSwapResultToInputText}
 			/>

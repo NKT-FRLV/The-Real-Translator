@@ -36,4 +36,7 @@ export default async function middleware(req: Request) {
   return NextResponse.next();
 }
 
-export const config = { matcher: [ '/api/:path*', '/profile:path*'] };
+export const config = { matcher: [
+	// '/api/:path*',
+	'/profile:path*'
+] };
