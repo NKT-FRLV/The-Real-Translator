@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from "react";
 import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
+import { SpeechToText } from "@/presentation/API/speech-to-text/SpeechToText";
 import { LanguageShort } from "@/shared/config/translation";
 import { SpeechMode } from "@/shared/types/settings";
 
@@ -114,29 +115,7 @@ export const useSpeechToText = ({
       formData.append("audio", audioBlob, "audio.webm");
       formData.append("language", language);
 
-      const response = await fetch("/api/speech-to-text", {
-        method: "POST",
-        body: formData,
-        signal: abortController.signal,
-        headers: {
-          'X-Speech-Mode': 'whisper-ai',
-          'X-Request-Timeout': '30000',
-        },
-      });
-
-      if (!response.ok) {
-        if (response.status === 403) {
-          throw new Error("Access denied. Admin role required for Whisper AI transcription.");
-        }
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const result = await response.json();
-      
-      if (result.error) {
-        throw new Error(result.error);
-      }
-
+      const result = await SpeechToText(formData, abortController);
       const transcriptText = result.text || "";
       
       // Get current transcript and concatenate
@@ -150,6 +129,14 @@ export const useSpeechToText = ({
       // Notify about transcript update with new text for concatenation
       if (onTranscriptUpdate && transcriptText) {
         onTranscriptUpdate(transcriptText);
+      }
+      
+      // Log additional info from API response if available
+      if (result.language) {
+        console.log(`Detected language: ${result.language}`);
+      }
+      if (result.duration) {
+        console.log(`Audio duration: ${result.duration}s`);
       }
       
     } catch (error) {
