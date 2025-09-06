@@ -1,10 +1,12 @@
 import { create } from 'zustand';
 import { LanguageShort, Tone } from '@/shared/config/translation';
+import { SpeechMode } from '@/shared/types/settings';
 
 interface UserSettings {
   defaultSourceLang: LanguageShort | null; // LanguageShort
   defaultTargetLang: LanguageShort | null;
   translationStyle: Tone;
+  speechRecognitionMode: SpeechMode;
   uiLanguage: string | null;
   preferredLLM: string;
   reviewDailyTarget: number | null;
@@ -25,6 +27,7 @@ interface SettingsState extends UserSettings {
   setDefaultSourceLang: (lang: LanguageShort) => void;
   setDefaultTargetLang: (lang: LanguageShort) => void;
   setTranslationStyle: (style: Tone) => void;
+  setSpeechRecognitionMode: (mode: SpeechMode) => void;
   setNotificationsEnabled: (enabled: boolean) => void;
   setEmailNotifications: (enabled: boolean) => void;
   setTranslationReminders: (enabled: boolean) => void;
@@ -41,12 +44,13 @@ interface SettingsState extends UserSettings {
 const defaultSettings: UserSettings = {
   defaultSourceLang: "ru",
   defaultTargetLang: "en",
+  translationStyle: "neutral",
+  speechRecognitionMode: "browser",
   uiLanguage: null,
   preferredLLM: "kimi-k2:free",
   reviewDailyTarget: null,
   notificationsEnabled: false,
   timezone: null,
-  translationStyle: "neutral",
   emailNotifications: false,
   translationReminders: false,
 };
@@ -62,6 +66,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   setDefaultSourceLang: (lang) => set({ defaultSourceLang: lang }),
   setDefaultTargetLang: (lang) => set({ defaultTargetLang: lang }),
   setTranslationStyle: (style) => set({ translationStyle: style }),
+  setSpeechRecognitionMode: (mode) => set({ speechRecognitionMode: mode }),
   setNotificationsEnabled: (enabled) => set({ notificationsEnabled: enabled }),
   setEmailNotifications: (enabled) => set({ emailNotifications: enabled }),
   setTranslationReminders: (enabled) => set({ translationReminders: enabled }),
@@ -84,6 +89,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       set({
         ...settings,
         // Map additional fields that might not be in DB  
+        speechRecognitionMode: settings.speechRecognitionMode || defaultSettings.speechRecognitionMode,
         emailNotifications: settings.emailNotifications || defaultSettings.emailNotifications,
         translationReminders: settings.translationReminders || defaultSettings.translationReminders,
         isLoading: false,
@@ -103,13 +109,14 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       const settingsToSave = {
         defaultSourceLang: state.defaultSourceLang,
         defaultTargetLang: state.defaultTargetLang,
+        translationStyle: state.translationStyle,
+        speechRecognitionMode: state.speechRecognitionMode,
         uiLanguage: state.uiLanguage,
         preferredLLM: state.preferredLLM,
         reviewDailyTarget: state.reviewDailyTarget,
         notificationsEnabled: state.notificationsEnabled,
         timezone: state.timezone,
         // Additional UI settings
-        translationStyle: state.translationStyle,
         emailNotifications: state.emailNotifications,
         translationReminders: state.translationReminders,
       };
@@ -150,6 +157,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
 export const useDefaultSourceLang = () => useSettingsStore((state) => state.defaultSourceLang);
 export const useDefaultTargetLang = () => useSettingsStore((state) => state.defaultTargetLang);
 export const useTranslationStyle = () => useSettingsStore((state) => state.translationStyle);
+export const useSpeechRecognitionMode = () => useSettingsStore((state) => state.speechRecognitionMode);
 export const useNotificationsEnabled = () => useSettingsStore((state) => state.notificationsEnabled);
 export const useEmailNotifications = () => useSettingsStore((state) => state.emailNotifications);
 export const useTranslationReminders = () => useSettingsStore((state) => state.translationReminders);
@@ -163,6 +171,14 @@ export const useSaveSettings = () => useSettingsStore((state) => state.saveSetti
 export const useSetDefaultSourceLang = () => useSettingsStore((state) => state.setDefaultSourceLang);
 export const useSetDefaultTargetLang = () => useSettingsStore((state) => state.setDefaultTargetLang);
 export const useSetTranslationStyle = () => useSettingsStore((state) => state.setTranslationStyle);
+export const useSetSpeechRecognitionMode = () => useSettingsStore((state) => state.setSpeechRecognitionMode);
 export const useSetNotificationsEnabled = () => useSettingsStore((state) => state.setNotificationsEnabled);
 export const useSetEmailNotifications = () => useSettingsStore((state) => state.setEmailNotifications);
 export const useSetTranslationReminders = () => useSettingsStore((state) => state.setTranslationReminders);
+
+// Hook that respects user role for speech recognition mode
+export const useEffectiveSpeechRecognitionMode = (isAdmin: boolean = false): SpeechMode => {
+  const storedMode = useSpeechRecognitionMode();
+  // Force browser mode for non-admin users
+  return !isAdmin ? "browser" : (storedMode || "browser");
+};

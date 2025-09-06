@@ -5,12 +5,11 @@ import React, { useState, useCallback, useRef, useEffect } from "react";
 import { useCompletion } from "@ai-sdk/react";
 import { useDebounce } from "use-debounce";
 import { useSession } from "next-auth/react";
+import { toast } from "sonner";
 import { TextWindow } from "../elements/Translator-Box/TextWindow";
 import BoxTranslateOptions from "../elements/Translator-Box/BoxTranslateOptions";
 import { LanguageShort, Tone } from "@/shared/config/translation";
-import SpeechRecognition, {
-	useSpeechRecognition,
-} from "react-speech-recognition";
+import { useSpeechToText } from "../hooks/useSpeechToText";
 // import { createLogger } from "@/shared/utils/logger";
 import CustomPlaceholder from "../components/textArea/CustomPlaceholder";
 import {
@@ -26,27 +25,11 @@ import {
 	useDefaultTargetLang,
 	useTranslationStyle,
 	useLoadSettings,
+	useEffectiveSpeechRecognitionMode,
+	useSetSpeechRecognitionMode,
 } from "../stores/settingsStore";
 
 type RequestKey = string;
-
-const BASE_LOCALES = {
-	en: "en-US",
-	ru: "ru-RU",
-  } as const;
-  
-  function resolveLocale(lang: "en" | "ru") {
-	if (typeof navigator === "undefined") return BASE_LOCALES[lang];
-	const prefs = navigator.languages ?? [navigator.language];
-  
-	if (lang === "en") {
-	  // если у юзера британская локаль — отдадим en-GB
-	  if (prefs.some(l => l.toLowerCase().startsWith("en-gb"))) return "en-GB";
-	  return "en-US";
-	}
-	return "ru-RU";
-  }
-  
 
 function makeRequestKey(
 	text: string,
@@ -82,18 +65,51 @@ export const TranslatorBox: React.FC = () => {
 	const setFromLang = useSetFromLang();
 	const setToLang = useSetToLang();
 	const setTone = useSetTone();
+	const setSpeechRecognitionMode = useSetSpeechRecognitionMode();
 
 	// ────────────────────────────────────────────────────────────────────────────
 	// Speech-to-text logic
 	// ────────────────────────────────────────────────────────────────────────────
 
+	const isAdmin = session?.user?.role === "ADMIN";
+	const speechRecognitionMode = useEffectiveSpeechRecognitionMode(isAdmin);
+
 	const {
 		transcript,
 		listening,
-		resetTranscript,
+		isSupported: isSpeechSupported,
+		isBrowserSupported: browserSupportsSpeechRecognition,
 		isMicrophoneAvailable,
-		browserSupportsSpeechRecognition,
-	} = useSpeechRecognition();
+		startListening,
+		stopListening,
+		resetTranscript,
+		isTranscribing,
+	} = useSpeechToText({
+		language: fromLang,
+		mode: speechRecognitionMode || "browser",
+		isAdmin,
+		onError: (error) => {
+			console.error("Speech recognition error:", error);
+			// Show user-friendly error message
+			if (error.includes("Admin role required")) {
+				toast.error("Whisper AI is available only for administrators", {
+					description: "Switch to browser mode or contact administrator",
+				});
+			} else if (error.includes("Recording too short")) {
+				toast.error("Recording too short", {
+					description: "Please speak for longer or check your microphone",
+				});
+			} else if (error.includes("rate limit")) {
+				toast.error("Rate limit exceeded", {
+					description: "Please wait a moment before trying again",
+				});
+			} else {
+				toast.error("Speech recognition failed", {
+					description: error,
+				});
+			}
+		},
+	});
 
 	const pendingRef = useRef(false);
 	const savedTranslationsRef = useRef<Set<string>>(new Set());
@@ -101,38 +117,38 @@ export const TranslatorBox: React.FC = () => {
 const handleClickMicroPhone = useCallback(async () => {
   if (pendingRef.current) return;
   pendingRef.current = true;
+  
   try {
-    // базовые гарды
-    if (!browserSupportsSpeechRecognition || !isMicrophoneAvailable) {
+    if (!isSpeechSupported || !isMicrophoneAvailable) {
       console.warn('Speech not supported or mic blocked');
       return;
     }
-    if (!["en", "ru"].includes(fromLang)) return;
 
     if (listening) {
-      SpeechRecognition.stopListening(); // мягкая остановка
-      // НЕ вызываем abort здесь без нужды — даст лишние onend/onerror
+      stopListening();
       return;
     }
 
-    // чистый старт
-    const lang = resolveLocale(fromLang as "en" | "ru");
-    resetTranscript(); // очистим предыдущий текст
-    // небольшая пауза перед стартом помогает хромовому движку
-    await new Promise(r => setTimeout(r, 50));
-
-    // ВАЖНО: continuous + interimResults
-    SpeechRecognition.startListening({
-      language: lang,
-    //   continuous: true,
-      interimResults: true,
-    });
-
+    // Start listening using the unified hook
+    await startListening();
   } finally {
     pendingRef.current = false;
   }
-}, [fromLang, listening, browserSupportsSpeechRecognition, isMicrophoneAvailable, resetTranscript]);
+}, [isSpeechSupported, isMicrophoneAvailable, listening, startListening, stopListening]);
 
+	// Toggle speech recognition mode (only for admins)
+	const handleSpeechModeToggle = useCallback(() => {
+		if (!isAdmin) return; // Prevent non-admin users from switching modes
+		
+		const newMode = speechRecognitionMode === "browser" ? "whisper" : "browser";
+		setSpeechRecognitionMode(newMode);
+		
+		// Stop current listening if active
+		if (listening) {
+			stopListening();
+		}
+		resetTranscript();
+	}, [isAdmin, speechRecognitionMode, setSpeechRecognitionMode, listening, stopListening, resetTranscript]);
 
 	// ────────────────────────────────────────────────────────────────────────────
 	// UI state
@@ -156,6 +172,8 @@ const handleClickMicroPhone = useCallback(async () => {
 		if (defaultTranslationStyle) {
 			setTone(defaultTranslationStyle);
 		}
+		// Speech recognition mode is handled by the settings store directly
+		// and used via speechRecognitionMode state
 	}, [
 		defaultSourceLang,
 		defaultTargetLang,
@@ -283,9 +301,12 @@ const handleClickMicroPhone = useCallback(async () => {
 	const safeTranscript = typeof transcript === "string" ? transcript : "";
 
 	useEffect(() => {
-		// синкаем только в режиме диктовки
-		if (listening) setInput(safeTranscript);
-	}, [listening, safeTranscript, setInput]);
+		// синкаем transcript с input при любом изменении transcript
+		// но только если transcript не пустой
+		if (safeTranscript && safeTranscript !== input) {
+			setInput(safeTranscript);
+		}
+	}, [safeTranscript, setInput, input]);
 
 	// если начался перевод, а юзер сного печататет, останавливаем перевод
 	const handleUserInputChange = useCallback(
@@ -306,13 +327,12 @@ const handleClickMicroPhone = useCallback(async () => {
 		}
 
 		activeKeyRef.current = "";
-		SpeechRecognition.abortListening();
-		SpeechRecognition.stopListening();
+		stopListening();
 		setCurrentTranslationId(null);
 		setInput("");
 		resetTranscript();
 		setCompletion("");
-	}, [isLoading, stop, setCompletion, setInput, resetTranscript]);
+	}, [isLoading, stop, setCompletion, setInput, resetTranscript, stopListening]);
 
 	const handleSwapResultToInputText = useCallback(() => {
 		const translatedText = completion?.trim() ?? "";
@@ -327,8 +347,7 @@ const handleClickMicroPhone = useCallback(async () => {
 
 		activeKeyRef.current = "";
 		resetTranscript();
-		SpeechRecognition.abortListening();
-		SpeechRecognition.stopListening();
+		stopListening();
 		setCurrentTranslationId(null);
 		setCompletion("");
 		setInput(translatedText);
@@ -336,7 +355,7 @@ const handleClickMicroPhone = useCallback(async () => {
 		// Один немедленный перевод без debounce, потом вернём дефолт
 		swappedOnceRef.current = true;
 		// setDebounceMs(0);
-	}, [completion, isLoading, stop, setCompletion, setInput, resetTranscript]);
+	}, [completion, isLoading, stop, setCompletion, setInput, resetTranscript, stopListening]);
 
 	// ────────────────────────────────────────────────────────────────────────────
 	// Стабильная функция для запуска перевода
@@ -432,13 +451,14 @@ const handleClickMicroPhone = useCallback(async () => {
 					)}
 					isInput={true}
 					maxLength={100000}
-					isSpeechSupported={
-						fromLang === "ru" ||
-						fromLang === "en"
-					}
+					isSpeechSupported={isSpeechSupported}
 					isBrowserSupportSpeech={browserSupportsSpeechRecognition}
 					onVoiceInput={handleClickMicroPhone}
 					listening={listening}
+					speechMode={speechRecognitionMode}
+					onSpeechModeToggle={handleSpeechModeToggle}
+					isAdmin={isAdmin}
+					isTranscribing={isTranscribing}
 				/>
 
 				<TextWindow

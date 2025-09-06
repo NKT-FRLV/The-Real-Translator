@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { X, Volume2, Mic, Copy, Bookmark, Share, Heart } from "lucide-react";
+import { X, Volume2, Mic, Copy, Bookmark, Share, Heart, Zap } from "lucide-react";
 import { Textarea } from "@/shared/shadcn/ui/textarea";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
@@ -8,6 +8,7 @@ import { IconButton } from "@/presentation/components/textArea/IconButton";
 import { useRouter } from "next/navigation";
 import { likeTranslation } from "@/presentation/API/like/likeApi";
 import { cn } from '@/shared/shadcn/utils'
+import { SpeechMode } from '@/shared/types/settings'
 
 interface TextWindowProps {
 	value?: string;
@@ -26,6 +27,13 @@ interface TextWindowProps {
 	isBrowserSupportSpeech?: boolean;
 	listening?: boolean;
 	onVoiceInput?: () => void;
+	// speech mode toggle
+	speechMode?: SpeechMode;
+	onSpeechModeToggle?: () => void;
+	// admin features
+	isAdmin?: boolean;
+	// whisper loading state
+	isTranscribing?: boolean;
 }
 
 export const TextWindow: React.FC<TextWindowProps> = ({
@@ -44,6 +52,10 @@ export const TextWindow: React.FC<TextWindowProps> = ({
 	isBrowserSupportSpeech,
 	listening,
 	onVoiceInput,
+	speechMode = "browser",
+	onSpeechModeToggle,
+	isAdmin = false,
+	isTranscribing = false,
 }) => {
 	const { data: session } = useSession();
 	const [isLiked, setIsLiked] = useState(false);
@@ -188,15 +200,45 @@ export const TextWindow: React.FC<TextWindowProps> = ({
 					/>
 
 					{isInput && (
-						<IconButton
-							icon={Mic}
-							tip={voiceInputTip}
-							disabled={disabledMic}
-							onClick={onVoiceInput}
-							className={cn(
-								listening && 'relative before:absolute before:inset-0 before:bg-red-500/30 before:rounded-full before:animate-ping after:absolute after:inset-0 after:bg-red-500/30 after:rounded-full'
+						<>
+							<IconButton
+								icon={Mic}
+								tip={voiceInputTip}
+								disabled={disabledMic}
+								onClick={onVoiceInput}
+								className={cn(
+									listening && 'relative hover:bg-transparent before:absolute before:inset-0 before:bg-red-500/30 before:rounded-full before:animate-ping after:absolute after:inset-0 after:bg-red-500/30 after:rounded-full'
+								)}
+							/>
+							
+							{onSpeechModeToggle && isAdmin && (
+								<IconButton
+									icon={Zap}
+									tip={speechMode === "whisper" 
+										? "Using Whisper AI -(Admin Only)" 
+										: "Basic speech recognition"
+									}
+									onClick={onSpeechModeToggle}
+									isActive={speechMode === "whisper"}
+									className={cn(
+										speechMode === "whisper" && 'text-yellow-500 bg-yellow-500/20 border-yellow-500/30 shadow-lg',
+										speechMode === "whisper" && listening && 'animate-pulse'
+									)}
+								/>
 							)}
-						/>
+							
+							{/* Whisper Transcription Loader */}
+							{isTranscribing && speechMode === "whisper" && (
+								<div className="flex items-center gap-2 px-2 py-1 bg-blue-500/10 rounded-md border border-blue-500/20">
+									<div className="flex space-x-1">
+										<div className="w-1 h-1 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+										<div className="w-1 h-1 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+										<div className="w-1 h-1 bg-blue-500 rounded-full animate-bounce"></div>
+									</div>
+									<span className="text-xs text-blue-400 font-medium">AI Processing...</span>
+								</div>
+							)}
+						</>
 					)}
 
 					<IconButton icon={Copy} onClick={onCopy} tip="Copy text" />

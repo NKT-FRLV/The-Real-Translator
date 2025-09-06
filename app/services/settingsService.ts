@@ -13,6 +13,7 @@ export async function getUserSettingsData(): Promise<UserTranslationSettings> {
       defaultSourceLang: "ru",
       defaultTargetLang: "en",
       translationStyle: "neutral",
+      speechRecognitionMode: "browser",
     };
   }
 
@@ -41,6 +42,7 @@ export async function getUserSettingsData(): Promise<UserTranslationSettings> {
     defaultSourceLang: (userSettings as UserTranslationSettings).defaultSourceLang || "ru",
     defaultTargetLang: (userSettings as UserTranslationSettings).defaultTargetLang || "en",
     translationStyle: (userSettings as UserTranslationSettings).translationStyle || "neutral",
+    speechRecognitionMode: (userSettings as UserTranslationSettings).speechRecognitionMode || "browser",
     uiLanguage: userSettings.uiLanguage || undefined,
     preferredLLM: userSettings.preferredLLM || undefined,
     reviewDailyTarget: userSettings.reviewDailyTarget || undefined,

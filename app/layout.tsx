@@ -95,7 +95,7 @@ export const metadata: Metadata = {
 			{
 				rel: "mask-icon",
 				url: "/safari-pinned-tab.svg",
-				color: "#0b0b0b",
+				color: "#ffffff",
 			},
 		],
 	},
@@ -104,7 +104,7 @@ export const metadata: Metadata = {
 	appleWebApp: {
 		capable: true,
 		title: "The Real Translator",
-		statusBarStyle: "default",
+		statusBarStyle: "black-translucent",
 		startupImage: [
 			// iPhone 16 Pro Max (6.9") – 2868×1320
 			{
