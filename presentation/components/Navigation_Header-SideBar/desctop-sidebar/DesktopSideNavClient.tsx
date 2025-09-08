@@ -2,13 +2,8 @@
 
 import ThemeSwitcher from "../ThemeSwitcher";
 import Logo from "../Logo";
-import {
-	NavigationMenu,
-	NavigationMenuList,
-} from "@/shared/shadcn/ui/navigation-menu";
 import ProfileButton from "../ProfileButton";
 import NavIcon from "../NavIcon";
-import { HelpCircle } from "lucide-react";
 
 export default function DesktopSideNavClient({
 	isAuth,
@@ -26,61 +21,45 @@ export default function DesktopSideNavClient({
 				<Logo responsive />
 			</div>
 
-			<div className="flex-1 flex flex-col items-center justify-center">
+			<div className="flex-1 flex flex-col gap-12 items-center justify-start">
 				<ThemeSwitcher className="mt-10" />
-				<NavigationMenu viewport={false} className="flex-col mt-0">
-					<NavigationMenuList className="flex-col gap-6">
-						{/* Иконка перевода */}
-						<NavIcon
-							iconType={'languages'}
-							menuItems={[
-								{ label: "Documents" },
-								{ label: "Web Pages" },
-								{ label: "Text" },
-							]}
-						/>
+				<nav className="flex flex-col gap-6 mt-6">
+					{/* Иконка перевода */}
+					<NavIcon
+						iconType={'languages'}
+						href="/profile?tab=translations"
+					/>
 
-						{/* Иконка истории */}
-						<NavIcon
-							iconType={'clock'}
-							menuItems={[
-								{ label: "Recent Translations" },
-								{ label: "Today" },
-								{ label: "This Week" },
-							]}
-						/>
+					{/* Иконка истории */}
+					<NavIcon
+						iconType={'clock'}
+						href="/profile?tab=history"
+					/>
 
-						{/* Иконка избранного */}
-						<NavIcon
-							iconType={'heart'}
-							menuItems={[
-								{ label: "Saved Translations" },
-								{ label: "Collections" },
-								{ label: "Export" },
-							]}
-						/>
+					{/* Иконка избранного */}
+					<NavIcon
+						iconType={'heart'}
+						href="/profile?tab=favorites"
+					/>
 
-						{/* Иконка настроек */}
-						<NavIcon
-							iconType={'settings'}
-							menuItems={[
-								{ label: "Languages" },
-								{ label: "Themes" },
-								{ label: "Notifications" },
-							]}
-						/>
+					{/* Демо темы */}
+					<NavIcon
+						iconType={'theme-demo'}
+						href="/theme-demo"
+					/>
 
-						{/* Иконка помощи */}
-						<NavIcon
-							iconType={'help'}
-							menuItems={[
-								{ label: "FAQ" },
-								{ label: "Shortcuts" },
-								{ label: "Feedback" },
-							]}
-						/>
-					</NavigationMenuList>
-				</NavigationMenu>
+					{/* Иконка настроек */}
+					<NavIcon
+						iconType={'settings'}
+						href="/profile?tab=settings"
+					/>
+
+					{/* Иконка помощи */}
+					<NavIcon
+						iconType={'help'}
+						href="/profile?tab=help"
+					/>
+				</nav>
 			</div>
 
 			<div className="flex items-center">

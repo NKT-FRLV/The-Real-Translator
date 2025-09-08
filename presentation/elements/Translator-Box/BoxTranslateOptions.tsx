@@ -40,7 +40,7 @@ const BoxTranslateOptions: React.FC<BoxTranslateOptionsProps> = memo(({
 	return (
 		<div className="px-3 pt-3 md:px-4 w-full rounded-lg bg-gradient-to-b from-red-900/10 to-[90%] from-[#121214]">
 			<div className="flex h-16 md:h-18 items-center justify-start border border-gray-700 bg-accent/30 px-3 md:px-6 py-2 rounded-lg">
-				<div className="flex w-full h-full items-center gap-2 md:gap-4">
+				<div className="flex w-full h-full items-center gap-0 md:gap-4 truncate">
 					<LanguageSelect
 						value={fromLang}
 						setValue={setFromLang}
@@ -59,15 +59,22 @@ const BoxTranslateOptions: React.FC<BoxTranslateOptionsProps> = memo(({
 							className="text-foreground stroke-2 size-4 md:size-6"
 						/>
 					</Button>
-					<div className="w-full h-full flex flex-1 items-center">
+					<div className="h-full flex flex-1 items-center gap-2 md:gap-3">
 						<LanguageSelect
 							value={toLang}
 							setValue={setToLang}
 							disabledValue={initialToLang || fromLang}
 							className="flex-1"
 						/>
-						<div className="text-xs p-0 md:text-base md:mx-2 h-full w-[1px] bg-foreground"></div>
-						<ToneSelector value={initialTone || tone} onToneChange={setTone} />
+						<div className="h-3/4 w-[1px] bg-border/50"></div>
+						<div className="relative flex flex-col items-center justify-center h-full">
+							<div className="relative">
+								<div className="absolute inset-0 bg-gradient-to-r from-red-500/10 via-red-400/5 to-red-500/10 rounded-md blur-sm"></div>
+								<div className="relative bg-white/[0.03] dark:bg-white/[0.02] border border-red-500/20 dark:border-red-400/15 rounded-md px-2 py-1 backdrop-blur-sm">
+									<ToneSelector value={initialTone || tone} onToneChange={setTone} />
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>

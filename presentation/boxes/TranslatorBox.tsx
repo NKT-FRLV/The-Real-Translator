@@ -430,12 +430,12 @@ const handleClickMicroPhone = useCallback(async () => {
 		: "Translation will appear here...";
 
 	return (
-		<div className="w-full min-h-[40vh] mx-auto space-y-2 md:space-y-3 flex flex-col">
+		<div className="w-full min-h-[40vh] mx-auto space-y-3 md:space-y-4 flex flex-col">
 			<BoxTranslateOptions
 				isTranslating={isLoading}
 				onSwapResultToInputText={handleSwapResultToInputText}
 			/>
-			<div className="w-full grid grid-cols-1 gap-3 md:gap-3 mb-4 md:mb-6 lg:grid-cols-2 bg-gradient-to-t from-red-900/20 to-[90%] from-[#121214] rounded-xl px-3 md:px-3 pb-3 md:pb-3">
+			<div className="w-full grid grid-cols-1 gap-4 md:gap-5 mb-6 md:mb-8 lg:grid-cols-2 backdrop-blur-md bg-white/[0.03] dark:bg-white/[0.02] border border-white/[0.08] dark:border-white/[0.06] rounded-2xl p-4 md:p-5 shadow-xl shadow-black/[0.15]">
 				<TextWindow
 					value={input}
 					onChange={handleUserInputChange}

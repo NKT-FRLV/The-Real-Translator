@@ -35,7 +35,7 @@ const ToneSelector = ({
 			<SelectTrigger
 				size="max"
 				className={cn(
-					"flex justify-center font-orbitron text-foreground font-semibold text-sm md:text-xl bg-transparent border-none focus:ring-0 hover:bg-background-hover transition-colors duration-300",
+					"flex justify-center font-orbitron text-foreground font-semibold text-sm md:text-xl bg-transparent border-none focus:ring-0 hover:bg-background-hover transition-colors duration-300 min-w-[60px] md:min-w-[120px] w-[60px] md:w-[120px]",
 					className
 				)}
 				icon={false}

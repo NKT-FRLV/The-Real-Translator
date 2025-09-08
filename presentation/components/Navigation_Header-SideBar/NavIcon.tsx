@@ -2,26 +2,17 @@
 
 import React from "react";
 import type { LucideIcon } from "lucide-react";
-import { Languages, Clock, Heart, Settings, HelpCircle } from "lucide-react";
+import { Languages, Clock, Heart, Settings, HelpCircle, Palette } from "lucide-react";
 import { cn } from "@/shared/shadcn/utils";
-import {
-	NavigationMenuTrigger,
-	NavigationMenuContent,
-	NavigationMenuItem,
-	NavigationMenuLink,
-} from "@/shared/shadcn/ui/navigation-menu";
+import Link from "next/link";
 
-type IconsUnion = "languages" | "clock" | "heart" | "settings" | "help";
+type IconsUnion = "languages" | "clock" | "heart" | "settings" | "help" | "theme-demo";
 
 type NavIconVariant = "desktop" | "mobile";
 
 interface NavIconProps {
 	iconType: IconsUnion;
-	menuItems: Array<{
-		label: string;
-		onClick?: () => void;
-		href?: string;
-	}>;
+	href: string;
 	className?: string;
 	size?: number;
 	iconClassName?: string;
@@ -31,7 +22,7 @@ interface NavIconProps {
 
 export const NavIcon: React.FC<NavIconProps> = ({
 	iconType,
-	menuItems,
+	href,
 	className,
 	size = 28,
 	iconClassName,
@@ -45,6 +36,7 @@ export const NavIcon: React.FC<NavIconProps> = ({
 		heart: Heart,
 		settings: Settings,
 		help: HelpCircle,
+		"theme-demo": Palette,
 	};
 
 	const Icon = IconsMap[iconType];
@@ -52,42 +44,10 @@ export const NavIcon: React.FC<NavIconProps> = ({
 	// Desktop variant - icon only
 	if (variant === "desktop") {
 		return (
-			<NavigationMenuItem>
-				<NavigationMenuTrigger
-					chevron={false}
-					className={cn(
-						"flex items-center justify-center w-10 h-10 p-0 rounded-lg",
-						className
-					)}
-				>
-					<Icon
-						size={size}
-						className={cn("text-current", iconClassName)}
-					/>
-				</NavigationMenuTrigger>
-				<NavigationMenuContent>
-					<div className="w-48 p-2">
-						{menuItems.map((item, index) => (
-							<NavigationMenuLink
-								key={index}
-								className="block p-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-800 rounded cursor-pointer"
-								onClick={item.onClick}
-							>
-								{item.label}
-							</NavigationMenuLink>
-						))}
-					</div>
-				</NavigationMenuContent>
-			</NavigationMenuItem>
-		);
-	}
-
-	// Mobile variant - icon with text
-	return (
-		<NavigationMenuItem className="w-full">
-			<NavigationMenuTrigger 
+			<Link
+				href={href}
 				className={cn(
-					"w-full justify-start gap-3 p-4 h-auto",
+					"flex items-center justify-center w-10 h-10 p-0 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors",
 					className
 				)}
 			>
@@ -95,22 +55,25 @@ export const NavIcon: React.FC<NavIconProps> = ({
 					size={size}
 					className={cn("text-current", iconClassName)}
 				/>
-				<span>{label}</span>
-			</NavigationMenuTrigger>
-			<NavigationMenuContent>
-				<div className="w-full p-2">
-					{menuItems.map((item, index) => (
-						<NavigationMenuLink
-							key={index}
-							className="block p-3 text-sm hover:bg-gray-800 rounded cursor-pointer"
-							onClick={item.onClick}
-						>
-							{item.label}
-						</NavigationMenuLink>
-					))}
-				</div>
-			</NavigationMenuContent>
-		</NavigationMenuItem>
+			</Link>
+		);
+	}
+
+	// Mobile variant - icon with text
+	return (
+		<Link
+			href={href}
+			className={cn(
+				"w-full flex items-center justify-start gap-3 p-4 h-auto rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors",
+				className
+			)}
+		>
+			<Icon
+				size={size}
+				className={cn("text-current", iconClassName)}
+			/>
+			<span>{label}</span>
+		</Link>
 	);
 };
 

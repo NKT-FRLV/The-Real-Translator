@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { Settings, Heart, User as UserIcon, Bell } from "lucide-react";
 import TabButton from "../TabButton";
 import GeneralTab from "../profile_tabs/GeneralTab";
@@ -30,9 +31,30 @@ const tabs: Tab[] = [
 	{ id: "notifications", label: "Alerts", icon: Bell },
 ];
 
-const SettingsWindow = ({user}: {user: User} ) => {
+// Mapping query parameters to tab types
+const queryToTabMap: Record<string, TabType> = {
+	"settings": "general",
+	"favorites": "liked", 
+	"account": "account",
+	"notifications": "notifications",
+	"help": "notifications", // help maps to notifications tab
+	"translations": "general", // translations maps to general settings
+	"history": "general", // history maps to general settings
+};
 
-	const [activeTab, setActiveTab] = useState<TabType>("general");
+const SettingsWindow = ({user}: {user: User} ) => {
+	const searchParams = useSearchParams();
+	
+	// Get initial tab from query params or default to "general"
+	const getInitialTab = (): TabType => {
+		const tabParam = searchParams?.get("tab");
+		if (tabParam && queryToTabMap[tabParam]) {
+			return queryToTabMap[tabParam];
+		}
+		return "general";
+	};
+
+	const [activeTab, setActiveTab] = useState<TabType>(getInitialTab);
 
 	// Settings actions
 	const loadSettings = useLoadSettings();
@@ -44,6 +66,14 @@ const SettingsWindow = ({user}: {user: User} ) => {
 			loadSettings();
 		}
 	}, [user?.id, loadSettings]);
+
+	// Update active tab when query params change
+	useEffect(() => {
+		const tabParam = searchParams?.get("tab");
+		if (tabParam && queryToTabMap[tabParam]) {
+			setActiveTab(queryToTabMap[tabParam]);
+		}
+	}, [searchParams]);
 
 	// Handle save settings
 	const handleSaveSettings = async () => {

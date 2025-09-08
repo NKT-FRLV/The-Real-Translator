@@ -1,10 +1,10 @@
 "use client";
 
 import * as React from "react";
-import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useCallback, useEffect, useState } from "react";
 
-import { Button } from "@/shared/shadcn/ui/button";
+import { ThemeToggleButton, useThemeTransition } from "@/shared/shadcn/ui/theme-toggle-button";
 import { cn } from "@/shared/shadcn/utils";
 
 function ThemeSwitcher({
@@ -13,11 +13,35 @@ function ThemeSwitcher({
 	className?: string;
 }) {
 	const { theme, setTheme } = useTheme();
+	const { startTransition } = useThemeTransition();
+	const [mounted, setMounted] = useState(false);
 
-	console.log(theme);
-	const handleThemeChange = (theme: "light" | "dark" | "system") => {
-		setTheme(theme);
-	};
+	useEffect(() => {
+		setMounted(true);
+	}, []);
+
+	const handleThemeToggle = useCallback(() => {
+		const newTheme = theme === "dark" ? "light" : "dark";
+		
+		startTransition(() => {
+			setTheme(newTheme);
+		});
+	}, [theme, setTheme, startTransition]);
+
+	const currentTheme = theme === "system" ? "light" : (theme as "light" | "dark") || "light";
+
+	if (!mounted) {
+		return (
+			<div
+				className={cn(
+					"h-8 w-8 md:h-12 md:w-12 flex items-center justify-center",
+					className
+				)}
+			>
+				<div className="h-full w-full border border-border rounded-md animate-pulse" />
+			</div>
+		);
+	}
 
 	return (
 		<div
@@ -26,18 +50,13 @@ function ThemeSwitcher({
 				className
 			)}
 		>
-			<Button
+			<ThemeToggleButton
+				theme={currentTheme}
+				onClick={handleThemeToggle}
+				variant="circle-blur"
+				start="top-right"
 				className="h-full w-full"
-				variant="outline"
-				size="icon"
-				onClick={() =>
-					handleThemeChange(theme === "light" ? "dark" : "light")
-				}
-			>
-				<Sun className="h-[1.3rem] w-[1.3rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
-				<Moon className="absolute h-[1.3rem] w-[1.3rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
-				<span className="sr-only">Toggle theme</span>
-			</Button>
+			/>
 		</div>
 	);
 }

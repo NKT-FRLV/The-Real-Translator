@@ -1,10 +1,6 @@
 "use client";
 import React from "react";
 import { motion, AnimatePresence } from "motion/react";
-import {
-	NavigationMenu,
-	NavigationMenuList,
-} from "@/shared/shadcn/ui/navigation-menu";
 import NavIcon from "../NavIcon";
 
 interface BurgerMenuProps {
@@ -29,76 +25,61 @@ const BurgerMenu: React.FC<BurgerMenuProps> = ({ isOpen, onClose }) => {
 					>
 						{/* Menu */}
 						<div className="bg-background border-b border-gray-700 shadow-lg z-51">
-							<div className="p-4">
-								<NavigationMenu className="w-full">
-									<NavigationMenuList className="flex-col w-full space-y-2">
-										{/* Translation Tools */}
-										<NavIcon
-											iconType="languages"
-											variant="mobile"
-											label="Translation Tools"
-											size={24}
-											menuItems={[
-												{ label: "Documents" },
-												{ label: "Web Pages" },
-												{ label: "Text" },
-											]}
-										/>
+							<nav className="p-4 space-y-2">
+								{/* Translation Tools */}
+								<NavIcon
+									iconType="languages"
+									variant="mobile"
+									label="Translation Tools"
+									size={24}
+									href="/profile?tab=translations"
+								/>
 
-										{/* History */}
-										<NavIcon
-											iconType="clock"
-											variant="mobile"
-											label="History"
-											size={24}
-											menuItems={[
-												{ label: "Recent Translations" },
-												{ label: "Today" },
-												{ label: "This Week" },
-											]}
-										/>
+								{/* History */}
+								<NavIcon
+									iconType="clock"
+									variant="mobile"
+									label="History"
+									size={24}
+									href="/profile?tab=history"
+								/>
 
-										{/* Favorites */}
-										<NavIcon
-											iconType="heart"
-											variant="mobile"
-											label="Favorites"
-											size={24}
-											menuItems={[
-												{ label: "Saved Translations" },
-												{ label: "Collections" },
-												{ label: "Export" },
-											]}
-										/>
+								{/* Favorites */}
+								<NavIcon
+									iconType="heart"
+									variant="mobile"
+									label="Favorites"
+									size={24}
+									href="/profile?tab=favorites"
+								/>
 
-										{/* Settings */}
-										<NavIcon
-											iconType="settings"
-											variant="mobile"
-											label="Settings"
-											size={24}
-											menuItems={[
-												{ label: "Languages" },
-												{ label: "Themes" },
-												{ label: "Notifications" },
-											]}
-										/>
+								{/* Theme Demo */}
+								<NavIcon
+									iconType="theme-demo"
+									variant="mobile"
+									label="Theme Demo"
+									size={24}
+									href="/theme-demo"
+								/>
 
-										{/* Help */}
-										<NavIcon
-											iconType="help"
-											variant="mobile"
-											label="Help"
-											size={24}
-											menuItems={[
-												{ label: "FAQ" },
-												{ label: "Shortcuts" },
-												{ label: "Feedback" },
-											]}
-										/>
-									</NavigationMenuList>
-								</NavigationMenu>
-							</div>
+								{/* Settings */}
+								<NavIcon
+									iconType="settings"
+									variant="mobile"
+									label="Settings"
+									size={24}
+									href="/profile?tab=settings"
+								/>
+
+								{/* Help */}
+								<NavIcon
+									iconType="help"
+									variant="mobile"
+									label="Help"
+									size={24}
+									href="/profile?tab=help"
+								/>
+							</nav>
 						</div>
 						{/* Backdrop */}
 						<div

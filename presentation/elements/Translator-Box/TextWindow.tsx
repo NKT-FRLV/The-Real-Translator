@@ -197,6 +197,7 @@ export const TextWindow: React.FC<TextWindowProps> = ({
 						icon={Volume2}
 						tip="Text to speech - Coming soon"
 						disabled={true}
+						size="big"
 					/>
 
 					{isInput && (
@@ -206,6 +207,7 @@ export const TextWindow: React.FC<TextWindowProps> = ({
 								tip={voiceInputTip}
 								disabled={disabledMic}
 								onClick={onVoiceInput}
+								size="big"
 								className={cn(
 									listening && 'relative hover:bg-transparent before:absolute before:inset-0 before:bg-red-500/30 before:rounded-full before:animate-ping after:absolute after:inset-0 after:bg-red-500/30 after:rounded-full'
 								)}
@@ -220,6 +222,7 @@ export const TextWindow: React.FC<TextWindowProps> = ({
 									}
 									onClick={onSpeechModeToggle}
 									isActive={speechMode === "whisper"}
+									size="big"
 									className={cn(
 										speechMode === "whisper" && 'text-yellow-500 bg-yellow-500/20 border-yellow-500/30 shadow-lg',
 										speechMode === "whisper" && listening && 'animate-pulse'
@@ -241,7 +244,7 @@ export const TextWindow: React.FC<TextWindowProps> = ({
 						</>
 					)}
 
-					<IconButton icon={Copy} onClick={onCopy} tip="Copy text" />
+					<IconButton icon={Copy} onClick={onCopy} size="big" tip="Copy text" />
 				</div>
 
 				<div className="flex items-center space-x-1 md:space-x-2">
@@ -255,6 +258,7 @@ export const TextWindow: React.FC<TextWindowProps> = ({
 									icon={X}
 									onClick={onClear}
 									tip="Clear text"
+									size="big"
 								/>
 							)}
 						</>
@@ -264,15 +268,18 @@ export const TextWindow: React.FC<TextWindowProps> = ({
 								icon={Bookmark}
 								tip="Save translation - Coming soon"
 								disabled={true}
+								size="big"
 							/>
 							<IconButton
 								icon={Share}
 								tip="Share translation - Coming soon"
 								disabled={true}
+								size="big"
 							/>
 							<IconButton
 								icon={Heart}
 								onClick={onLike}
+								size="big"
 								disabled={
 									isLiking ||
 									!translationId ||
@@ -290,6 +297,7 @@ export const TextWindow: React.FC<TextWindowProps> = ({
 								icon={Copy}
 								onClick={onCopy}
 								tip="Copy text"
+								size="big"
 							/>
 						</>
 					)}
