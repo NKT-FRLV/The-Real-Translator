@@ -172,13 +172,15 @@ export default async function RootLayout({
 						>
 							{/* Just widgets temporals*/}
 							<PWAThemeManager />
-							<PerformanceMonitor />
 							<SplashScreenManager />
+							
+							<PerformanceMonitor />
+							
 							<div className="min-h-dvh grid grid-cols-1 grid-rows-[auto_1fr] md:md:grid-cols-[72px_1fr]">
-								<HeaderShell />
+								<HeaderShell user={session?.user} />
 
 								{/* Десктопный сайдбар */}
-								<SideNavShell />
+								<SideNavShell user={session?.user} />
 
 								{/* НАДО НАСТРАИВАТЬ GRID ДЛЯ КАЖДОЙ СТРАНИЦЫ */}
 								{children}

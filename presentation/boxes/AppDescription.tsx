@@ -48,7 +48,7 @@ export const AppDescription: React.FC = () => {
 
 					{/* Right Content - Illustration */}
 					<Illustration priority={true} />
-					<StyleCardList/>
+					<StyleCardList />
 				</div>
 			</div>
 		</div>

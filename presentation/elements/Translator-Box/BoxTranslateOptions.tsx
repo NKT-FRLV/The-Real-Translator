@@ -25,11 +25,12 @@ const BoxTranslateOptions: React.FC<BoxTranslateOptionsProps> = memo(({
 }) => {
 	const fromLang = useFromLang();
 	const toLang = useToLang();
+	const tone = useTone();
 	const setFromLang = useSetFromLang();
 	const setToLang = useSetToLang();
-	const swapLanguages = useSwapLanguages();
-	const tone = useTone();
 	const setTone = useSetTone();
+
+	const swapLanguages = useSwapLanguages();
 
 	const handleSwapLanguages = () => {
 		if (isTranslating) return;
@@ -42,7 +43,7 @@ const BoxTranslateOptions: React.FC<BoxTranslateOptionsProps> = memo(({
 			<div className="flex h-16 md:h-18 items-center justify-start border border-gray-700 bg-accent/30 px-3 md:px-6 py-2 rounded-lg">
 				<div className="flex w-full h-full items-center gap-0 md:gap-4 truncate">
 					<LanguageSelect
-						value={fromLang}
+						value={fromLang || initialFromLang}
 						setValue={setFromLang}
 						disabledValue={initialFromLang || toLang}
 						className="flex-1"
@@ -61,7 +62,7 @@ const BoxTranslateOptions: React.FC<BoxTranslateOptionsProps> = memo(({
 					</Button>
 					<div className="h-full flex flex-1 items-center gap-2 md:gap-3">
 						<LanguageSelect
-							value={toLang}
+							value={toLang || initialToLang}
 							setValue={setToLang}
 							disabledValue={initialToLang || fromLang}
 							className="flex-1"

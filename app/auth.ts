@@ -1,6 +1,8 @@
 // auth.ts (в корне или src/auth.ts)
 import "server-only";
 
+export const runtime = "edge";
+
 import NextAuth, { type NextAuthConfig } from "next-auth";
 import { headers } from "next/headers";
 import { PrismaAdapter } from "@auth/prisma-adapter";
@@ -8,6 +10,7 @@ import { prisma } from "@/app/prismaClient/prisma"; // может стоит д�
 import { TUserRole } from "@/shared/types/user";
 import GitHub from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
+// import Yandex from "next-auth/providers/yandex"
 
 const requireEnv = (k: string) => {
 	const v = process.env[k];
@@ -51,6 +54,10 @@ export const authConfig: NextAuthConfig = {
 			clientId: requireEnv("GOOGLE_ID"),
 			clientSecret: requireEnv("GOOGLE_SECRET"),
 		}),
+		// Yandex({
+		// 	clientId: requireEnv("YANDEX_ID"),
+		// 	clientSecret: requireEnv("YANDEX_SECRET"),
+		// }),
 	],
 	events: {
 		async signIn({ user }) {
@@ -83,33 +90,13 @@ export const authConfig: NextAuthConfig = {
 		// При стратегии "database" коллбек вызывается при чтении сессии.
 		// Гарантируем, что session.user содержит id/role без кастов.
 		async session({ session, user }) {
-			if (!session.user) return session;
-
-			// 1) Пытаемся обогатить по email (самый надёжный путь)
-			if (typeof session.user.email === "string") {
-				const found = await prisma.user.findUnique({
-					where: { email: session.user.email },
-					select: { id: true, role: true },
-				});
-				if (found) {
-					session.user.id = found.id;
-					session.user.role = found.role;
-					return session;
-				}
+			// при strategy: "database" сюда приходит `user` уже из адаптера
+			if (session.user && user) {
+			  // гарантируем id/role в session.user без доп. походов в БД
+			  // (убедись, что в User есть поле `role` и оно возвращается адаптером)
+			  session.user.id = user.id;
+			  session.user.role = user.role ?? undefined;
 			}
-
-			// 2) Фоллбэк: если email недоступен, но коллбек дал user (обычно при первом запросе)
-			if (user) {
-				const foundById = await prisma.user.findUnique({
-					where: { id: user.id },
-					select: { id: true, role: true },
-				});
-				if (foundById) {
-					session.user.id = foundById.id;
-					session.user.role = foundById.role;
-				}
-			}
-
 			return session;
 		},
 	},

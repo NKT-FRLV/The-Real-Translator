@@ -3,7 +3,7 @@
 
 import DesktopSideNavClient from "./DesktopSideNavClient"; // "use client"
 import crypto from "crypto";
-import { auth } from "@/app/auth";
+import { User } from "next-auth";
 
 function gravatar(email?: string | null) {
   if (!email) return null;
@@ -11,9 +11,12 @@ function gravatar(email?: string | null) {
   return `https://www.gravatar.com/avatar/${hash}?d=identicon&s=256`;
 }
 
-export default async function SideNavShell() {
-  const session = await auth();
-  const user = session?.user ?? null;
+interface SideNavShellProps {
+  user?: User;
+}
+
+export default async function SideNavShell({ user }: SideNavShellProps) {
+
   
   const avatarSrc =
     user?.image ??

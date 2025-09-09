@@ -7,7 +7,7 @@ export default async function middleware(req: Request) {
   const session = await auth();
   const url = new URL(req.url);
 
-  console.log("middleware check", url.pathname);
+  console.log("session", session);
 
 
   if (url.pathname.startsWith("/app")) {
