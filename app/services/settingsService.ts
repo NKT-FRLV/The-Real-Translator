@@ -1,11 +1,11 @@
-import { auth } from "@/app/auth";
+import { authCached } from "../lib/authCached";
 import { prisma } from "@/app/prismaClient/prisma";
 import {UserTranslationSettings} from "@/shared/types/settings"
 
 
 
 export async function getUserSettingsData(): Promise<UserTranslationSettings> {
-  const session = await auth();
+  const session = await authCached();
   
   if (!session?.user?.id) {
     // Возвращаем дефолтные настройки для неавторизованных пользователей

@@ -1,5 +1,4 @@
 // presentation/components/Layout/HeaderShell.tsx
-import { auth } from "@/app/auth";
 import MobileHeaderClient from "./MobileHeaderClient";
 import crypto from "crypto";
 import { User } from "next-auth";

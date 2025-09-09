@@ -1,5 +1,6 @@
-import { auth } from "@/app/auth";
+// import { auth } from "@/app/auth";
 import { redirect } from "next/navigation";
+import { authCached } from "@/app/lib/authCached";
 import { Separator } from "@/shared/shadcn/ui/separator";
 import UserInfo from "./_components/boxes/UserInfo";
 import ProfileButton from "./_components/ProfileButton";
@@ -9,7 +10,7 @@ export default async function ProfileLayout({
 }: {
 	children: React.ReactNode;
 }) {
-	const session = await auth();
+	const session = await authCached();
 	const user = session?.user;
 
 	if (!user) {

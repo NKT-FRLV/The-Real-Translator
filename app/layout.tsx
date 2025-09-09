@@ -7,7 +7,8 @@ import { SplashScreenManager } from "@/presentation/components/SplashScreenManag
 import { SessionProvider } from "next-auth/react";
 import QueryProvider from "@/presentation/providers/QueryProvider";
 import SessionHeartbeat from "@/presentation/SessionHeartBeat";
-import { auth } from "@/app/auth";
+// import { auth } from "@/app/auth";
+import { authCached } from "./lib/authCached";
 import "./globals.css";
 
 // import Footer from "@/presentation/components/footer/Footer";
@@ -154,7 +155,7 @@ export default async function RootLayout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	const session = await auth();
+	const session = await authCached();
 
 	return (
 		<html lang="en" suppressHydrationWarning>
@@ -173,7 +174,7 @@ export default async function RootLayout({
 							{/* Just widgets temporals*/}
 							<PWAThemeManager />
 							<SplashScreenManager />
-							
+
 							<PerformanceMonitor />
 							
 							<div className="min-h-dvh grid grid-cols-1 grid-rows-[auto_1fr] md:md:grid-cols-[72px_1fr]">

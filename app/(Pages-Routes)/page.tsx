@@ -3,9 +3,15 @@ import { TranslatorBox } from "@/presentation/boxes/TranslatorBox";
 import { AppDescription } from "@/presentation/boxes/AppDescription";
 import Footer from "@/presentation/components/footer/Footer";
 import { ClientWarmer } from "@/presentation/components/ClientWarmer";
+// import { authCached } from "@/app/lib/authCached";
 
 
 export default async function Home() {
+
+	
+
+
+
 	// const userSettings = await getUserSettingsData()
 	
 	// Деструктурируем только нужные поля для логов
@@ -21,8 +27,6 @@ export default async function Home() {
 			<TranslatorBox />
 			<AppDescription />
 			<Footer />
-
 		</main>
-		
 	);
 }
