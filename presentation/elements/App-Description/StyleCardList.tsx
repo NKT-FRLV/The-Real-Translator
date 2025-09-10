@@ -1,6 +1,6 @@
 'use client'
 import React, { useState } from 'react';
-import { toneDescriptions, ToneDescription } from '@/shared/constants/tone-style';
+import { toneDescriptionsMap, toneDescriptions, ToneDescription } from '@/shared/constants/tone-style';
 import { Tone } from '@/shared/types/types';
 import { StyleCard } from './StyleCard';
 import { StyleModal } from './StyleModal';
@@ -15,25 +15,19 @@ export const StyleCardList: React.FC<StyleCardListProps> = ({
   items, 
 //   onToneSelect 
 }) => {
+	
   const list = items ?? toneDescriptions;
 
   const tone = useTone();
   const setTone = useSetTone();
-  const [selectedStyle, setSelectedStyle] = useState<ToneDescription | null>(null);
+
+  const [selectedTone, setSelectedTone] = useState<Tone>(tone);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleCardClick = (style: ToneDescription) => {
-    setSelectedStyle(style);
-    setIsModalOpen(true);
-  };
 
-  const handleModalClose = () => {
-    setIsModalOpen(false);
-    setSelectedStyle(null);
-  };
-
-  const handleToneSelect = (tone: Tone) => {
-	setTone(tone);
+  const handleModalOpen = (tone: Tone) => {
+	setIsModalOpen(true);	
+	setSelectedTone(tone);
   };
 
   return (
@@ -44,16 +38,16 @@ export const StyleCardList: React.FC<StyleCardListProps> = ({
             key={`${style.tone}-${index}`} 
             style={style}
 			isSelected={tone === style.tone}
-            onClick={() => handleCardClick(style)}
+            onClick={() => handleModalOpen(style.tone)}
           />
         ))}
       </div>
       
       <StyleModal
         isOpen={isModalOpen}
-        onClose={handleModalClose}
-        style={selectedStyle}
-        onSelectTone={handleToneSelect}
+        onClose={() => setIsModalOpen(false)}
+        style={toneDescriptionsMap[selectedTone]}
+        onSelectTone={setTone}
       />
     </>
   );

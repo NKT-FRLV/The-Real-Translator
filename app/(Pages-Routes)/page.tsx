@@ -22,7 +22,7 @@ export default async function Home() {
 	return (
 		<main className="row-start-2 md:row-start-1 md:col-start-2 px-0 md:px-2 md:py-2 flex flex-col items-center sm:items-start">
 			{/* Warm up the translation server component*/}
-			<ClientWarmer />
+			{/* <ClientWarmer /> */}
 			{/* Layout */}
 			<TranslatorBox />
 			<AppDescription />

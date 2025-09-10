@@ -14,6 +14,7 @@ export type ToneDescriptionList<T> = {
 	tone: T;
 	new: boolean;
 	description: string;
+	warning?: string;
 	detailedDescription: string;
 	image?: string;
 };
@@ -23,7 +24,7 @@ export type ToneDescription = ToneDescriptionList<Tone>;
 // Enforce full coverage of all Tone variants via mapped type
 export type ToneDescriptionMap = { [K in Tone]: ToneDescriptionList<K> };
 
-const toneDescriptionsMap = {
+export const toneDescriptionsMap = {
     neutral: {
         name: "Neutral",
         tone: "neutral",
@@ -43,6 +44,7 @@ const toneDescriptionsMap = {
         tone: "poetic",
         new: true,
         description: "Recognizable style of Russian poet Alexander Pushkin",
+		warning: "This style already works, but it’s pretty hit-or-miss with current AI model, because i still use a free model 'Moonshot - kimi/k2'. Later on, when I add a paid subscription, the beefier AI models will be able to turn any text into real, living poetry.",
         detailedDescription: "Transform your text into beautiful, rhythmic prose reminiscent of classical Russian poetry. This unique style captures the elegance and emotional depth of Pushkin's literary mastery, adding artistic flair and cultural richness to your translations.",
         image: "pushkin.png",
     },

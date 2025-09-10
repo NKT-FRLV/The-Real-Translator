@@ -24,6 +24,7 @@ export const Illustration: React.FC<IllustrationProps> = ({
         src={src}
         alt={alt}
         fill
+		
         className={className}
         priority={priority}
       />

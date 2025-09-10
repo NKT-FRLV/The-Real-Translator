@@ -61,9 +61,14 @@ export const StyleModal: React.FC<StyleModalProps> = ({
               <h3 className="text-md md:text-2xl font-semibold text-foreground">
                 About this style
               </h3>
-              <p className="text-md md:text-2xl text-muted-foreground leading-relaxed">
+              <p className="text-md md:text-2xl text-muted-foreground leading-relaxed bg-background/70 rounded-md p-2">
                 {style.detailedDescription}
               </p>
+              {style.warning && (
+                <p className="text-sm md:text-base text-muted-foreground leading-relaxed bg-yellow-500/10 border-l-4 border-yellow-500/20 rounded-md p-2">
+                  {style.warning}
+                </p>
+              )}
             </div>
           </div>
 

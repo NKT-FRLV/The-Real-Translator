@@ -463,6 +463,7 @@ const handleClickMicroPhone = useCallback(async () => {
 
 				<TextWindow
 					value={displayText}
+					canLike={!!session?.user?.id}
 					// placeholder={placeholder}
 					renderCustomPlaceholder={() => (
 						<CustomPlaceholder

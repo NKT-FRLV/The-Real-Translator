@@ -40,11 +40,16 @@
 	--sidebar-accent-foreground: oklch(0.21 0.006 285.885);
 	--sidebar-border: oklch(0.92 0.004 286.32);
 	--sidebar-ring: oklch(0.637 0.237 25.331);
+	
+	/* Logo adaptive colors - only main background and central letter */
+	--logo-main-background:#ffffff;
+	--logo-main-foreground:#000000;
 }
 
 @theme inline {
 	--font-orbitron: var(--font-orbitron); /* <-- Шрифт для заголовков */
 	--font-rubik-mono: var(--font-rubik-mono); /* <-- Шрифт для заголовков */
+	--font-inter: var(--font-inter); /* <-- Шрифт для переводчика */
 	--color-background: var(--background);
 	--color-foreground: var(--foreground);
 	--font-sans: var(--font-geist-sans);
@@ -81,6 +86,8 @@
 	--color-myCard: var(--myCard);
 	--color-background-hover: var(--background-hover);
 	--color-success: var(--success);
+	--color-logo-main-background: var(--logo-main-background);
+	--color-logo-main-foreground: var(--logo-main-foreground);
 	--radius-sm: calc(var(--radius) - 4px);
 	--radius-md: calc(var(--radius) - 2px);
 	--radius-lg: var(--radius);
@@ -135,6 +142,10 @@ body {
 	--sidebar-border: oklch(1 0 0 / 10%);
 	--sidebar-ring: oklch(0.637 0.237 25.331);
 	--myCard: #252427;
+	
+	/* Logo adaptive colors - inverted for dark theme */
+	--logo-main-background: #000000;
+	--logo-main-foreground: #ffffff;
 }
 
 @layer base {

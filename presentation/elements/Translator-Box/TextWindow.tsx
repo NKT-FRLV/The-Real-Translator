@@ -3,7 +3,6 @@ import React, { useState, useEffect } from "react";
 import { X, Volume2, Mic, Copy, Bookmark, Share, Heart, Zap } from "lucide-react";
 import { Textarea } from "@/shared/shadcn/ui/textarea";
 import { toast } from "sonner";
-import { useSession } from "next-auth/react";
 import { IconButton } from "@/presentation/components/textArea/IconButton";
 import { useRouter } from "next/navigation";
 import { likeTranslation } from "@/presentation/API/like/likeApi";
@@ -12,6 +11,7 @@ import { SpeechMode } from '@/shared/types/settings'
 
 interface TextWindowProps {
 	value?: string;
+	canLike?: boolean;
 	onChange?: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
 	onClear?: () => void;
 	placeholder?: string;
@@ -38,6 +38,7 @@ interface TextWindowProps {
 
 export const TextWindow: React.FC<TextWindowProps> = ({
 	value = "",
+	canLike = true,
 	onChange,
 	onClear,
 	placeholder,
@@ -57,7 +58,7 @@ export const TextWindow: React.FC<TextWindowProps> = ({
 	isAdmin = false,
 	isTranscribing = false,
 }) => {
-	const { data: session } = useSession();
+
 	const [isLiked, setIsLiked] = useState(false);
 	const [isLiking, setIsLiking] = useState(false);
 	const router = useRouter();
@@ -97,7 +98,7 @@ export const TextWindow: React.FC<TextWindowProps> = ({
 	};
 
 	const onLike = async () => {
-		if (!session?.user?.id) {
+		if (!canLike) {
 			toast.error("Please sign in to like translations", {
 				action: {
 					label: "Sign in",
@@ -172,11 +173,11 @@ export const TextWindow: React.FC<TextWindowProps> = ({
 					}}
 					placeholder={readOnly ? undefined : placeholder}
 					readOnly={readOnly}
-					className={`w-full min-h-full field-sizing-content pr-6 md:pr-10 bg-transparent text-foreground placeholder-gray-500 border-none outline-none resize-none ${
+					className={`w-full min-h-full field-sizing-content pr-6 md:pr-10 bg-transparent text-foreground placeholder-gray-500 border-none outline-none resize-none font-inter ${
 						value.length < 30
 							? "text-lg md:text-2xl lg:text-3xl"
 							: "text-sm md:text-base lg:text-lg"
-					} font-medium placeholder:text-sm md:placeholder:text-base lg:placeholder:text-lg ${className}`}
+					} font-normal placeholder:text-sm md:placeholder:text-base lg:placeholder:text-lg ${className}`}
 					maxLength={maxLength}
 				/>
 
@@ -264,7 +265,7 @@ export const TextWindow: React.FC<TextWindowProps> = ({
 						</>
 					) : (
 						<>
-							<IconButton
+							{/* <IconButton
 								icon={Bookmark}
 								tip="Save translation - Coming soon"
 								disabled={true}
@@ -275,7 +276,7 @@ export const TextWindow: React.FC<TextWindowProps> = ({
 								tip="Share translation - Coming soon"
 								disabled={true}
 								size="big"
-							/>
+							/> */}
 							<IconButton
 								icon={Heart}
 								onClick={onLike}
@@ -293,12 +294,12 @@ export const TextWindow: React.FC<TextWindowProps> = ({
 								}
 								isLoading={isLiking}
 							/>
-							<IconButton
+							{/* <IconButton
 								icon={Copy}
 								onClick={onCopy}
 								tip="Copy text"
 								size="big"
-							/>
+							/> */}
 						</>
 					)}
 				</div>

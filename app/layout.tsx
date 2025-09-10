@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 export { viewport } from "./viewport";
-import { Geist, Geist_Mono, Rubik_Mono_One, Orbitron } from "next/font/google";
+import { Geist, Geist_Mono, Rubik_Mono_One, Orbitron, Inter } from "next/font/google";
 import { PWAThemeManager } from "@/presentation/components/PWAThemeManager";
 import { PerformanceMonitor } from "@/presentation/components/PerformanceMonitor";
 import { SplashScreenManager } from "@/presentation/components/SplashScreenManager";
@@ -39,6 +39,12 @@ const orbitron = Orbitron({
 	weight: ["400", "500", "600"],
 	subsets: ["latin"],
 	variable: "--font-orbitron",
+	display: "swap",
+});
+
+const inter = Inter({
+	subsets: ["latin", "cyrillic"],
+	variable: "--font-inter",
 	display: "swap",
 });
 
@@ -160,7 +166,7 @@ export default async function RootLayout({
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<body
-				className={`${geistSans.variable} ${geistMono.variable} ${rubikMonoOne.variable} ${orbitron.variable} antialiased`}
+				className={`${geistSans.variable} ${geistMono.variable} ${rubikMonoOne.variable} ${orbitron.variable} ${inter.variable} antialiased`}
 			>
 				<SessionHeartbeat />
 				<QueryProvider>
