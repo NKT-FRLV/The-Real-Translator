@@ -9,10 +9,10 @@ import {
 	SelectValue,
 } from "@/shared/shadcn/ui/select";
 import { cn } from "@/shared/shadcn/";
-import { useTone, useSetTone } from "@/presentation/stores/translatorStore";
+// import { useTone, useSetTone } from "@/presentation/stores/translatorStore";
 
 interface ToneSelectorProps {
-	value?: Tone;
+	value: Tone;
 	className?: string;
 	onToneChange?: (value: Tone) => void;
 	useStore?: boolean;
@@ -22,20 +22,15 @@ const ToneSelector = ({
 	value,
 	className,
 	onToneChange,
-	useStore = false,
 }: ToneSelectorProps) => {
-	const tone = useTone();
-	const setTone = useSetTone();
+	
 
-	// Используем стор если useStore = true, иначе пропсы
-	const currentTone = useStore ? tone : value || "neutral";
-	const handleToneChange = useStore ? setTone : onToneChange || (() => {});
 	return (
-		<Select value={currentTone} onValueChange={handleToneChange}>
+		<Select value={value} onValueChange={onToneChange}>
 			<SelectTrigger
 				size="max"
 				className={cn(
-					"flex justify-center font-orbitron text-foreground font-semibold text-sm md:text-xl bg-transparent border-none focus:ring-0 hover:bg-background-hover transition-colors duration-300 min-w-[60px] md:min-w-[120px] w-[60px] md:w-[120px]",
+					"flex justify-center px-0 py-3 md:py-3.5 font-orbitron text-foreground font-semibold text-sm md:text-xl bg-transparent border-none focus:ring-0 hover:bg-background-hover transition-colors duration-300 min-w-[60px] md:min-w-[120px] w-[80px] md:w-[120px]",
 					className
 				)}
 				icon={false}

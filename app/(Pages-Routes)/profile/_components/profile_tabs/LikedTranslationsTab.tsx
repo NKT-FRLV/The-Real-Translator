@@ -1,5 +1,4 @@
 "use client";
-import React, { useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { useSession } from "next-auth/react";
 import LikedTransCard from "../LikedTransCard";
@@ -182,22 +181,19 @@ const LikedTranslationsTab = () => {
 		},
 	});
 
-	const onCopy = useCallback(async (text: string) => {
+	const onCopy = async (text: string) => {
 		try {
 			await navigator.clipboard.writeText(text);
 			toast.success("Copied to clipboard");
 		} catch {
 			toast.error("Failed to copy");
 		}
-	}, []);
+	};
 
-	const onDelete = useCallback(
-		(id: string) => {
+	const onDelete = (id: string) => {
 			// Без лоадера на кнопке — элемент сразу исчезает
 			unlikeMutation.mutate(id);
-		},
-		[unlikeMutation]
-	);
+		}
 
 	if (!session?.user?.id) {
 		return (

@@ -12,9 +12,7 @@ import type { User } from "next-auth";
 
 import {
 	useLoadSettings,
-	useSaveSettings,
 } from "@/presentation/stores/settingsStore";
-import { toast } from "sonner";
 
 export type TabType = "general" | "liked" | "account" | "notifications";
 
@@ -58,7 +56,6 @@ const SettingsWindow = ({user}: {user: User} ) => {
 
 	// Settings actions
 	const loadSettings = useLoadSettings();
-	const saveSettings = useSaveSettings();
 
 	// Load settings on mount
 	useEffect(() => {
@@ -75,20 +72,10 @@ const SettingsWindow = ({user}: {user: User} ) => {
 		}
 	}, [searchParams]);
 
-	// Handle save settings
-	const handleSaveSettings = async () => {
-		try {
-			await saveSettings();
-			toast.success("Settings saved successfully!");
-		} catch {
-			toast.error("Failed to save settings. Please try again.");
-		}
-	};
-
 	const renderTabContent = () => {
 		switch (activeTab) {
 			case "general":
-				return <GeneralTab saveSettings={handleSaveSettings} />;
+				return <GeneralTab />;
 			case "liked":
 				return <LikedTranslationsTab />;
 			case "account":

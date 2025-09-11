@@ -3,9 +3,16 @@ import { LanguageShort, Tone } from '@/shared/config/translation';
 import { SpeechMode } from '@/shared/types/settings';
 
 interface UserSettings {
-  defaultSourceLang: LanguageShort | null; // LanguageShort
-  defaultTargetLang: LanguageShort | null;
-  translationStyle: Tone;
+  // Динамические настройки для текущей работы переводчика
+  fromLang: LanguageShort; 
+  toLang: LanguageShort;
+  tone: Tone;
+  
+  // Статические настройки пользователя (сохраненные в БД)
+  savedFromLang: LanguageShort;
+  savedToLang: LanguageShort;
+  savedTone: Tone;
+  
   speechRecognitionMode: SpeechMode;
   uiLanguage: string | null;
   preferredLLM: string;
@@ -20,13 +27,19 @@ interface UserSettings {
 interface SettingsState extends UserSettings {
   // Loading states
   isLoading: boolean;
-  isSaving: boolean;
-  lastSaved: Date | null;
   
-  // Actions
-  setDefaultSourceLang: (lang: LanguageShort) => void;
-  setDefaultTargetLang: (lang: LanguageShort) => void;
-  setTranslationStyle: (style: Tone) => void;
+  swapLanguages: (from: LanguageShort, to: LanguageShort) => void;
+  
+  // Actions для динамических настроек (меняются во время работы переводчика)
+  setFromLang: (lang: LanguageShort) => void;
+  setToLang: (lang: LanguageShort) => void;
+  setTone: (style: Tone) => void;
+  
+  // Actions для статических настроек (обновляются только при загрузке из БД)
+  setSavedFromLang: (lang: LanguageShort) => void;
+  setSavedToLang: (lang: LanguageShort) => void;
+  setSavedTone: (style: Tone) => void;
+  
   setSpeechRecognitionMode: (mode: SpeechMode) => void;
   setNotificationsEnabled: (enabled: boolean) => void;
   setEmailNotifications: (enabled: boolean) => void;
@@ -37,14 +50,20 @@ interface SettingsState extends UserSettings {
   
   // API Actions
   loadSettings: () => Promise<void>;
-  saveSettings: () => Promise<void>;
   resetToDefaults: () => void;
 }
 
 const defaultSettings: UserSettings = {
-  defaultSourceLang: "ru",
-  defaultTargetLang: "en",
-  translationStyle: "neutral",
+  // Динамические настройки для переводчика (изначально равны сохраненным)
+  fromLang: "ru",
+  toLang: "en",
+  tone: "neutral",
+  
+  // Статические настройки пользователя (сохраненные в БД)
+  savedFromLang: "ru",
+  savedToLang: "en",
+  savedTone: "neutral",
+  
   speechRecognitionMode: "browser",
   uiLanguage: null,
   preferredLLM: "kimi-k2:free",
@@ -55,17 +74,21 @@ const defaultSettings: UserSettings = {
   translationReminders: false,
 };
 
-export const useSettingsStore = create<SettingsState>((set, get) => ({
+export const useSettingsStore = create<SettingsState>((set) => ({
   // Initial state
   ...defaultSettings,
   isLoading: false,
-  isSaving: false,
-  lastSaved: null,
 
-  // Individual setters
-  setDefaultSourceLang: (lang) => set({ defaultSourceLang: lang }),
-  setDefaultTargetLang: (lang) => set({ defaultTargetLang: lang }),
-  setTranslationStyle: (style) => set({ translationStyle: style }),
+  // Setters для динамических настроек (используются в переводчике)
+  setFromLang: (lang) => set({ fromLang: lang }),
+  setToLang: (lang) => set({ toLang: lang }),
+  setTone: (style) => set({ tone: style }),
+
+  // Setters для статических настроек (обновляются только при загрузке из БД)
+  setSavedFromLang: (lang) => set({ savedFromLang: lang }),
+  setSavedToLang: (lang) => set({ savedToLang: lang }),
+  setSavedTone: (style) => set({ savedTone: style }),
+
   setSpeechRecognitionMode: (mode) => set({ speechRecognitionMode: mode }),
   setNotificationsEnabled: (enabled) => set({ notificationsEnabled: enabled }),
   setEmailNotifications: (enabled) => set({ emailNotifications: enabled }),
@@ -73,6 +96,14 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   setUiLanguage: (lang) => set({ uiLanguage: lang }),
   setReviewDailyTarget: (target) => set({ reviewDailyTarget: target }),
   setTimezone: (timezone) => set({ timezone }),
+
+  swapLanguages: (from, to) => {
+    set({ 
+      fromLang: to, 
+      toLang: from 
+    });
+  },
+
 
   // Load settings from API
   loadSettings: async () => {
@@ -86,12 +117,32 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       
       const settings = await response.json();
       
+      // Маппинг полей из API в store
+      const fromLang = settings.defaultSourceLang || defaultSettings.fromLang;
+      const toLang = settings.defaultTargetLang || defaultSettings.toLang;
+      const tone = settings.translationStyle || defaultSettings.tone;
+      
       set({
-        ...settings,
-        // Map additional fields that might not be in DB  
+        // Устанавливаем динамические настройки (изначально равны статическим)
+        fromLang,
+        toLang,
+        tone,
+        
+        // Устанавливаем статические настройки (сохраненные в БД)
+        savedFromLang: fromLang,
+        savedToLang: toLang,
+        savedTone: tone,
+        
+        // Остальные настройки
         speechRecognitionMode: settings.speechRecognitionMode || defaultSettings.speechRecognitionMode,
+        uiLanguage: settings.uiLanguage || defaultSettings.uiLanguage,
+        preferredLLM: settings.preferredLLM || defaultSettings.preferredLLM,
+        reviewDailyTarget: settings.reviewDailyTarget || defaultSettings.reviewDailyTarget,
+        notificationsEnabled: settings.notificationsEnabled || defaultSettings.notificationsEnabled,
+        timezone: settings.timezone || defaultSettings.timezone,
         emailNotifications: settings.emailNotifications || defaultSettings.emailNotifications,
         translationReminders: settings.translationReminders || defaultSettings.translationReminders,
+        
         isLoading: false,
       });
     } catch (error) {
@@ -100,77 +151,45 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     }
   },
 
-  // Save settings to API
-  saveSettings: async () => {
-    try {
-      set({ isSaving: true });
-      
-      const state = get();
-      const settingsToSave = {
-        defaultSourceLang: state.defaultSourceLang,
-        defaultTargetLang: state.defaultTargetLang,
-        translationStyle: state.translationStyle,
-        speechRecognitionMode: state.speechRecognitionMode,
-        uiLanguage: state.uiLanguage,
-        preferredLLM: state.preferredLLM,
-        reviewDailyTarget: state.reviewDailyTarget,
-        notificationsEnabled: state.notificationsEnabled,
-        timezone: state.timezone,
-        // Additional UI settings
-        emailNotifications: state.emailNotifications,
-        translationReminders: state.translationReminders,
-      };
-
-      const response = await fetch('/api/settings', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(settingsToSave),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to save settings');
-      }
-
-      set({ 
-        isSaving: false, 
-        lastSaved: new Date() 
-      });
-    } catch (error) {
-      console.error('Error saving settings:', error);
-      set({ isSaving: false });
-      throw error; // Re-throw to handle in UI
-    }
-  },
-
   // Reset to default settings
   resetToDefaults: () => {
     set({
       ...defaultSettings,
-      lastSaved: null,
     });
   },
 }));
 
-// Селекторы для оптимизации ререндеров
-export const useDefaultSourceLang = () => useSettingsStore((state) => state.defaultSourceLang);
-export const useDefaultTargetLang = () => useSettingsStore((state) => state.defaultTargetLang);
-export const useTranslationStyle = () => useSettingsStore((state) => state.translationStyle);
+// Селекторы для динамических настроек (используются в переводчике)
+export const useFromLang = () => useSettingsStore((state) => state.fromLang);
+export const useToLang = () => useSettingsStore((state) => state.toLang);
+export const useTone = () => useSettingsStore((state) => state.tone);
+
+// Селекторы для статических настроек (используются в профиле)
+export const useSavedFromLang = () => useSettingsStore((state) => state.savedFromLang);
+export const useSavedToLang = () => useSettingsStore((state) => state.savedToLang);
+export const useSavedTone = () => useSettingsStore((state) => state.savedTone);
+
+// Остальные селекторы
 export const useSpeechRecognitionMode = () => useSettingsStore((state) => state.speechRecognitionMode);
 export const useNotificationsEnabled = () => useSettingsStore((state) => state.notificationsEnabled);
 export const useEmailNotifications = () => useSettingsStore((state) => state.emailNotifications);
 export const useTranslationReminders = () => useSettingsStore((state) => state.translationReminders);
 export const useSettingsLoading = () => useSettingsStore((state) => state.isLoading);
-export const useSettingsSaving = () => useSettingsStore((state) => state.isSaving);
-export const useLastSaved = () => useSettingsStore((state) => state.lastSaved);
 
 // Actions selectors
+export const useSwapLanguages = () => useSettingsStore((state) => state.swapLanguages);
 export const useLoadSettings = () => useSettingsStore((state) => state.loadSettings);
-export const useSaveSettings = () => useSettingsStore((state) => state.saveSettings);
-export const useSetDefaultSourceLang = () => useSettingsStore((state) => state.setDefaultSourceLang);
-export const useSetDefaultTargetLang = () => useSettingsStore((state) => state.setDefaultTargetLang);
-export const useSetTranslationStyle = () => useSettingsStore((state) => state.setTranslationStyle);
+
+// Actions для динамических настроек
+export const useSetFromLang = () => useSettingsStore((state) => state.setFromLang);
+export const useSetToLang = () => useSettingsStore((state) => state.setToLang);
+export const useSetTone = () => useSettingsStore((state) => state.setTone);
+
+// Actions для статических настроек (используются редко, в основном при загрузке)
+export const useSetSavedFromLang = () => useSettingsStore((state) => state.setSavedFromLang);
+export const useSetSavedToLang = () => useSettingsStore((state) => state.setSavedToLang);
+export const useSetSavedTone = () => useSettingsStore((state) => state.setSavedTone);
+
 export const useSetSpeechRecognitionMode = () => useSettingsStore((state) => state.setSpeechRecognitionMode);
 export const useSetNotificationsEnabled = () => useSettingsStore((state) => state.setNotificationsEnabled);
 export const useSetEmailNotifications = () => useSettingsStore((state) => state.setEmailNotifications);

@@ -59,18 +59,15 @@ export const TextWindow: React.FC<TextWindowProps> = ({
 	isTranscribing = false,
 }) => {
 
+	const router = useRouter();
 	const [isLiked, setIsLiked] = useState(false);
 	const [isLiking, setIsLiking] = useState(false);
-	const router = useRouter();
-
 	const [hydrated, setHydrated] = useState(false);
+
+	useEffect(() => setIsLiked(false), [translationId]);
 	useEffect(() => setHydrated(true), []);
 
 	const disabledMic = !hydrated || !isSpeechSupported || !isBrowserSupportSpeech;
-
-	useEffect(() => {
-		setIsLiked(false);
-	}, [translationId]);
 
 	const onCopy = async () => {
 		if (value.length === 0) {

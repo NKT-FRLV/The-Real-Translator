@@ -4,7 +4,7 @@ import { toneDescriptionsMap, toneDescriptions, ToneDescription } from '@/shared
 import { Tone } from '@/shared/types/types';
 import { StyleCard } from './StyleCard';
 import { StyleModal } from './StyleModal';
-import { useTone, useSetTone } from '@/presentation/stores/translatorStore';
+import { useTone, useSetTone } from '@/presentation/stores/settingsStore';
 
 type StyleCardListProps = {
   items?: ToneDescription[];

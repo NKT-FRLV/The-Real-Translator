@@ -1,4 +1,3 @@
-import React from "react";
 import { languages } from "@/shared/config/translation";
 import { Calendar, Languages, Copy, Trash } from "lucide-react";
 import { Translation } from "@prisma/client";
@@ -83,7 +82,7 @@ const LikedTransCard = ({ translation, onCopy, onDelete }: LikedTransCardProps) 
           </span>
           <span>
             <span className="text-xs text-muted-foreground">Model: </span>
-            <span className="text-xs font-medium capitalize">{translation.model}</span>
+            <span className="text-xs font-medium capitalize">{translation.model === 'default' ? 'Moonshot - kimi/k2' : translation.model}</span>
           </span>
         </div>
         <Button

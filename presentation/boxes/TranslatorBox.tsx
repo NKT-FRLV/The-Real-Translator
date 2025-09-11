@@ -12,18 +12,24 @@ import { LanguageShort, Tone } from "@/shared/config/translation";
 import { useSpeechToText } from "../hooks/useSpeechToText";
 // import { createLogger } from "@/shared/utils/logger";
 import CustomPlaceholder from "../components/textArea/CustomPlaceholder";
+// import {
+// 	useFromLang,
+// 	useToLang,
+// 	useTone,
+// 	useSetFromLang,
+// 	useSetToLang,
+// 	useSetTone,
+// } from "../stores/translatorStore";
 import {
+
 	useFromLang,
 	useToLang,
 	useTone,
-	useSetFromLang,
-	useSetToLang,
-	useSetTone,
-} from "../stores/translatorStore";
-import {
-	useDefaultSourceLang,
-	useDefaultTargetLang,
-	useTranslationStyle,
+	// useSetFromLang,
+	// useSetToLang,
+	// useSetTone,
+	// useSwapLanguages,
+
 	useLoadSettings,
 	useEffectiveSpeechRecognitionMode,
 	useSetSpeechRecognitionMode,
@@ -50,21 +56,22 @@ export const TranslatorBox: React.FC = () => {
 	// ────────────────────────────────────────────────────────────────────────────
 	// Store state
 	// ────────────────────────────────────────────────────────────────────────────
-	const fromLang = useFromLang();
-	const toLang = useToLang();
+	// Settings store hooks for loading user preferences
+	const fromLang = useFromLang() || "ru";
+	const toLang = useToLang() || "en";
 	const tone = useTone();
+
 	const { data: session } = useSession();
 
-	// Settings store hooks for loading user preferences
-	const defaultSourceLang = useDefaultSourceLang();
-	const defaultTargetLang = useDefaultTargetLang();
-	const defaultTranslationStyle = useTranslationStyle();
 	const loadSettings = useLoadSettings();
 
 	// Translator store setters
-	const setFromLang = useSetFromLang();
-	const setToLang = useSetToLang();
-	const setTone = useSetTone();
+	// const setFromLang = useSetFromLang();
+	// const setToLang = useSetToLang();
+	// const setTone = useSetTone();
+	// const setFromLang = useSetDefaultSourceLang();
+	// const setToLang = useSetDefaultTargetLang();
+	// const setTone = useSetTranslationStyle();
 	const setSpeechRecognitionMode = useSetSpeechRecognitionMode();
 
 	// ────────────────────────────────────────────────────────────────────────────
@@ -93,11 +100,13 @@ export const TranslatorBox: React.FC = () => {
 			// Show user-friendly error message
 			if (error.includes("Admin role required")) {
 				toast.error("Whisper AI is available only for administrators", {
-					description: "Switch to browser mode or contact administrator",
+					description:
+						"Switch to browser mode or contact administrator",
 				});
 			} else if (error.includes("Recording too short")) {
 				toast.error("Recording too short", {
-					description: "Please speak for longer or check your microphone",
+					description:
+						"Please speak for longer or check your microphone",
 				});
 			} else if (error.includes("rate limit")) {
 				toast.error("Rate limit exceeded", {
@@ -114,41 +123,55 @@ export const TranslatorBox: React.FC = () => {
 	const pendingRef = useRef(false);
 	const savedTranslationsRef = useRef<Set<string>>(new Set());
 
-const handleClickMicroPhone = useCallback(async () => {
-  if (pendingRef.current) return;
-  pendingRef.current = true;
-  
-  try {
-    if (!isSpeechSupported || !isMicrophoneAvailable) {
-      console.warn('Speech not supported or mic blocked');
-      return;
-    }
+	const handleClickMicroPhone = useCallback(async () => {
+		if (pendingRef.current) return;
+		pendingRef.current = true;
 
-    if (listening) {
-      stopListening();
-      return;
-    }
+		try {
+			if (!isSpeechSupported || !isMicrophoneAvailable) {
+				console.warn("Speech not supported or mic blocked");
+				return;
+			}
 
-    // Start listening using the unified hook
-    await startListening();
-  } finally {
-    pendingRef.current = false;
-  }
-}, [isSpeechSupported, isMicrophoneAvailable, listening, startListening, stopListening]);
+			if (listening) {
+				stopListening();
+				return;
+			}
+
+			// Start listening using the unified hook
+			await startListening();
+		} finally {
+			pendingRef.current = false;
+		}
+	}, [
+		isSpeechSupported,
+		isMicrophoneAvailable,
+		listening,
+		startListening,
+		stopListening,
+	]);
 
 	// Toggle speech recognition mode (only for admins)
 	const handleSpeechModeToggle = useCallback(() => {
 		if (!isAdmin) return; // Prevent non-admin users from switching modes
-		
-		const newMode = speechRecognitionMode === "browser" ? "whisper" : "browser";
+
+		const newMode =
+			speechRecognitionMode === "browser" ? "whisper" : "browser";
 		setSpeechRecognitionMode(newMode);
-		
+
 		// Stop current listening if active
 		if (listening) {
 			stopListening();
 		}
 		resetTranscript();
-	}, [isAdmin, speechRecognitionMode, setSpeechRecognitionMode, listening, stopListening, resetTranscript]);
+	}, [
+		isAdmin,
+		speechRecognitionMode,
+		setSpeechRecognitionMode,
+		listening,
+		stopListening,
+		resetTranscript,
+	]);
 
 	// ────────────────────────────────────────────────────────────────────────────
 	// UI state
@@ -162,26 +185,26 @@ const handleClickMicroPhone = useCallback(async () => {
 	}, [session?.user?.id, loadSettings]);
 
 	// Apply loaded settings to translator store
-	useEffect(() => {
-		if (defaultSourceLang) {
-			setFromLang(defaultSourceLang);
-		}
-		if (defaultTargetLang) {
-			setToLang(defaultTargetLang);
-		}
-		if (defaultTranslationStyle) {
-			setTone(defaultTranslationStyle);
-		}
-		// Speech recognition mode is handled by the settings store directly
-		// and used via speechRecognitionMode state
-	}, [
-		defaultSourceLang,
-		defaultTargetLang,
-		defaultTranslationStyle,
-		setFromLang,
-		setToLang,
-		setTone,
-	]);
+	// useEffect(() => {
+	// 	if (defaultSourceLang) {
+	// 		setFromLang(defaultSourceLang);
+	// 	}
+	// 	if (defaultTargetLang) {
+	// 		setToLang(defaultTargetLang);
+	// 	}
+	// 	if (defaultTranslationStyle) {
+	// 		setTone(defaultTranslationStyle);
+	// 	}
+	// 	// Speech recognition mode is handled by the settings store directly
+	// 	// and used via speechRecognitionMode state
+	// }, [
+	// 	defaultSourceLang,
+	// 	defaultTargetLang,
+	// 	defaultTranslationStyle,
+	// 	setFromLang,
+	// 	setToLang,
+	// 	setTone,
+	// ]);
 
 	// Дебаунс: 0 мс сразу после swap, 800 мс обычно
 	const DEFAULT_DEBOUNCE = 800;
@@ -332,7 +355,14 @@ const handleClickMicroPhone = useCallback(async () => {
 		setInput("");
 		resetTranscript();
 		setCompletion("");
-	}, [isLoading, stop, setCompletion, setInput, resetTranscript, stopListening]);
+	}, [
+		isLoading,
+		stop,
+		setCompletion,
+		setInput,
+		resetTranscript,
+		stopListening,
+	]);
 
 	const handleSwapResultToInputText = useCallback(() => {
 		const translatedText = completion?.trim() ?? "";
@@ -355,7 +385,15 @@ const handleClickMicroPhone = useCallback(async () => {
 		// Один немедленный перевод без debounce, потом вернём дефолт
 		swappedOnceRef.current = true;
 		// setDebounceMs(0);
-	}, [completion, isLoading, stop, setCompletion, setInput, resetTranscript, stopListening]);
+	}, [
+		completion,
+		isLoading,
+		stop,
+		setCompletion,
+		setInput,
+		resetTranscript,
+		stopListening,
+	]);
 
 	// ────────────────────────────────────────────────────────────────────────────
 	// Стабильная функция для запуска перевода
@@ -389,16 +427,37 @@ const handleClickMicroPhone = useCallback(async () => {
 	useEffect(() => {
 		const sourceText = input.trim();
 		const resultText = completion.trim();
-		
+
 		// Создаем уникальный ключ для этого перевода
 		const translationKey = `${sourceText}|${resultText}|${fromLang}|${toLang}|${tone}`;
-		
+
 		// Сохраняем только если есть и исходный текст, и результат, перевод завершен, и мы еще не сохраняли этот перевод
-		if (sourceText && resultText && !isLoading && !error && !savedTranslationsRef.current.has(translationKey)) {
+		if (
+			sourceText &&
+			resultText &&
+			!isLoading &&
+			!error &&
+			!savedTranslationsRef.current.has(translationKey)
+		) {
 			savedTranslationsRef.current.add(translationKey);
-			void saveTranslation(sourceText, resultText, fromLang, toLang, tone);
+			void saveTranslation(
+				sourceText,
+				resultText,
+				fromLang,
+				toLang,
+				tone
+			);
 		}
-	}, [completion, isLoading, error, input, fromLang, toLang, tone, saveTranslation]);
+	}, [
+		completion,
+		isLoading,
+		error,
+		input,
+		fromLang,
+		toLang,
+		tone,
+		saveTranslation,
+	]);
 
 	// ────────────────────────────────────────────────────────────────────────────
 	// Оркестратор перевода — без зацикливания
