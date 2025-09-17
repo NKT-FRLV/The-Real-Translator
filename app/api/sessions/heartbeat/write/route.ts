@@ -2,18 +2,21 @@
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-import { cookies } from "next/headers";
+// import { cookies } from "next/headers";
 import { prisma } from "@/app/prismaClient/prisma";
 import { UAParser } from "ua-parser-js";
+import { auth } from "@/app/auth";
 
 export async function POST(req: Request) {
-  const cookieStore = await cookies();
-  const token =
-    cookieStore.get("__Secure-authjs.session-token")?.value ??
-    cookieStore.get("authjs.session-token")?.value ??
-    null;
+//   const cookieStore = await cookies();
+//   const token =
+//     cookieStore.get("__Secure-authjs.session-token")?.value ??
+//     cookieStore.get("authjs.session-token")?.value ??
+//     null;
+const session = await auth();
+const token = session?.user?.id;
 
-  if (!token) {
+  if (!session) {
     // ⛔️ без тела на 204
     return new Response(null, { status: 204 });
   }

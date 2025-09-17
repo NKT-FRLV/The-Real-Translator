@@ -4,11 +4,10 @@ import { streamText } from 'ai';
 import { openrouter } from "@/app/services/openRouter";
 import { Tone } from "@/shared/types/types";
 import { isLanguageShort, isTone } from "@/shared/config/translation";
-import { MODEL, MODEL_KEY, SUPPORTED_MODELS } from "@/app/services/modelConfig";
 import { buildSystem } from "@/app/utils/prompt-build";
 
 export const runtime = "edge";
-
+const envModel = process.env.TRANSLATION_MODEL || "gpt-4.1-nano";
 
 // ───────────────────────────────────────────────────────────────────────────────
 // HEAD — для варминга соединения
@@ -24,19 +23,19 @@ export async function HEAD() {
 // ───────────────────────────────────────────────────────────────────────────────
 // GET — служебная информация
 // ───────────────────────────────────────────────────────────────────────────────
-export async function GET() {
+// export async function GET() {
 
-	const response = {
-		supportedModels: Object.keys(SUPPORTED_MODELS),
-		currentModel: MODEL_KEY,
-		provider: "OpenRouter",
-		runtime,
-	};
+// 	const response = {
+// 		supportedModels: Object.keys(SUPPORTED_MODELS),
+// 		currentModel: MODEL_KEY,
+// 		provider: "OpenRouter",
+// 		runtime,
+// 	};
 
-	return new Response(JSON.stringify(response), {
-		headers: { "Content-Type": "application/json" },
-	});
-}
+// 	return new Response(JSON.stringify(response), {
+// 		headers: { "Content-Type": "application/json" },
+// 	});
+// }
 
 // ───────────────────────────────────────────────────────────────────────────────
 // POST — основной стриминг перевода
@@ -99,7 +98,7 @@ export async function POST(req: NextRequest) {
 
 		const system = buildSystem(fromLang, toLang, tone);
 
-		const reasoningOptions = MODEL.includes("gpt-5") ? {
+		const reasoningOptions = envModel.includes("gpt-5") ? {
 			extraBody: {
 			  reasoning: { effort: "low", exclude: true }
 			}
@@ -107,7 +106,7 @@ export async function POST(req: NextRequest) {
 
 		// Chat-модель через OpenRouter + корректный text stream для useCompletion
 		const result = streamText({
-			model: openrouter.chat(MODEL, reasoningOptions),
+			model: openrouter.chat(envModel, reasoningOptions),
 			system,
 			messages: [{ role: "user", content: text }],
 			temperature: 0,
