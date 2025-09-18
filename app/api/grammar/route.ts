@@ -1,0 +1,148 @@
+import { NextRequest } from "next/server";
+import { generateObject } from 'ai';
+import { openrouter } from "@/app/services/openRouter";
+import { EditingStyle } from "@/app/(Pages-Routes)/grammar-check/_components/StyleSelector";
+import { GrammarCheckResponseSchema } from "@/app/(Pages-Routes)/grammar-check/_components/grammar-schema";
+
+export const runtime = "edge";
+const envModel = process.env.GRAMMAR_MODEL || "openai/gpt-4o-mini";
+
+// ───────────────────────────────────────────────────────────────────────────────
+// HEAD — для варминга соединения
+// ───────────────────────────────────────────────────────────────────────────────
+export async function HEAD() {
+	return new Response(null, {
+		status: 200,
+		headers: { "Cache-Control": "no-cache" },
+	});
+}
+
+// ───────────────────────────────────────────────────────────────────────────────
+// POST — грамматическая проверка с ИИ
+// ───────────────────────────────────────────────────────────────────────────────
+export async function POST(req: NextRequest) {
+	try {
+		// Проверим сигнал аборта в самом начале
+		if (req.signal?.aborted) {
+			return new Response(null, { status: 204 });
+		}
+
+		const raw = await req.json();
+		const text = raw?.text || "";
+		const style: EditingStyle = raw?.style || "neutral";
+
+		// Проверим текст на пустоту
+		if (!text.trim()) {
+			return new Response(
+				JSON.stringify({ error: "Text to check is required" }),
+				{ status: 400, headers: { "Content-Type": "application/json" } }
+			);
+		}
+
+		// Проверим сигнал аборта перед тяжелыми операциями
+		if (req.signal?.aborted) {
+			return new Response(null, { status: 204 });
+		}
+
+		const system = buildGrammarSystem(style);
+
+		// Грамматическая проверка через OpenRouter с валидацией
+		const result = await generateObject({
+			model: openrouter.chat(envModel),
+			system,
+			messages: [{ role: "user", content: text }],
+			schema: GrammarCheckResponseSchema,
+			temperature: 0.3,
+			topP: 0.9,
+			maxOutputTokens: 2000,
+			abortSignal: req.signal,
+		});
+
+		// Логируем результат для отладки
+		console.log("Grammar check result:", JSON.stringify(result.object, null, 2));
+
+		// Возвращаем валидированный JSON ответ
+		return new Response(JSON.stringify(result.object), {
+			headers: {
+				"Content-Type": "application/json",
+				"Cache-Control": "no-cache",
+			},
+		});
+
+	} catch (error: unknown) {
+		// abort — нормальный сценарий
+		if (
+			req.signal?.aborted ||
+			(error instanceof Error && error.name === "AbortError")
+		) {
+			return new Response(null, { status: 204 });
+		}
+
+		// Логируем ошибку для отладки
+		console.error("Grammar check API error:", error);
+		console.error("Error details:", {
+			name: error instanceof Error ? error.name : "Unknown",
+			message: error instanceof Error ? error.message : "Unknown error",
+			stack: error instanceof Error ? error.stack : undefined,
+		});
+
+		return new Response(
+			JSON.stringify({
+				error:
+					error instanceof Error
+						? error.message
+						: "Grammar check failed",
+			}),
+			{ status: 500, headers: { "Content-Type": "application/json" } }
+		);
+	}
+}
+
+// ───────────────────────────────────────────────────────────────────────────────
+// Система промптов для грамматической проверки
+// ───────────────────────────────────────────────────────────────────────────────
+const getStyleInstructions = (style: EditingStyle): string => {
+	const map: Record<EditingStyle, string> = {
+		neutral: `Provide balanced, professional grammar corrections with clear explanations. Focus on clarity and correctness without being overly formal or casual.`,
+		
+		formal: `Use sophisticated, academic language in your corrections. Provide detailed explanations with formal terminology. Focus on precision and scholarly tone.`,
+		
+		informal: `Use casual, conversational language in your corrections. Keep explanations simple and friendly. Focus on natural, everyday language patterns.`,
+		
+		influencer: `Use trendy, engaging language in your corrections. Include modern expressions and social media-friendly explanations. Make it sound current and relatable.`,
+		
+		pirate: `Use pirate-themed language in your corrections. Include phrases like "Arrr, matey!" and nautical terms. Make explanations fun and adventurous.`,
+		
+		elf: `Use elegant, mystical language in your corrections. Include poetic expressions and magical terminology. Make explanations sound wise and enchanting.`,
+		
+		academic: `Use scholarly, precise language in your corrections. Provide detailed explanations with academic terminology. Focus on research-quality writing.`,
+		
+		casual: `Use relaxed, friendly language in your corrections. Keep explanations simple and approachable. Focus on natural, everyday communication.`,
+		
+		professional: `Use business-appropriate language in your corrections. Provide clear, concise explanations suitable for workplace communication.`,
+	};
+	return map[style] ?? map.neutral;
+};
+
+const buildGrammarSystem = (style: EditingStyle): string => {
+	return `You are an expert grammar checker. Fix the text and show changes with markers.
+
+STYLE: ${style}
+${getStyleInstructions(style)}
+
+REQUIRED OUTPUT FORMAT:
+1. correctedText: The final corrected text
+2. correctedWithDiffText: Show changes with markers:
+   - Use -text- for deleted text
+   - Use +text+ for added text
+   - Keep unchanged text normal
+
+EXAMPLE:
+Input: "Helo, im from Amaraka"
+correctedText: "Hello, I'm from America"
+correctedWithDiffText: "-Helo- +Hello+ , i+'+m from -Amaraka-+America+"
+
+Be aggressive with corrections. Clean up messy text completely.
+
+Style: ${style}`;
+};

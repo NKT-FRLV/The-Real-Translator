@@ -14,7 +14,6 @@ export default function DesktopSideNavClient({
 	userName?: string;
 	avatarSrc: string;
 }) {
-
 	return (
 		<header className="hidden md:flex fixed top-0 bottom-0 flex-col items-center justify-between p-3 w-[72px]">
 			<div className="flex items-center">
@@ -26,44 +25,42 @@ export default function DesktopSideNavClient({
 				<nav className="flex flex-col gap-6 mt-6">
 					{/* Иконка перевода */}
 					<NavIcon
-						iconType={'languages'}
+						iconType={"languages"}
 						href="/profile?tab=translations"
 					/>
 
 					{/* Иконка истории */}
-					<NavIcon
-						iconType={'clock'}
-						href="/profile?tab=history"
-					/>
+					<NavIcon iconType={"clock"} href="/profile?tab=history" />
 
 					{/* Иконка избранного */}
-					<NavIcon
-						iconType={'heart'}
-						href="/profile?tab=favorites"
-					/>
+					<NavIcon iconType={"heart"} href="/profile?tab=favorites" />
 
 					{/* Демо темы */}
-					<NavIcon
+					{/* <NavIcon
 						iconType={'theme-demo'}
 						href="/theme-demo"
-					/>
+					/> */}
+
+					<NavIcon iconType={"grammar-check"} href="/grammar-check" />
 
 					{/* Иконка настроек */}
 					<NavIcon
-						iconType={'settings'}
+						iconType={"settings"}
 						href="/profile?tab=settings"
 					/>
 
 					{/* Иконка помощи */}
-					<NavIcon
-						iconType={'help'}
-						href="/profile?tab=help"
-					/>
+					<NavIcon iconType={"help"} href="/profile?tab=help" />
 				</nav>
 			</div>
 
 			<div className="flex items-center">
-			<ProfileButton isAuth={isAuth} avatarSrc={avatarSrc} userName={userName} size="desktop" />
+				<ProfileButton
+					isAuth={isAuth}
+					avatarSrc={avatarSrc}
+					userName={userName}
+					size="desktop"
+				/>
 			</div>
 		</header>
 	);

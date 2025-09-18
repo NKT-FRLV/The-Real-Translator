@@ -44,12 +44,32 @@
 	/* Logo adaptive colors - only main background and central letter */
 	--logo-main-background:#ffffff;
 	--logo-main-foreground:#000000;
+	
+	/* Grammar Check Colors */
+	--grammar-success: oklch(0.7 0.15 140);
+	--grammar-success-bg: oklch(0.95 0.02 140);
+	--grammar-success-border: oklch(0.8 0.05 140);
+	--grammar-warning: oklch(0.7 0.15 80);
+	--grammar-warning-bg: oklch(0.95 0.02 80);
+	--grammar-warning-border: oklch(0.8 0.05 80);
+	--grammar-error: oklch(0.6 0.2 20);
+	--grammar-error-bg: oklch(0.95 0.02 20);
+	--grammar-error-border: oklch(0.8 0.05 20);
+	--grammar-info: oklch(0.6 0.15 240);
+	--grammar-info-bg: oklch(0.95 0.02 240);
+	--grammar-info-border: oklch(0.8 0.05 240);
+	--grammar-text: oklch(0.2 0.01 285);
+	--grammar-text-muted: oklch(0.5 0.01 285);
+	--grammar-bg: oklch(0.98 0.01 285);
+	--grammar-bg-secondary: oklch(0.96 0.01 285);
+	--grammar-border: oklch(0.9 0.01 285);
 }
 
 @theme inline {
 	--font-orbitron: var(--font-orbitron); /* <-- Шрифт для заголовков */
 	--font-rubik-mono: var(--font-rubik-mono); /* <-- Шрифт для заголовков */
 	--font-inter: var(--font-inter); /* <-- Шрифт для переводчика */
+	
 	--color-background: var(--background);
 	--color-foreground: var(--foreground);
 	--font-sans: var(--font-geist-sans);
@@ -88,6 +108,23 @@
 	--color-success: var(--success);
 	--color-logo-main-background: var(--logo-main-background);
 	--color-logo-main-foreground: var(--logo-main-foreground);
+	--color-grammar-success: var(--grammar-success);
+	--color-grammar-success-bg: var(--grammar-success-bg);
+	--color-grammar-success-border: var(--grammar-success-border);
+	--color-grammar-warning: var(--grammar-warning);
+	--color-grammar-warning-bg: var(--grammar-warning-bg);
+	--color-grammar-warning-border: var(--grammar-warning-border);
+	--color-grammar-error: var(--grammar-error);
+	--color-grammar-error-bg: var(--grammar-error-bg);
+	--color-grammar-error-border: var(--grammar-error-border);
+	--color-grammar-info: var(--grammar-info);
+	--color-grammar-info-bg: var(--grammar-info-bg);
+	--color-grammar-info-border: var(--grammar-info-border);
+	--color-grammar-text: var(--grammar-text);
+	--color-grammar-text-muted: var(--grammar-text-muted);
+	--color-grammar-bg: var(--grammar-bg);
+	--color-grammar-bg-secondary: var(--grammar-bg-secondary);
+	--color-grammar-border: var(--grammar-border);
 	--radius-sm: calc(var(--radius) - 4px);
 	--radius-md: calc(var(--radius) - 2px);
 	--radius-lg: var(--radius);
@@ -146,6 +183,25 @@ body {
 	/* Logo adaptive colors - inverted for dark theme */
 	--logo-main-background: #000000;
 	--logo-main-foreground: #ffffff;
+	
+	/* Grammar Check Colors - Dark Theme */
+	--grammar-success: oklch(0.7 0.15 140);
+	--grammar-success-bg: oklch(0.15 0.05 140);
+	--grammar-success-border: oklch(0.3 0.05 140);
+	--grammar-warning: oklch(0.7 0.15 80);
+	--grammar-warning-bg: oklch(0.15 0.05 80);
+	--grammar-warning-border: oklch(0.3 0.05 80);
+	--grammar-error: oklch(0.7 0.2 20);
+	--grammar-error-bg: oklch(0.15 0.05 20);
+	--grammar-error-border: oklch(0.3 0.05 20);
+	--grammar-info: oklch(0.7 0.15 240);
+	--grammar-info-bg: oklch(0.15 0.05 240);
+	--grammar-info-border: oklch(0.3 0.05 240);
+	--grammar-text: oklch(0.9 0.01 285);
+	--grammar-text-muted: oklch(0.6 0.01 285);
+	--grammar-bg: oklch(0.12 0.01 285);
+	--grammar-bg-secondary: oklch(0.15 0.01 285);
+	--grammar-border: oklch(0.2 0.01 285);
 }
 
 @layer base {
@@ -207,4 +263,29 @@ body {
 	-webkit-background-clip: text;
 	color: transparent;
 	animation: gentleShimmer 6s linear infinite;
+}
+
+/* Grammar Check Theme Classes */
+@layer utilities {
+	.bg-grammar-success-bg { background-color: var(--grammar-success-bg); }
+	.text-grammar-success { color: var(--grammar-success); }
+	.border-grammar-success-border { border-color: var(--grammar-success-border); }
+	
+	.bg-grammar-warning-bg { background-color: var(--grammar-warning-bg); }
+	.text-grammar-warning { color: var(--grammar-warning); }
+	.border-grammar-warning-border { border-color: var(--grammar-warning-border); }
+	
+	.bg-grammar-error-bg { background-color: var(--grammar-error-bg); }
+	.text-grammar-error { color: var(--grammar-error); }
+	.border-grammar-error-border { border-color: var(--grammar-error-border); }
+	
+	.bg-grammar-info-bg { background-color: var(--grammar-info-bg); }
+	.text-grammar-info { color: var(--grammar-info); }
+	.border-grammar-info-border { border-color: var(--grammar-info-border); }
+	
+	.text-grammar-text { color: var(--grammar-text); }
+	.text-grammar-text-muted { color: var(--grammar-text-muted); }
+	.bg-grammar-bg { background-color: var(--grammar-bg); }
+	.bg-grammar-bg-secondary { background-color: var(--grammar-bg-secondary); }
+	.border-grammar-border { border-color: var(--grammar-border); }
 }

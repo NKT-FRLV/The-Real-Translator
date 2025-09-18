@@ -24,7 +24,7 @@ export default async function SideNavShell({ user }: SideNavShellProps) {
     "https://api.dicebear.com/9.x/shapes/svg?seed=rt&size=128";
 
   return (
-    <aside className="hidden md:flex md:col-start-1 md:row-span-2 border-r border-gray-700 z-1">
+    <aside className="hidden md:flex md:col-start-1 md:row-span-2 border-r z-1">
       <DesktopSideNavClient
         isAuth={!!user}
         userName={user?.name ?? undefined}

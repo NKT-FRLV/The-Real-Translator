@@ -2,11 +2,11 @@
 
 import React from "react";
 import type { LucideIcon } from "lucide-react";
-import { Languages, Clock, Heart, Settings, HelpCircle, Palette } from "lucide-react";
+import { Languages, Clock, Heart, Settings, HelpCircle, Palette, GraduationCap } from "lucide-react";
 import { cn } from "@/shared/shadcn/utils";
 import Link from "next/link";
 
-type IconsUnion = "languages" | "clock" | "heart" | "settings" | "help" | "theme-demo";
+type IconsUnion = "languages" | "clock" | "heart" | "settings" | "help" | "theme-demo" | "grammar-check";
 
 type NavIconVariant = "desktop" | "mobile";
 
@@ -37,6 +37,7 @@ export const NavIcon: React.FC<NavIconProps> = ({
 		settings: Settings,
 		help: HelpCircle,
 		"theme-demo": Palette,
+		"grammar-check": GraduationCap,
 	};
 
 	const Icon = IconsMap[iconType];

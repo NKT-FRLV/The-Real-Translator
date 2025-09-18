@@ -55,6 +55,12 @@ const token = session?.user?.id;
     },
   });
 
+  // Проверяем, что сессия существует перед обновлением
+  if (!row) {
+    // Сессия не найдена, возможно истекла или была удалена
+    return new Response(null, { status: 204 });
+  }
+
   // пишем только то, что изменилось (чтобы не долбить БД)
   await prisma.session.update({
     where: { sessionToken: token },
