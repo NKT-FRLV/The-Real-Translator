@@ -54,12 +54,21 @@ const BurgerMenu: React.FC<BurgerMenuProps> = ({ isOpen, onClose }) => {
 								/>
 
 								{/* Theme Demo */}
-								<NavIcon
+								{/* <NavIcon
 									iconType="theme-demo"
 									variant="mobile"
 									label="Theme Demo"
 									size={24}
 									href="/theme-demo"
+								/> */}
+
+								{/* Grammar Check */}
+								<NavIcon
+									iconType="grammar-check"
+									variant="mobile"
+									label="Grammar Check"
+									size={24}
+									href="/grammar-check"
 								/>
 
 								{/* Settings */}
