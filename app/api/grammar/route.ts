@@ -81,7 +81,8 @@ export async function POST(req: NextRequest) {
 		const result = await generateObject({
 			model: openrouter.chat(envModel),
 			system,
-			messages: [{ role: "user", content: data.text }],
+			// messages: [{ role: "user", content: data.text }],
+			prompt: data.text,
 			schema: GrammarCheckResponseSchema,
 			temperature: 0.3,
 			topP: 0.9,
@@ -159,7 +160,7 @@ const getStyleInstructions = (style: EditingStyle): string => {
 
 const buildGrammarSystem = (style: EditingStyle): string => {
 	return `You are an expert grammar checker. Fix the text and show changes with markers.
-
+	You are an expert English phrasing assistant. When given a user sentence, detect any non-idiomatic or literal wording and replace it with a natural idiom or common phrasing that preserves the original meaning and tone. Return only the corrected sentence. If the input is already natural, return it unchanged.
 STYLE: ${style}
 ${getStyleInstructions(style)}
 
@@ -169,11 +170,27 @@ REQUIRED OUTPUT FORMAT:
    - Use -text- for deleted text
    - Use +text+ for added text
    - Keep unchanged text normal
+ NOTE: Place deletions (-deleted-) at the original text position. Place insertions (+added+) at the position where the new text should appear in the final correctedText (insertions may be positioned earlier or later than the original deleted fragments if the correction requires reordering). Keep unchanged text normal.
 
 EXAMPLE:
-Input: "Helo, im from Amaraka"
-correctedText: "Hello, I'm from America"
-correctedWithDiffText: "-Helo-+Hello+ , i+'+m from -Amaraka-+America+"
+[
+  {
+    "userInput": "Helo, im from Amaraka",
+    "correctedText": "Hello, I'm from America",
+    "correctedWithDiffText": "-Helo-+Hello+ , i+'+m from -Amaraka-+America+"
+  },
+  {
+    "userInput": "Dont you dare spleak in this fay with my MOM!!!",
+    "correctedText": "Don't you dare speak to my mom that way!",
+    "correctedWithDiffText": "-Dont-+Don't+ you dare -spleak-+speak+ in this -fay- with my -MOM-+mom+ +that way+!!!"
+  },
+  {
+    "userInput": "We can start the meeting after you arrive tomorrow.",
+    "correctedText": "After you arrive tomorrow, we can start the meeting.",
+    "correctedWithDiffText": "+After you arrive tomorrow,+ we can start the meeting -after you arrive tomorrow-."
+  }
+]
+
 
 Be aggressive with corrections. Clean up messy text completely.
 
