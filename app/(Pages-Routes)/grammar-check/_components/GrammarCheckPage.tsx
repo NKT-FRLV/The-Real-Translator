@@ -70,7 +70,6 @@ export default function GrammarCheckPage() {
   const [changes, setChanges] = useState<TextChange[]>([]);
   const [errors, setErrors] = useState<GrammarError[]>([]);
   const [correctedWithDiffText, setCorrectedWithDiffText] = useState("");
-  // const [diffMarkers, setDiffMarkers] = useState<DiffMarker[]>([]);
   
   // Track if we have results to regenerate when style changes
 //   const [hasResults, setHasResults] = useState(false);
@@ -78,7 +77,7 @@ export default function GrammarCheckPage() {
   // Toggle for testing (set to true to use mock data)
 
 
-  const useMockData = true; // API работает!
+  const useMockData = false; // API работает!
 
   const handleCheckGrammar = async () => {
     if (!inputText.trim()) return;
@@ -97,7 +96,6 @@ export default function GrammarCheckPage() {
       setChanges(result.changes || []);
       setErrors(result.errors);
       setCorrectedWithDiffText(result.correctedWithDiffText || "");
-      // setDiffMarkers(result.diffMarkers || []);
     //   setHasResults(true);
       setIsModalOpen(true);
     } catch (error) {
@@ -119,6 +117,16 @@ export default function GrammarCheckPage() {
     setIsModalOpen(false);
   };
 
+
+  const handleInputChange = (value: string) => {
+    setInputText(value);
+	setChanges([]);
+	setErrors([]);
+	setCorrectedWithDiffText("");
+	setCorrectedText("");
+
+  };
+
   const handleRegenerate = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -129,7 +137,6 @@ export default function GrammarCheckPage() {
       setChanges(result.changes || []);
       setErrors(result.errors);
       setCorrectedWithDiffText(result.correctedWithDiffText || "");
-      // setDiffMarkers(result.diffMarkers || []);
     } catch (error) {
       console.error("Regeneration failed:", error);
       toast.error("Regeneration failed", {
@@ -161,7 +168,7 @@ export default function GrammarCheckPage() {
 
       <GrammarCheckInput
         value={inputText}
-        onChange={setInputText}
+        onChange={handleInputChange}
         onCheckGrammar={handleCheckGrammar}
         isLoading={isLoading}
       />

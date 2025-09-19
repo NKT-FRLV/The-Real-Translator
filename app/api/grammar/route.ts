@@ -1,11 +1,28 @@
 import { NextRequest } from "next/server";
-import { generateObject } from 'ai';
+import { generateObject } from "ai";
 import { openrouter } from "@/app/services/openRouter";
 import { EditingStyle } from "@/app/(Pages-Routes)/grammar-check/_components/StyleSelector";
 import { GrammarCheckResponseSchema } from "@/app/(Pages-Routes)/grammar-check/_components/grammar-schema";
+import { z } from "zod";
 
 export const runtime = "edge";
 const envModel = process.env.GRAMMAR_MODEL || "openai/gpt-4o-mini";
+
+
+const requestSchema = z.object({
+	text: z.string().min(1),
+	style: z.enum([
+		"neutral",
+		"formal",
+		"informal",
+		"influencer",
+		"pirate",
+		"elf",
+		"academic",
+		"casual",
+		"professional",
+	]).default("neutral")
+});
 
 // ───────────────────────────────────────────────────────────────────────────────
 // HEAD — для варминга соединения
@@ -28,11 +45,25 @@ export async function POST(req: NextRequest) {
 		}
 
 		const raw = await req.json();
-		const text = raw?.text || "";
-		const style: EditingStyle = raw?.style || "neutral";
+		// const text = raw?.text || "";
+		// const style: EditingStyle = raw?.style || "neutral";
 
+		
+		const parsed = requestSchema.safeParse(raw);
+		const { data, success } = parsed;
+		if (!success) {
+			console.error("Schema error:", parsed.error);
+			return new Response(
+				JSON.stringify({ error: parsed.error.message }),
+				{ status: 400, headers: { "Content-Type": "application/json" } }
+			);
+		}
+		console.log('--------------------------------');
+		console.log(data.style);
+		console.log(data.text);
+		console.log('--------------------------------');
 		// Проверим текст на пустоту
-		if (!text.trim()) {
+		if (!data.text.trim()) {
 			return new Response(
 				JSON.stringify({ error: "Text to check is required" }),
 				{ status: 400, headers: { "Content-Type": "application/json" } }
@@ -44,13 +75,13 @@ export async function POST(req: NextRequest) {
 			return new Response(null, { status: 204 });
 		}
 
-		const system = buildGrammarSystem(style);
+		const system = buildGrammarSystem(data.style);
 
 		// Грамматическая проверка через OpenRouter с валидацией
 		const result = await generateObject({
 			model: openrouter.chat(envModel),
 			system,
-			messages: [{ role: "user", content: text }],
+			messages: [{ role: "user", content: data.text }],
 			schema: GrammarCheckResponseSchema,
 			temperature: 0.3,
 			topP: 0.9,
@@ -59,7 +90,10 @@ export async function POST(req: NextRequest) {
 		});
 
 		// Логируем результат для отладки
-		console.log("Grammar check result:", JSON.stringify(result.object, null, 2));
+		console.log(
+			"Grammar check result:",
+			JSON.stringify(result.object, null, 2)
+		);
 
 		// Возвращаем валидированный JSON ответ
 		return new Response(JSON.stringify(result.object), {
@@ -68,7 +102,6 @@ export async function POST(req: NextRequest) {
 				"Cache-Control": "no-cache",
 			},
 		});
-
 	} catch (error: unknown) {
 		// abort — нормальный сценарий
 		if (
@@ -104,21 +137,21 @@ export async function POST(req: NextRequest) {
 const getStyleInstructions = (style: EditingStyle): string => {
 	const map: Record<EditingStyle, string> = {
 		neutral: `Provide balanced, professional grammar corrections with clear explanations. Focus on clarity and correctness without being overly formal or casual.`,
-		
+
 		formal: `Use sophisticated, academic language in your corrections. Provide detailed explanations with formal terminology. Focus on precision and scholarly tone.`,
-		
+
 		informal: `Use casual, conversational language in your corrections. Keep explanations simple and friendly. Focus on natural, everyday language patterns.`,
-		
+
 		influencer: `Use trendy, engaging language in your corrections. Include modern expressions and social media-friendly explanations. Make it sound current and relatable.`,
-		
+
 		pirate: `Use pirate-themed language in your corrections. Include phrases like "Arrr, matey!" and nautical terms. Make explanations fun and adventurous.`,
-		
+
 		elf: `Use elegant, mystical language in your corrections. Include poetic expressions and magical terminology. Make explanations sound wise and enchanting.`,
-		
+
 		academic: `Use scholarly, precise language in your corrections. Provide detailed explanations with academic terminology. Focus on research-quality writing.`,
-		
+
 		casual: `Use relaxed, friendly language in your corrections. Keep explanations simple and approachable. Focus on natural, everyday communication.`,
-		
+
 		professional: `Use business-appropriate language in your corrections. Provide clear, concise explanations suitable for workplace communication.`,
 	};
 	return map[style] ?? map.neutral;
@@ -140,7 +173,7 @@ REQUIRED OUTPUT FORMAT:
 EXAMPLE:
 Input: "Helo, im from Amaraka"
 correctedText: "Hello, I'm from America"
-correctedWithDiffText: "-Helo- +Hello+ , i+'+m from -Amaraka-+America+"
+correctedWithDiffText: "-Helo-+Hello+ , i+'+m from -Amaraka-+America+"
 
 Be aggressive with corrections. Clean up messy text completely.
 

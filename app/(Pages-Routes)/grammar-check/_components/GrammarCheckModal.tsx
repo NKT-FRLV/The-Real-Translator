@@ -11,7 +11,7 @@ import { Button } from "@/shared/shadcn/ui/button";
 import { TextDiff } from "./TextDiff";
 import { ErrorExplanations } from "./ErrorExplanations";
 import StyleSelector, { EditingStyle } from "./StyleSelector";
-import { TextChange, GrammarError, DiffMarker } from "./grammar-schema";
+import { TextChange, GrammarError } from "./grammar-schema";
 import { RotateCcw, Copy, Check } from "lucide-react";
 
 interface GrammarCheckModalProps {

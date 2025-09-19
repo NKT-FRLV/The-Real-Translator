@@ -2,14 +2,21 @@
 
 import React from "react";
 import { cn } from "@/shared/shadcn/utils";
-import { TextChange, DiffMarker } from "./grammar-schema";
+import { TextChange } from "./grammar-schema";
+
+// Локальный тип для парсинга diff текста
+type DiffMarker = {
+	type: "deleted" | "added" | "unchanged";
+	content: string;
+	originalText: string;
+	correctedText: string;
+};
 
 interface TextDiffProps {
 	originalText: string;
 	correctedText: string;
 	changes: TextChange[];
 	correctedWithDiffText?: string;
-	diffMarkers?: DiffMarker[];
 	className?: string;
 }
 

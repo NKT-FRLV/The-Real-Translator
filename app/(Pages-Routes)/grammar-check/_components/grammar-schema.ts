@@ -9,13 +9,6 @@ export const TextChangeSchema = z.object({
   end: z.number().min(0).describe("Exact character position where the change ends in the original text (0-based index)"),
 });
 
-// Новая схема для маркеров изменений (упрощённая)
-export const DiffMarkerSchema = z.object({
-  type: z.enum(["deleted", "added", "unchanged"]).describe("Type of text segment"),
-  content: z.string().describe("The actual text content"),
-  originalText: z.string().describe("Original text"),
-  correctedText: z.string().describe("Corrected text"),
-});
 
 // Схема для одной ошибки
 export const GrammarErrorSchema = z.object({
@@ -42,6 +35,5 @@ export const GrammarCheckResponseSchema = z.object({
 
 // Типы для TypeScript
 export type TextChange = z.infer<typeof TextChangeSchema>;
-export type DiffMarker = z.infer<typeof DiffMarkerSchema>;
 export type GrammarError = z.infer<typeof GrammarErrorSchema>;
 export type GrammarCheckResponse = z.infer<typeof GrammarCheckResponseSchema>;
