@@ -2,27 +2,11 @@ import { NextRequest } from "next/server";
 import { generateObject } from "ai";
 import { openrouter } from "@/app/services/openRouter";
 import { EditingStyle } from "@/app/(Pages-Routes)/grammar-check/_components/StyleSelector";
-import { GrammarCheckResponseSchema } from "@/app/(Pages-Routes)/grammar-check/_components/grammar-schema";
-import { z } from "zod";
+import { GrammarCheckResponseSchema, RequestGrammarCheckSchema } from "@/app/(Pages-Routes)/grammar-check/_components/grammar-schema";
+
 
 export const runtime = "edge";
 const envModel = process.env.GRAMMAR_MODEL || "openai/gpt-4o-mini";
-
-
-const requestSchema = z.object({
-	text: z.string().min(1),
-	style: z.enum([
-		"neutral",
-		"formal",
-		"informal",
-		"influencer",
-		"pirate",
-		"elf",
-		"academic",
-		"casual",
-		"professional",
-	]).default("neutral")
-});
 
 // ───────────────────────────────────────────────────────────────────────────────
 // HEAD — для варминга соединения
@@ -49,8 +33,9 @@ export async function POST(req: NextRequest) {
 		// const style: EditingStyle = raw?.style || "neutral";
 
 		
-		const parsed = requestSchema.safeParse(raw);
+		const parsed = RequestGrammarCheckSchema.safeParse(raw);
 		const { data, success } = parsed;
+
 		if (!success) {
 			console.error("Schema error:", parsed.error);
 			return new Response(
@@ -61,21 +46,16 @@ export async function POST(req: NextRequest) {
 		console.log('--------------------------------');
 		console.log(data.style);
 		console.log(data.text);
+		console.log(data.retry);
 		console.log('--------------------------------');
-		// Проверим текст на пустоту
-		if (!data.text.trim()) {
-			return new Response(
-				JSON.stringify({ error: "Text to check is required" }),
-				{ status: 400, headers: { "Content-Type": "application/json" } }
-			);
-		}
 
 		// Проверим сигнал аборта перед тяжелыми операциями
 		if (req.signal?.aborted) {
 			return new Response(null, { status: 204 });
 		}
 
-		const system = buildGrammarSystem(data.style);
+		const system = buildGrammarSystem(data.style, data.retry);
+
 
 		// Грамматическая проверка через OpenRouter с валидацией
 		const result = await generateObject({
@@ -158,41 +138,52 @@ const getStyleInstructions = (style: EditingStyle): string => {
 	return map[style] ?? map.neutral;
 };
 
-const buildGrammarSystem = (style: EditingStyle): string => {
+const buildGrammarSystem = (style: EditingStyle, retry: boolean): string => {
 	return `You are an expert grammar checker. Fix the text and show changes with markers.
-	You are an expert English phrasing assistant. When given a user sentence, detect any non-idiomatic or literal wording and replace it with a natural idiom or common phrasing that preserves the original meaning and tone. Return only the corrected sentence. If the input is already natural, return it unchanged.
+	You are an expert in All language phrasing assistant. When given a user sentence, detect any non-idiomatic or literal wording and replace it with a natural idiom or common phrasing that preserves the original meaning and tone. Return only the corrected sentence. If the input is already natural, return it unchanged.
+	First you recognize the language of the text, then you correct the text in the same language.
 STYLE: ${style}
 ${getStyleInstructions(style)}
 
 REQUIRED OUTPUT FORMAT:
 1. correctedText: The final corrected text
 2. correctedWithDiffText: Show changes with markers:
-   - Use -text- for deleted text
-   - Use +text+ for added text
+   - Use <del>text</del> for deleted text
+   - Use <ins>text</ins> for added text
    - Keep unchanged text normal
- NOTE: Place deletions (-deleted-) at the original text position. Place insertions (+added+) at the position where the new text should appear in the final correctedText (insertions may be positioned earlier or later than the original deleted fragments if the correction requires reordering). Keep unchanged text normal.
+ NOTE: Place deletions (<del>deleted</del>) at the original text position. Place insertions (<ins>added</ins>) at the position where the new text should appear in the final correctedText (insertions may be positioned earlier or later than the original deleted fragments if the correction requires reordering). Keep unchanged text normal.
 
-EXAMPLE:
+EXAMPLES:
 [
   {
     "userInput": "Helo, im from Amaraka",
     "correctedText": "Hello, I'm from America",
-    "correctedWithDiffText": "-Helo-+Hello+ , i+'+m from -Amaraka-+America+"
+    "correctedWithDiffText": "<del>Helo</del><ins>Hello</ins>, i<ins>'</ins>m from <del>Amaraka</del><ins>America</ins>"
   },
   {
     "userInput": "Dont you dare spleak in this fay with my MOM!!!",
     "correctedText": "Don't you dare speak to my mom that way!",
-    "correctedWithDiffText": "-Dont-+Don't+ you dare -spleak-+speak+ in this -fay- with my -MOM-+mom+ +that way+!!!"
+    "correctedWithDiffText": "<del>Dont</del><ins>Don't</ins> you dare <del>spleak</del><ins>speak</ins> in this <del>fay</del> with my <del>MOM</del><ins>mom</ins> <ins>that way</ins>!!!"
   },
   {
     "userInput": "We can start the meeting after you arrive tomorrow.",
     "correctedText": "After you arrive tomorrow, we can start the meeting.",
-    "correctedWithDiffText": "+After you arrive tomorrow,+ we can start the meeting -after you arrive tomorrow-."
+    "correctedWithDiffText": "<ins>After you arrive tomorrow,</ins> we can start the meeting <del>after you arrive tomorrow</del>."
   }
 ]
+NOTE: The examples are in English, but it can be in any language.
+NOTE: If you not include part of users input text to the "correctedText", you should wrap it in <del>text</del> in "correctedWithDiffText" result.
+NOTE: Remove nonsense parts of text , Wrap it in <del>text</del> in "correctedWithDiffText" result.
+NOTE: If you add or replace or change part of users input text to the "correctedText" and "correctedWithDiffText", you should wrap it in <ins>text</ins> in "correctedWithDiffText" result.
+NOTE: Untouched text should be normal without any markers.
+IMPORTANT: Each opening markers should(<del> or <ins>) have a closing markers (</del> or </ins>).
+
 
 
 Be aggressive with corrections. Clean up messy text completely.
 
-Style: ${style}`;
+Style: ${style}
+${getStyleInstructions(style)}
+
+${retry ? 'You made a mistake with enhancing text, please check the text more acuracy, take atantion to users language' : ''}`;
 };

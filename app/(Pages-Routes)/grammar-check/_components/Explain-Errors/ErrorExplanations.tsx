@@ -2,7 +2,7 @@
 
 import React from "react";
 import { cn } from "@/shared/shadcn/utils";
-import { GrammarError } from "./grammar-schema";
+import { GrammarError } from "../grammar-schema";
 
 interface ErrorExplanationsProps {
   errors: GrammarError[];
@@ -38,11 +38,11 @@ export function ErrorExplanations({
       <div className={cn("rounded-lg border border-grammar-success-border bg-grammar-success-bg p-3 sm:p-4", className)}>
         <div className="flex items-center gap-2">
           <div className="h-2 w-2 rounded-full bg-grammar-success"></div>
-          <span className="text-xs sm:text-sm font-medium text-grammar-success">
+          <span className="text-xs sm:text-sm md:text-base font-medium text-grammar-success">
             Great job! No errors found.
           </span>
         </div>
-        <p className="mt-1 text-xs text-grammar-text-muted">
+        <p className="mt-1 text-xs sm:text-sm md:text-base text-grammar-text-muted">
           Your text is well-written and follows good grammar practices.
         </p>
       </div>
@@ -52,7 +52,7 @@ export function ErrorExplanations({
   return (
     <div className={cn("space-y-3 sm:space-y-4", className)}>
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <h3 className="text-base sm:text-lg font-semibold text-grammar-text">
+        <h3 className="text-base sm:text-lg md:text-2xl font-semibold text-grammar-text">
           Grammar Analysis
         </h3>
         <span className="rounded-full bg-grammar-bg-secondary px-2 py-1 text-xs sm:text-sm text-grammar-text-muted self-start sm:self-auto">
