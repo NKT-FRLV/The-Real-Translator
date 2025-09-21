@@ -11,13 +11,13 @@ export default function SessionHeartbeat() {
     };
     send(); // сразу при монтировании
     const iv = setInterval(send, 10 * 60 * 1000); // каждые 10 минут
-    const onVis = () => {
-      if (document.visibilityState === "visible") send();
-    };
-    document.addEventListener("visibilitychange", onVis);
+    // const onVis = () => {
+    //   if (document.visibilityState === "visible") send();
+    // };
+    // document.addEventListener("visibilitychange", onVis);
     return () => {
       clearInterval(iv);
-      document.removeEventListener("visibilitychange", onVis);
+    //   document.removeEventListener("visibilitychange", onVis);
     };
   }, []);
 

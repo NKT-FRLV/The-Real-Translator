@@ -18,6 +18,7 @@ interface NavIconProps {
 	iconClassName?: string;
 	variant?: NavIconVariant;
 	label?: string; // для мобильной версии
+	onClick?: () => void;
 }
 
 export const NavIcon: React.FC<NavIconProps> = ({
@@ -28,6 +29,7 @@ export const NavIcon: React.FC<NavIconProps> = ({
 	iconClassName,
 	variant = "desktop",
 	label,
+	onClick,
 }) => {
 
 	const IconsMap: Record<IconsUnion, LucideIcon> = {
@@ -60,10 +62,11 @@ export const NavIcon: React.FC<NavIconProps> = ({
 		);
 	}
 
-	// Mobile variant - icon with text
+	// Mobile variant - icon with text + onClick close menu
 	return (
 		<Link
 			href={href}
+			onClick={onClick}
 			className={cn(
 				"w-full flex items-center justify-start gap-3 p-4 h-auto rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors",
 				className

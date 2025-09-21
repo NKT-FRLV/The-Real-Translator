@@ -70,7 +70,7 @@ export const authConfig: NextAuthConfig = {
 					h.get("x-real-ip") ||
 					null;
 
-				await prisma.session.updateMany({
+				prisma.session.updateMany({
 					// хак: зацепляем “свежесозданные” сессии за последние 5 минут
 					where: {
 						userId: user.id,
@@ -89,14 +89,16 @@ export const authConfig: NextAuthConfig = {
 	callbacks: {
 		// При стратегии "database" коллбек вызывается при чтении сессии.
 		// Гарантируем, что session.user содержит id/role без кастов.
-		async session({ session, user }) {
+		async session({ session }) {
+		
+			// console.log("user", user);
 			// при strategy: "database" сюда приходит `user` уже из адаптера
-			if (session.user && user) {
-			  // гарантируем id/role в session.user без доп. походов в БД
-			  // (убедись, что в User есть поле `role` и оно возвращается адаптером)
-			  session.user.id = user.id;
-			  session.user.role = user.role ?? undefined;
-			}
+			// if (session.user && user) {
+			// 	// гарантируем id/role в session.user без доп. походов в БД
+			// 	// (убедись, что в User есть поле `role` и оно возвращается адаптером)
+			// 	session.user.id = user.id;
+			// 	session.user.role = user.role ?? undefined;
+			// }
 			return session;
 		},
 	},

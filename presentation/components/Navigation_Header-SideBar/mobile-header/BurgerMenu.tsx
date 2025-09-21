@@ -9,6 +9,7 @@ interface BurgerMenuProps {
 }
 
 const BurgerMenu: React.FC<BurgerMenuProps> = ({ isOpen, onClose }) => {
+	
 	//   if (!isOpen) return null;
 
 	return (
@@ -30,6 +31,7 @@ const BurgerMenu: React.FC<BurgerMenuProps> = ({ isOpen, onClose }) => {
 								<NavIcon
 									iconType="languages"
 									variant="mobile"
+									onClick={onClose}
 									label="Translation Tools"
 									size={24}
 									href="/profile?tab=translations"
@@ -39,6 +41,7 @@ const BurgerMenu: React.FC<BurgerMenuProps> = ({ isOpen, onClose }) => {
 								<NavIcon
 									iconType="clock"
 									variant="mobile"
+									onClick={onClose}
 									label="History"
 									size={24}
 									href="/profile?tab=history"
@@ -48,6 +51,7 @@ const BurgerMenu: React.FC<BurgerMenuProps> = ({ isOpen, onClose }) => {
 								<NavIcon
 									iconType="heart"
 									variant="mobile"
+									onClick={onClose}
 									label="Favorites"
 									size={24}
 									href="/profile?tab=favorites"
@@ -66,6 +70,7 @@ const BurgerMenu: React.FC<BurgerMenuProps> = ({ isOpen, onClose }) => {
 								<NavIcon
 									iconType="grammar-check"
 									variant="mobile"
+									onClick={onClose}
 									label="Grammar Check"
 									size={24}
 									href="/grammar-check"
@@ -75,6 +80,7 @@ const BurgerMenu: React.FC<BurgerMenuProps> = ({ isOpen, onClose }) => {
 								<NavIcon
 									iconType="settings"
 									variant="mobile"
+									onClick={onClose}
 									label="Settings"
 									size={24}
 									href="/profile?tab=settings"
@@ -84,6 +90,7 @@ const BurgerMenu: React.FC<BurgerMenuProps> = ({ isOpen, onClose }) => {
 								<NavIcon
 									iconType="help"
 									variant="mobile"
+									onClick={onClose}
 									label="Help"
 									size={24}
 									href="/profile?tab=help"

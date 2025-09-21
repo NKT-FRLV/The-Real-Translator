@@ -13,6 +13,7 @@ const checkGrammarWithAI = async (
 	style: EditingStyle,
 	retry: boolean = false
 ): Promise<GrammarCheckResponse> => {
+
 	try {
 		const response = await fetch("/api/grammar", {
 			method: "POST",
@@ -48,17 +49,17 @@ export default function GrammarCheckPage() {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
 	const [editingStyle, setEditingStyle] = useState<EditingStyle>("neutral");
-	const mockMode = false;
+
 	// Results from grammar check
 	const [correctedText, setCorrectedText] = useState("");
 	//   const [errors, setErrors] = useState<GrammarError[]>([]);
 	const [correctedWithDiffText, setCorrectedWithDiffText] = useState("");
 
-
+	const mockMode = false;
 	const handleMockresult = async (): Promise<GrammarCheckResponse> => {
 		return new Promise((resolve) => {
 			setTimeout(() => {
-				resolve({ correctedText: "Mock corrected text", correctedWithDiffText: "M<del>ock</del><ins>ock</ins> corrected <del>with diff</del> text" });
+				resolve({ correctedText: "Mock Data Checked, it is a test text", correctedWithDiffText: "M<del>a</del><ins>o</ins>ck Data Checked <del>EEEEE</del><ins>,</ins> it is a test text" });
 			}, 3000);
 		});
 	}

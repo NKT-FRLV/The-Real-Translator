@@ -12,7 +12,7 @@ import { TextDiff } from "./TextDiff";
 import { ErrorExplanations } from "./Explain-Errors/ErrorExplanations";
 import StyleSelector, { EditingStyle } from "./StyleSelector";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { useRouter } from 'next/navigation'
 // import {  GrammarError } from "./grammar-schema";
 import { RotateCcw, Copy, Check, Info } from "lucide-react";
 import { ErrorsExplanationsResponse, GrammarError } from "./grammar-schema";
@@ -109,6 +109,13 @@ export default function GrammarCheckModal({
 		}
 	};
 
+
+	const handleTranslate = () => {
+		// console.log("correctedText", correctedText);
+		const encodedText = encodeURIComponent(correctedText);
+		router.push(`/?text=${encodedText}`);
+	};
+
 	return (
 		<Dialog open={isOpen} onOpenChange={onClose}>
 			<DialogContent
@@ -203,9 +210,19 @@ export default function GrammarCheckModal({
 							Cancel
 						</Button>
 						<Button
+							variant="outline"
+							onClick={handleTranslate}
+							disabled={isLoading}
+							className="text-primary-foreground w-full sm:w-auto order-2 sm:order-1"
+						>
+
+							Translate It!
+						</Button>
+						<Button
+							variant="outline"
 							onClick={onApplyChanges}
 							disabled={isLoading}
-							className="bg-primary text-primary-foreground hover:bg-primary/90 w-full sm:w-auto order-1 sm:order-2"
+							className="text-primary-foreground w-full sm:w-auto order-1 sm:order-2"
 						>
 							{isLoading ? "Processing..." : "Apply Changes"}
 						</Button>

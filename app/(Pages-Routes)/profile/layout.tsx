@@ -12,7 +12,7 @@ export default async function ProfileLayout({
 }) {
 	const session = await authCached();
 	const user = session?.user;
-
+	console.log("user in profile layout", user);
 	if (!user) {
 		redirect("/login");
 	}

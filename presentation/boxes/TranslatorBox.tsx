@@ -2,6 +2,7 @@
 "use client";
 
 import React, { useState, useCallback, useRef, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useCompletion } from "@ai-sdk/react";
 import { useDebounce } from "use-debounce";
 import { useSession } from "next-auth/react";
@@ -53,6 +54,12 @@ function makeRequestKey(
 // }
 
 export const TranslatorBox: React.FC = () => {
+	const router = useRouter();
+	const searchParams = useSearchParams();
+	const text = searchParams.get("text") ? decodeURIComponent(searchParams.get("text")!) : null;
+
+	console.log("text", text);
+
 	// ────────────────────────────────────────────────────────────────────────────
 	// Store state
 	// ────────────────────────────────────────────────────────────────────────────
@@ -184,28 +191,6 @@ export const TranslatorBox: React.FC = () => {
 		}
 	}, [session?.user?.id, loadSettings]);
 
-	// Apply loaded settings to translator store
-	// useEffect(() => {
-	// 	if (defaultSourceLang) {
-	// 		setFromLang(defaultSourceLang);
-	// 	}
-	// 	if (defaultTargetLang) {
-	// 		setToLang(defaultTargetLang);
-	// 	}
-	// 	if (defaultTranslationStyle) {
-	// 		setTone(defaultTranslationStyle);
-	// 	}
-	// 	// Speech recognition mode is handled by the settings store directly
-	// 	// and used via speechRecognitionMode state
-	// }, [
-	// 	defaultSourceLang,
-	// 	defaultTargetLang,
-	// 	defaultTranslationStyle,
-	// 	setFromLang,
-	// 	setToLang,
-	// 	setTone,
-	// ]);
-
 	// Дебаунс: 0 мс сразу после swap, 800 мс обычно
 	const DEFAULT_DEBOUNCE = 800;
 	const [debounceMs, setDebounceMs] = useState<number>(DEFAULT_DEBOUNCE);
@@ -287,8 +272,15 @@ export const TranslatorBox: React.FC = () => {
 					tone
 				);
 			}
+			
+			// Очищаем URL параметр text после завершения перевода
+			const url = new URL(window.location.href);
+			if (url.searchParams.has("text")) {
+				url.searchParams.delete("text");
+				router.replace(url.pathname + url.search, { scroll: false });
+			}
 		},
-		[fromLang, toLang, tone, saveTranslation]
+		[fromLang, toLang, tone, saveTranslation, router]
 	);
 
 	const onError = useCallback(() => {
@@ -322,6 +314,16 @@ export const TranslatorBox: React.FC = () => {
 	const [debouncedInputText] = useDebounce(input, debounceMs);
 
 	const safeTranscript = typeof transcript === "string" ? transcript : "";
+
+	useEffect(() => {
+		if (text) {
+			setInput(text);
+			// Очищаем URL параметр после установки текста
+			const url = new URL(window.location.href);
+			url.searchParams.delete("text");
+			router.replace(url.pathname + url.search, { scroll: false });
+		}
+	}, [text, setInput, router]);
 
 	useEffect(() => {
 		// синкаем transcript с input при любом изменении transcript

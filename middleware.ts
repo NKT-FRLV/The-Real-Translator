@@ -10,7 +10,7 @@ export default async function middleware(req: Request) {
 
 	// Для API routes возвращаем JSON ошибки вместо редиректов
 	if (url.pathname.startsWith("/api/")) {
-		if (!user || user.role?.toLowerCase() !== "admin") {
+		if (!user) {
 			return NextResponse.json(
 				{
 					error: "Authentication required",
@@ -25,7 +25,7 @@ export default async function middleware(req: Request) {
 	}
 
 	// Для обычных страниц используем редиректы
-	if (!user || user.role?.toLowerCase() !== "admin") {
+	if (!user) {
 		return NextResponse.redirect(`${baseUrl}/login`);
 	}
 
