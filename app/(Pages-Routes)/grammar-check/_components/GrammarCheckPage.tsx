@@ -48,11 +48,20 @@ export default function GrammarCheckPage() {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
 	const [editingStyle, setEditingStyle] = useState<EditingStyle>("neutral");
-
+	const mockMode = true;
 	// Results from grammar check
 	const [correctedText, setCorrectedText] = useState("");
 	//   const [errors, setErrors] = useState<GrammarError[]>([]);
 	const [correctedWithDiffText, setCorrectedWithDiffText] = useState("");
+
+
+	const handleMockresult = async (): Promise<GrammarCheckResponse> => {
+		return new Promise((resolve) => {
+			setTimeout(() => {
+				resolve({ correctedText: "Mock corrected text", correctedWithDiffText: "M<del>ock</del><ins>ock</ins> corrected <del>with diff</del> text" });
+			}, 3000);
+		});
+	}
 
 	const handleCheckGrammar = async () => {
 		if (!inputText.trim()) return;
@@ -64,10 +73,11 @@ export default function GrammarCheckPage() {
 
 		setIsLoading(true);
 		try {
-			const result = await checkGrammarWithAI(inputText, editingStyle);
+			setIsModalOpen(true);
+			const result = !mockMode ? await checkGrammarWithAI(inputText, editingStyle) : await handleMockresult();
 			setCorrectedText(result.correctedText);
 			setCorrectedWithDiffText(result.correctedWithDiffText || "");
-			setIsModalOpen(true);
+			
 		} catch (error) {
 			console.error("Grammar check failed:", error);
 			toast.error("Grammar check failed", {
@@ -114,7 +124,7 @@ export default function GrammarCheckPage() {
 	}, [inputText, editingStyle]);
 
 	return (
-		<div className="relative z-20 w-full mt-14 md:mt-0 max-w-4xl mx-auto space-y-4 sm:space-y-6 px-4 sm:px-0">
+		<div className="relative z-10 w-full mt-14 md:mt-0 max-w-4xl mx-auto space-y-4 sm:space-y-6 px-4 sm:px-0">
 			<div className="text-center space-y-2">
 				<h1 className="font-orbitron bg-gradient-to-b from-neutral-200 to-neutral-500 bg-clip-text py-6 text-4xl md:text-7xl font-bold text-transparent">
 					Grammar Check

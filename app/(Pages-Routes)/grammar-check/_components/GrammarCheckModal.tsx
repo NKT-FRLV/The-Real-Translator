@@ -185,7 +185,7 @@ export default function GrammarCheckModal({
 
 					{/* Text Comparison */}
 					<TextDiff
-						// originalText={originalText}
+						originalText={originalText}
 						correctedText={correctedText}
 						// changes={changes}
 						correctedWithDiffText={correctedWithDiffText}
