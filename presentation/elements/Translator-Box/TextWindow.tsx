@@ -158,7 +158,7 @@ export const TextWindow: React.FC<TextWindowProps> = ({
 	const voiceInputTip = getVoiceInputTip();
 
 	return (
-		<div className="flex flex-col w-full rounded-lg border border-gray-700 bg-accent/30">
+		<div className="flex flex-col w-full rounded-lg border border-gray-700">
 			<label className="p-3 md:p-3 min-h-[120px] md:min-h-[180px] relative block flex-1">
 				<Textarea
 					value={value}

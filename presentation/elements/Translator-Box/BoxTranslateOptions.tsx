@@ -48,7 +48,7 @@ const BoxTranslateOptions: React.FC<BoxTranslateOptionsProps> = ({
 
 	return (
 		<div className="px-3 pt-3 md:px-4 w-full rounded-lg bg-gradient-to-b from-red-900/10 to-[90%] from-[#121214]">
-			<div className="flex h-16 md:h-20 items-center justify-start border border-gray-700 bg-accent/30 p-0 rounded-lg">
+			<div className="flex h-16 md:h-20 items-center justify-start border border-gray-700 p-0 rounded-lg">
 				<div className="flex w-full h-full px-3 md:px-6 py-2 items-center gap-0 md:gap-4 truncate">
 					<LanguageSelect
 						value={fromLang || initialFromLang}

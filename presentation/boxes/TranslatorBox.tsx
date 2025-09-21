@@ -494,7 +494,7 @@ export const TranslatorBox: React.FC = () => {
 				isTranslating={isLoading}
 				onSwapResultToInputText={handleSwapResultToInputText}
 			/>
-			<div className="w-full grid grid-cols-1 gap-4 md:gap-5 mb-6 md:mb-8 lg:grid-cols-2 backdrop-blur-md bg-white/[0.03] dark:bg-white/[0.02] border border-white/[0.08] dark:border-white/[0.06] rounded-2xl p-4 md:p-5 shadow-xl shadow-black/[0.15]">
+			<div className="w-full grid grid-cols-1 gap-4 md:gap-5 mb-6 md:mb-8 lg:grid-cols-2 rounded-2xl p-4 md:p-5 bg-gradient-to-t from-red-900/10 to-[90%] from-[#121214]">
 				<TextWindow
 					value={input}
 					onChange={handleUserInputChange}

@@ -7,7 +7,8 @@ import { isLanguageShort, isTone } from "@/shared/config/translation";
 import { buildSystem } from "@/app/utils/prompt-build";
 
 export const runtime = "edge";
-const envModel = process.env.TRANSLATION_MODEL || "gpt-4.1-nano";
+
+const envModel = process.env.TRANSLATION_MODEL || "openai/gpt-4o-mini";
 
 // ───────────────────────────────────────────────────────────────────────────────
 // HEAD — для варминга соединения
@@ -98,34 +99,59 @@ export async function POST(req: NextRequest) {
 
 		const system = buildSystem(fromLang, toLang, tone);
 
-		const reasoningOptions = envModel.includes("gpt-5") ? {
-			extraBody: {
-			  reasoning: { effort: "low", exclude: true }
-			}
-		  } : {};
-
-		// Chat-модель через OpenRouter + корректный text stream для useCompletion
-		const result = streamText({
-			model: openrouter.chat(envModel, reasoningOptions),
-			system,
-			messages: [{ role: "user", content: text }],
-			temperature: 0,
-			topP: 1,
+		// Оптимизированные настройки для максимальной скорости с sub-провайдерами
+		const speedOptimizedOptions = {
+			// Provider routing для автоматического выбора быстрого провайдера
 			providerOptions: {
 				openrouter: {
-				  reasoning: { effort: "low", exclude: true }
-				},
-			  },
-			// Можно дать чуть больше для длинных кусков
-			maxOutputTokens: 1000,
+					// Автоматический выбор самого быстрого провайдера
+					provider: "auto", // Позволяет OpenRouter выбрать самого быстрого провайдера
+					// Настройки для максимальной скорости
+					timeout: 30000, // 30 секунд таймаут
+					retries: 2, // Минимальные повторы
+					// Отключаем reasoning для ускорения
+					reasoning: { effort: "low", exclude: true },
+					// Настройки для быстрого ответа
+					stream: true,
+					// Приоритет скорости над качеством
+					priority: "speed",
+					
+				}
+			},
+			// Дополнительные настройки для ускорения
+			extraBody: {
+				reasoning: { effort: "low", exclude: true },
+			}
+		};
+
+		// Chat-модель через OpenRouter с оптимизацией скорости
+		const result = streamText({
+			model: openrouter.chat(envModel, speedOptimizedOptions),
+			system,
+			messages: [{ role: "user", content: text }],
+			// Оптимизированные параметры для скорости
+			temperature: 0, // Детерминированный ответ
+			topP: 0.9, // Немного снижено для ускорения
+			// Минимальные токены для быстрого ответа
+			maxOutputTokens: 800, // Снижено для ускорения
 			abortSignal: req.signal,
 		});
 
 		// Используем toTextStreamResponse для совместимости с useCompletion и streamProtocol: "text"
 		const response = result.toTextStreamResponse({
 			headers: {
-				"Cache-Control": "no-cache, no-transform",
-				"X-Accel-Buffering": "no",
+				// Оптимизация кэширования для стриминга
+				"Cache-Control": "no-cache, no-store, no-transform",
+				"X-Accel-Buffering": "no", // Отключаем буферизацию nginx
+				// Дополнительные заголовки для максимальной скорости
+				"Connection": "keep-alive",
+				"Transfer-Encoding": "chunked",
+				// Заголовки для оптимизации стриминга
+				"X-Content-Type-Options": "nosniff",
+				"X-Frame-Options": "DENY",
+				// Настройки для быстрого ответа
+				"X-Response-Time": "fast",
+				"X-Streaming": "true"
 			},
 		});
 
