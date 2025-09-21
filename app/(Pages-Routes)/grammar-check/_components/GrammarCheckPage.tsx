@@ -48,7 +48,7 @@ export default function GrammarCheckPage() {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
 	const [editingStyle, setEditingStyle] = useState<EditingStyle>("neutral");
-	const mockMode = true;
+	const mockMode = false;
 	// Results from grammar check
 	const [correctedText, setCorrectedText] = useState("");
 	//   const [errors, setErrors] = useState<GrammarError[]>([]);
