@@ -1,11 +1,17 @@
 "use client";
 
 import React, { useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { GrammarCheckInput } from "./GrammarCheckInput";
 import GrammarCheckModal from "./GrammarCheckModal";
 import { EditingStyle } from "./StyleSelector";
 import { GrammarCheckResponse } from "./grammar-schema";
+import { useSession } from "next-auth/react";
+import { mayBeKickOutToLogin } from "../_utils/utils";
+
+
+
 
 // Real API call to grammar check service
 const checkGrammarWithAI = async (
@@ -45,6 +51,8 @@ const checkGrammarWithAI = async (
 };
 
 export default function GrammarCheckPage() {
+	const router = useRouter();
+	const { data: session } = useSession();
 	const [inputText, setInputText] = useState("");
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
@@ -71,6 +79,9 @@ export default function GrammarCheckPage() {
 			setIsModalOpen(true);
 			return;
 		}
+
+		const isAllowed = mayBeKickOutToLogin(session, () => router.push("/login"));
+		if (!isAllowed) return;
 
 		setIsLoading(true);
 		try {

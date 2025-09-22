@@ -20,6 +20,7 @@ export function GrammarCheckInput({
 	isLoading = false,
 	className,
 }: GrammarCheckInputProps) {
+
 	const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
 		onChange(e.target.value);
 	};
