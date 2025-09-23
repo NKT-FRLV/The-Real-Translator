@@ -69,8 +69,8 @@ export const authConfig: NextAuthConfig = {
 					(h.get("x-forwarded-for") ?? "").split(",")[0].trim() ||
 					h.get("x-real-ip") ||
 					null;
-
-				prisma.session.updateMany({
+				
+				await prisma.session.updateMany({
 					// хак: зацепляем “свежесозданные” сессии за последние 5 минут
 					where: {
 						userId: user.id,

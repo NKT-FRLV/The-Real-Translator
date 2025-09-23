@@ -8,6 +8,8 @@ export default async function middleware(req: Request) {
 	const url = new URL(req.url);
 	const baseUrl = url.origin;
 
+	console.log("middleware check user", user);
+
 	// Для API routes возвращаем JSON ошибки вместо редиректов
 	if (url.pathname.startsWith("/api/")) {
 		if (!user) {

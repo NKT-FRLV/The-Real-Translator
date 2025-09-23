@@ -2,21 +2,19 @@
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-// import { cookies } from "next/headers";
 import { prisma } from "@/app/prismaClient/prisma";
 import { UAParser } from "ua-parser-js";
-import { auth } from "@/app/auth";
+import { cookies } from "next/headers";
 
 export async function POST(req: Request) {
-	//   const cookieStore = await cookies();
-	//   const token =
-	//     cookieStore.get("__Secure-authjs.session-token")?.value ??
-	//     cookieStore.get("authjs.session-token")?.value ??
-	//     null;
-	const session = await auth();
-	const token = session?.user?.id;
+	const cookieStore = await cookies();
+	const token =
+		cookieStore.get("__Secure-authjs.session-token")?.value ??
+		cookieStore.get("authjs.session-token")?.value ??
+		null;
 
-	if (!session) {
+
+	if (!token) {
 		// ⛔️ без тела на 204
 		return new Response(null, { status: 204 });
 	}
@@ -34,6 +32,7 @@ export async function POST(req: Request) {
 		region?: string | null;
 		ua?: string;
 	};
+
 
 	const parsed = UAParser(ua || "");
 	const device = [
@@ -62,6 +61,7 @@ export async function POST(req: Request) {
 
 	// Проверяем, что сессия существует перед обновлением
 	if (!row) {
+		console.log("could not update location and ip after heartbeat");
 		// Сессия не найдена, возможно истекла или была удалена
 		return new Response(null, { status: 204 });
 	}

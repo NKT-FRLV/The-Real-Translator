@@ -71,14 +71,6 @@ export const TranslatorBox: React.FC = () => {
 	const { data: session } = useSession();
 
 	const loadSettings = useLoadSettings();
-
-	// Translator store setters
-	// const setFromLang = useSetFromLang();
-	// const setToLang = useSetToLang();
-	// const setTone = useSetTone();
-	// const setFromLang = useSetDefaultSourceLang();
-	// const setToLang = useSetDefaultTargetLang();
-	// const setTone = useSetTranslationStyle();
 	const setSpeechRecognitionMode = useSetSpeechRecognitionMode();
 
 	// ────────────────────────────────────────────────────────────────────────────
@@ -462,7 +454,7 @@ export const TranslatorBox: React.FC = () => {
 	]);
 
 	// ────────────────────────────────────────────────────────────────────────────
-	// Оркестратор перевода — без зацикливания
+	// АВОТОПЕРЕВОД С DEBOUNCE
 	// ────────────────────────────────────────────────────────────────────────────
 	useEffect(() => {
 		const prompt = debouncedInputText.trim();

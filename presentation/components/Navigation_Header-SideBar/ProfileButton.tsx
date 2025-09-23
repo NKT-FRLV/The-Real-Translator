@@ -30,9 +30,9 @@ const ProfileButton = ({
 					asChild
 					variant="outline"
 					size="icon"
-					className={size === "mobile" ? "px-6" : "p-6 mb-6"}
+					className={`${size === "mobile" ? "px-6" : "p-6 mb-6"}`}
 				>
-					<Link href="/login">Sign in</Link>
+					<Link href="/login">Login</Link>
 				</Button>
 			)}
 		</>

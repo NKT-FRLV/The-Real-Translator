@@ -16,7 +16,7 @@ export const AppDescription: React.FC = () => {
 									for 100+ Languages
 								</span>
 							</h2>
-							<p className="text-foreground text-sm md:text-lg font-semibold leading-relaxed">
+							<p className="font-inter text-muted-foreground text-sm md:text-lg font-semibold leading-relaxed">
 								Experience translation that goes beyond
 								word-for-word accuracy. Our AI understands
 								context, culture, and nuance to deliver

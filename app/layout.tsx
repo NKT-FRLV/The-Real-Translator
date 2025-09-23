@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 export { viewport } from "./viewport";
-import { Geist, Geist_Mono, Rubik_Mono_One, Orbitron, Inter } from "next/font/google";
+import { Geist_Mono, Rubik_Mono_One, Orbitron, Inter } from "next/font/google";
 import { PWAThemeManager } from "@/presentation/components/PWAThemeManager";
-import { PerformanceMonitor } from "@/presentation/components/PerformanceMonitor";
+// import { PerformanceMonitor } from "@/presentation/components/PerformanceMonitor";
 import { SplashScreenManager } from "@/presentation/components/SplashScreenManager";
 import { SessionProvider } from "next-auth/react";
 import QueryProvider from "@/presentation/providers/QueryProvider";
@@ -17,11 +17,6 @@ import HeaderShell from "@/presentation/components/Navigation_Header-SideBar/mob
 import SideNavShell from "@/presentation/components/Navigation_Header-SideBar/desctop-sidebar/SideNavShell";
 
 import { Toaster } from "@/shared/shadcn/ui/sonner";
-
-const geistSans = Geist({
-	variable: "--font-geist-sans",
-	subsets: ["latin"],
-});
 
 const geistMono = Geist_Mono({
 	variable: "--font-geist-mono",
@@ -166,7 +161,7 @@ export default async function RootLayout({
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<body
-				className={`${geistSans.variable} ${geistMono.variable} ${rubikMonoOne.variable} ${orbitron.variable} ${inter.variable} antialiased`}
+				className={`${geistMono.variable} ${rubikMonoOne.variable} ${orbitron.variable} ${inter.variable} antialiased`}
 			>
 				<SessionHeartbeat />
 				<QueryProvider>
@@ -181,8 +176,8 @@ export default async function RootLayout({
 							<PWAThemeManager />
 							<SplashScreenManager />
 
-							<PerformanceMonitor />
-							
+							{/* <PerformanceMonitor /> */}
+
 							<div className="min-h-dvh grid grid-cols-1 grid-rows-[auto_1fr] md:md:grid-cols-[72px_1fr]">
 								<HeaderShell user={session?.user} />
 

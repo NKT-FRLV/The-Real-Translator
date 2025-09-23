@@ -2,8 +2,8 @@
 
 import React from "react";
 import { cn } from "@/shared/shadcn/utils";
-// import TextFiffSkeleton from "./loaders/TextFiffSkeleton";
-import { Skeleton } from "@/shared/shadcn/ui/skeleton";
+import TextDiffSkeleton from "./loaders/TextDiffSkeleton";
+
 // import { TextChange } from "./grammar-schema";
 
 // // Локальный тип для парсинга diff текста
@@ -157,10 +157,12 @@ export function TextDiff({
 				{correctedWithDiffText ? (
 					renderTextWithDiffMarkers()
 				) : (
-					<TextDiffSkeleton 
-						text={originalText || "This is a sample text that will be processed by AI to improve grammar and style. The skeleton will adapt to this text size."}
+					<TextDiffSkeleton
+						text={
+							originalText ||
+							"This text will be on background invisible. This is a sample text that will be processed by AI to improve grammar and style. The skeleton will adapt to this text size."
+						}
 						className="text-sm md:text-base text-grammar-text leading-relaxed"
-						isDiff={true}
 					/>
 				)}
 			</div>
@@ -173,8 +175,11 @@ export function TextDiff({
 					{correctedText ? (
 						correctedText
 					) : (
-						<TextDiffSkeleton 
-							text={originalText || "This is a sample text that will be processed by AI to improve grammar and style. The skeleton will adapt to this text size and show realistic loading animation."}
+						<TextDiffSkeleton
+							text={
+								originalText ||
+								"This is a sample text that will be processed by AI to improve grammar and style. The skeleton will adapt to this text size and show realistic loading animation."
+							}
 						/>
 					)}
 				</div>
@@ -182,45 +187,3 @@ export function TextDiff({
 		</div>
 	);
 }
-
-function TextDiffSkeleton({ 
-	text, 
-	className,
-	isDiff = false
-}: { 
-	text: string; 
-	className?: string;
-	isDiff?: boolean;
-}) {
-	
-		return (
-			<div className={cn("relative", className)}>
-				{/* Невидимый текст для определения размеров */}
-				<div className="invisible text-sm md:text-base leading-relaxed">
-					{isDiff ? (
-						// Имитируем diff-формат с разными стилями
-						<>
-							<span className="text-[#595d62]/90 line-through px-1 rounded font-bold">
-								old text
-							</span>
-							<span className="bg-grammar-success-bg text-grammar-success px-1 rounded font-bold">
-								new text
-							</span>
-							<span className="font-bold">
-								{text}
-							</span>
-						</>
-					) : (
-						text
-					)}
-				</div>
-				{/* Скелетон поверх невидимого текста с анимацией */}
-				<div className="absolute inset-0">
-					<div className="relative h-full w-full overflow-hidden">
-						<Skeleton className="h-full w-full animate-pulse" />
-					</div>
-				</div>
-			</div>
-		);
-	}
-
