@@ -13,7 +13,6 @@ export async function POST(req: Request) {
 		cookieStore.get("authjs.session-token")?.value ??
 		null;
 
-
 	if (!token) {
 		// ⛔️ без тела на 204
 		return new Response(null, { status: 204 });

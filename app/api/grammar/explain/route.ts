@@ -44,11 +44,11 @@ export async function POST(req: NextRequest) {
 				{ status: 400, headers: { "Content-Type": "application/json" } }
 			);
 		}
-		console.log("--------------------------------");
-		console.log(data.style);
-		console.log(data.text);
-		console.log(data.enhancedText);
-		console.log("--------------------------------");
+		// console.log("--------------------------------");
+		// console.log(data.style);
+		// console.log(data.text);
+		// console.log(data.enhancedText);
+		// console.log("--------------------------------");
 
 		// Проверим сигнал аборта перед тяжелыми операциями
 		if (req.signal?.aborted) {

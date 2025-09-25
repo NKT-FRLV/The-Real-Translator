@@ -4,22 +4,26 @@
 import { useEffect } from "react";
 
 export default function SessionHeartbeat() {
-  useEffect(() => {
-    const send = () => {
-      // не передаём тело — sendBeacon ок, роут читает куки
-      navigator.sendBeacon("/api/sessions/heartbeat/edge");
-    };
-    send(); // сразу при монтировании
-    const iv = setInterval(send, 10 * 60 * 1000); // каждые 10 минут
-    // const onVis = () => {
-    //   if (document.visibilityState === "visible") send();
-    // };
-    // document.addEventListener("visibilitychange", onVis);
-    return () => {
-      clearInterval(iv);
-    //   document.removeEventListener("visibilitychange", onVis);
-    };
-  }, []);
+	useEffect(() => {
+		const send = () => {
+			console.log("send heartbeat Beacon API");
+			// не передаём тело — sendBeacon ок, роут читает куки
+			navigator.sendBeacon("/api/sessions/heartbeat/edge");
+		};
+		send(); // сразу при монтировании
+		// const iv = setInterval(send, 10 * 60 * 1000); // каждые 10 минут
+		const onVis = () => {
+			if (document.visibilityState === "visible") {
+				send(); // Отправляем heartbeat при возврате
+			}
+		};
+		document.addEventListener("visibilitychange", onVis);
 
-  return null;
+		return () => {
+			//   clearInterval(iv);
+			document.removeEventListener("visibilitychange", onVis);
+		};
+	}, []);
+
+	return null;
 }
