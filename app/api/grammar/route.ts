@@ -43,11 +43,11 @@ export async function POST(req: NextRequest) {
 				{ status: 400, headers: { "Content-Type": "application/json" } }
 			);
 		}
-		console.log('--------------------------------');
-		console.log(data.style);
-		console.log(data.text);
-		console.log(data.retry);
-		console.log('--------------------------------');
+		// console.log('--------------------------------');
+		// console.log(data.style);
+		// console.log(data.text);
+		// console.log(data.retry);
+		// console.log('--------------------------------');
 
 		// Проверим сигнал аборта перед тяжелыми операциями
 		if (req.signal?.aborted) {
@@ -117,11 +117,11 @@ export async function POST(req: NextRequest) {
 // ───────────────────────────────────────────────────────────────────────────────
 const getStyleInstructions = (style: EditingStyle): string => {
 	const map: Record<EditingStyle, string> = {
-		neutral: `Provide balanced, professional grammar corrections with clear explanations. Focus on clarity and correctness without being overly formal or casual.`,
+		neutral: `Provide balanced, professional grammar corrections with clear explanations. Focus on clarity and correctness without being overly formal or casual, (Could contain simple spelling mistakes, or local idioms or slang).`,
 
 		formal: `Use sophisticated, academic language in your corrections. Provide detailed explanations with formal terminology. Focus on precision and scholarly tone.`,
 
-		informal: `Use casual, conversational language in your corrections. Keep explanations simple and friendly. Focus on natural, everyday language patterns.`,
+		informal: `Use casual, conversational language in your corrections. Keep explanations simple and friendly. Focus on natural, everyday language patterns, (Could contain simple spelling mistakes, and more local idioms and slang).`,
 
 		influencer: `Use trendy, engaging language in your corrections. Include modern expressions and social media-friendly explanations. Make it sound current and relatable.`,
 
@@ -131,7 +131,7 @@ const getStyleInstructions = (style: EditingStyle): string => {
 
 		academic: `Use scholarly, precise language in your corrections. Provide detailed explanations with academic terminology. Focus on research-quality writing.`,
 
-		casual: `Use relaxed, friendly language in your corrections. Keep explanations simple and approachable. Focus on natural, everyday communication.`,
+		casual: `Use relaxed, friendly language in your corrections. Keep explanations simple and approachable. Focus on natural, everyday communication. (Could contain a bit of local idioms or slang).`,
 
 		professional: `Use business-appropriate language in your corrections. Provide clear, concise explanations suitable for workplace communication.`,
 	};
