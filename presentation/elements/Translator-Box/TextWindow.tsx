@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { X, Volume2, Mic, Copy, Bookmark, Share, Heart, Zap } from "lucide-react";
+import { X, Volume2, Mic, Copy, Heart, Zap } from "lucide-react";
 import { Textarea } from "@/shared/shadcn/ui/textarea";
 import { toast } from "sonner";
 import { IconButton } from "@/presentation/components/textArea/IconButton";
@@ -27,6 +27,10 @@ interface TextWindowProps {
 	isBrowserSupportSpeech?: boolean;
 	listening?: boolean;
 	onVoiceInput?: () => void;
+	onTextToSpeech?: () => void;
+	isTextSpeaking?: boolean;
+	isTextToSpeechSupported?: boolean;
+	availableLanguages?: string[];
 	// speech mode toggle
 	speechMode?: SpeechMode;
 	onSpeechModeToggle?: () => void;
@@ -53,6 +57,10 @@ export const TextWindow: React.FC<TextWindowProps> = ({
 	isBrowserSupportSpeech,
 	listening,
 	onVoiceInput,
+	onTextToSpeech,
+	isTextSpeaking = false,
+	isTextToSpeechSupported = true,
+	availableLanguages = [],
 	speechMode = "browser",
 	onSpeechModeToggle,
 	isAdmin = false,
@@ -193,9 +201,23 @@ export const TextWindow: React.FC<TextWindowProps> = ({
 				<div className="flex items-center space-x-1 md:space-x-2">
 					<IconButton
 						icon={Volume2}
-						tip="Text to speech - Coming soon"
-						disabled={true}
+						tip={
+							!isTextToSpeechSupported 
+								? `Only for: ${availableLanguages.join(", ")}`
+								: isTextSpeaking 
+									? "Stop speaking" 
+									: "Text to speech"
+						}
+						onClick={onTextToSpeech}
+						disabled={listening || !value.length || !isTextToSpeechSupported}
 						size="big"
+						className={
+							!isTextToSpeechSupported 
+								? "opacity-50 cursor-not-allowed" 
+								: isTextSpeaking 
+									? "bg-blue-500/20 animate-pulse" 
+									: ""
+						}
 					/>
 
 					{isInput && (

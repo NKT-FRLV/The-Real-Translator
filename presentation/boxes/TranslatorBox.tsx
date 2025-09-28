@@ -10,6 +10,7 @@ import { TextWindow } from "../elements/Translator-Box/TextWindow";
 import BoxTranslateOptions from "../elements/Translator-Box/BoxTranslateOptions";
 import { LanguageShort, Tone } from "@/shared/config/translation";
 import { useSpeechToText } from "../hooks/useSpeechToText";
+import { useTextToSpeech } from "../hooks/useTextToSpeech";
 import CustomPlaceholder from "../components/textArea/CustomPlaceholder";
 
 import {
@@ -95,6 +96,28 @@ export const TranslatorBox: React.FC = () => {
 					description: error,
 				});
 			}
+		},
+	});
+
+	// Text-to-speech hook
+	const { 
+		speak: speakText, 
+		stop: stopSpeaking, 
+		isSpeaking: isTextSpeaking, 
+		isLanguageSupported,
+		getAvailableLanguageNames 
+	} = useTextToSpeech({
+		onError: (error) => {
+			console.error("Text-to-speech error:", error);
+			toast.error("Speech synthesis failed", {
+				description: error,
+			});
+		},
+		onStart: () => {
+			console.log("Speech synthesis started");
+		},
+		onEnd: () => {
+			console.log("Speech synthesis ended");
 		},
 	});
 
@@ -315,6 +338,7 @@ export const TranslatorBox: React.FC = () => {
 
 		activeKeyRef.current = "";
 		stopListening();
+		stopSpeaking();
 		setCurrentTranslationId(null);
 		setInput("");
 		resetTranscript();
@@ -326,6 +350,7 @@ export const TranslatorBox: React.FC = () => {
 		setInput,
 		resetTranscript,
 		stopListening,
+		stopSpeaking,
 	]);
 
 	const handleSwapResultToInputText = useCallback(() => {
@@ -342,6 +367,7 @@ export const TranslatorBox: React.FC = () => {
 		activeKeyRef.current = "";
 		resetTranscript();
 		stopListening();
+		stopSpeaking();
 		setCurrentTranslationId(null);
 		setCompletion("");
 		setInput(translatedText);
@@ -357,6 +383,7 @@ export const TranslatorBox: React.FC = () => {
 		setInput,
 		resetTranscript,
 		stopListening,
+		stopSpeaking,
 	]);
 
 	// ────────────────────────────────────────────────────────────────────────────
@@ -446,6 +473,26 @@ export const TranslatorBox: React.FC = () => {
 	// ────────────────────────────────────────────────────────────────────────────
 	const displayText = error?.message || completion;
 
+	const handleTextToSpeech = useCallback(() => {
+		if (displayText.length === 0) {
+			return;
+		}
+		if (isTextSpeaking) {
+			stopSpeaking();
+			return;
+		}
+		// Проверяем поддержку языка перед воспроизведением
+		if (!isLanguageSupported(toLang)) {
+			const availableLanguages = getAvailableLanguageNames();
+			toast.error("Text-to-speech not available", {
+				description: `Speech synthesis is not available for language: ${toLang}. Available languages: ${availableLanguages.join(", ")}`,
+			});
+			return;
+		}
+		speakText(displayText, toLang);
+	}, [displayText, toLang, speakText, isTextSpeaking, stopSpeaking, isLanguageSupported, getAvailableLanguageNames]);
+	const supportedLanguages = getAvailableLanguageNames();
+	const isTextToSpeechSupported = isLanguageSupported(toLang);
 	const placeholder = isLoading
 		? "Translating..."
 		: error
@@ -503,6 +550,10 @@ export const TranslatorBox: React.FC = () => {
 						!!displayText && !isLoading && !error
 					}
 					listening={false}
+					onTextToSpeech={handleTextToSpeech}
+					isTextSpeaking={isTextSpeaking}
+					isTextToSpeechSupported={isTextToSpeechSupported}
+					availableLanguages={supportedLanguages}
 				/>
 			</div>
 		</div>
