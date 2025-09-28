@@ -66,7 +66,7 @@ ORIGINAL TEXT (with potential errors by user):
 ENHANCED TEXT (corrected, perfect version by AI):
 "${data.enhancedText}"
 
-Analyze every change made between the original and enhanced text. For each improvement, provide a detailed explanation of what was wrong, why it needed correction, and how to avoid similar mistakes in the future.`;
+Analyze every change made between the original and enhanced text. For each improvement, provide a detailed explanation of what was wrong, why it needed correction, and how to avoid similar mistakes in the future, respond in the same language as the original text.`;
 
 		// Грамматическая проверка через OpenRouter с валидацией
 		const result = await generateObject({

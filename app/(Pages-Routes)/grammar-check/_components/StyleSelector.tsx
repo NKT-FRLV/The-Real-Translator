@@ -86,16 +86,16 @@ export default function StyleSelector({
 	return (
 		<div className={cn("flex flex-col gap-2", className)}>
 			<span className="text-xs sm:text-sm font-medium text-grammar-text">
-				Editing Style
+				Editing Personality
 			</span>
 			<Select value={value} onValueChange={onValueChange}>
 				<SelectTrigger size="max" className="w-full text-xs sm:text-sm">
-					<SelectValue placeholder="Select editing style" />
+					<SelectValue placeholder="Select editing personality" />
 				</SelectTrigger>
 				<SelectContent>
 					<SelectGroup>
 						<SelectLabel className="text-xs sm:text-sm font-medium text-grammar-text">
-							Styles
+							Personalities
 						</SelectLabel>
 						{editingStyles.map((style) => (
 							<SelectItem key={style.value} value={style.value}>

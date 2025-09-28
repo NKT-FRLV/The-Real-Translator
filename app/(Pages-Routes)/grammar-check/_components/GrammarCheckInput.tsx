@@ -4,6 +4,7 @@ import React from "react";
 import { Button } from "@/shared/shadcn/ui/button";
 import { Textarea } from "@/shared/shadcn/ui/textarea";
 import { cn } from "@/shared/shadcn/utils";
+import { X } from "lucide-react";
 
 interface GrammarCheckInputProps {
 	value: string;
@@ -20,11 +21,13 @@ export function GrammarCheckInput({
 	isLoading = false,
 	className,
 }: GrammarCheckInputProps) {
-
 	const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
 		onChange(e.target.value);
 	};
 
+	const handleClear = () => {
+		onChange("");
+	};
 	const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
 		if (e.key === "/" && (e.ctrlKey || e.metaKey)) {
 			e.preventDefault();
@@ -43,10 +46,20 @@ export function GrammarCheckInput({
 					className={cn(
 						"font-inter",
 						"bg-background ring-0 ring-gray-700 focus-visible:ring-1",
-						"min-h-[150px] sm:min-h-[200px] w-full resize-none rounded-lg sm:rounded-xl border-2 px-3 py-2.5 sm:px-4 sm:py-3 text-sm sm:text-base placeholder:text-muted-foreground"
+						"min-h-[150px] sm:min-h-[200px] w-full resize-none rounded-lg sm:rounded-xl border-2 pl-3 py-2.5 sm:pl-4 sm:py-3 pr-10 md:pr-12 text-sm sm:text-base placeholder:text-muted-foreground"
 					)}
 					disabled={isLoading}
 				/>
+
+				<Button
+					className="absolute top-2 right-2"
+					variant="ghost"
+					size="icon"
+					onClick={handleClear}
+					disabled={!value.trim() || isLoading}
+				>
+					<X className={cn("!h-10 !w-10")} />
+				</Button>
 			</div>
 
 			<div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">

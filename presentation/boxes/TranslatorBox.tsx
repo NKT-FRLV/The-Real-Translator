@@ -2,7 +2,6 @@
 "use client";
 
 import React, { useState, useCallback, useRef, useEffect } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
 import { useCompletion } from "@ai-sdk/react";
 import { useDebounce } from "use-debounce";
 import { useSession } from "next-auth/react";
@@ -11,30 +10,18 @@ import { TextWindow } from "../elements/Translator-Box/TextWindow";
 import BoxTranslateOptions from "../elements/Translator-Box/BoxTranslateOptions";
 import { LanguageShort, Tone } from "@/shared/config/translation";
 import { useSpeechToText } from "../hooks/useSpeechToText";
-// import { createLogger } from "@/shared/utils/logger";
 import CustomPlaceholder from "../components/textArea/CustomPlaceholder";
-// import {
-// 	useFromLang,
-// 	useToLang,
-// 	useTone,
-// 	useSetFromLang,
-// 	useSetToLang,
-// 	useSetTone,
-// } from "../stores/translatorStore";
-import {
 
+import {
 	useFromLang,
 	useToLang,
 	useTone,
-	// useSetFromLang,
-	// useSetToLang,
-	// useSetTone,
-	// useSwapLanguages,
-
 	useLoadSettings,
 	useEffectiveSpeechRecognitionMode,
 	useSetSpeechRecognitionMode,
 } from "../stores/settingsStore";
+
+import { useTranslatorStore } from "../stores/translatorStore";
 
 type RequestKey = string;
 
@@ -47,18 +34,10 @@ function makeRequestKey(
 	return `${text}\u241F${fromLang}\u241F${toLang}\u241F${tone}`;
 }
 
-// interface TranslatorBoxProps {
-// 	defaultSourceLang: LanguageShort;
-// 	defaultTargetLang: LanguageShort;
-// 	translationStyle: Tone;
-// }
-
 export const TranslatorBox: React.FC = () => {
-	const router = useRouter();
-	const searchParams = useSearchParams();
-	const text = searchParams.get("text") ? decodeURIComponent(searchParams.get("text")!) : null;
 
-	console.log("text", text);
+	const { inputText: fromGrammarCheckText, setInputText } = useTranslatorStore();
+
 
 	// ────────────────────────────────────────────────────────────────────────────
 	// Store state
@@ -264,15 +243,9 @@ export const TranslatorBox: React.FC = () => {
 					tone
 				);
 			}
-			
-			// Очищаем URL параметр text после завершения перевода
-			const url = new URL(window.location.href);
-			if (url.searchParams.has("text")) {
-				url.searchParams.delete("text");
-				router.replace(url.pathname + url.search, { scroll: false });
-			}
+		
 		},
-		[fromLang, toLang, tone, saveTranslation, router]
+		[fromLang, toLang, tone, saveTranslation]
 	);
 
 	const onError = useCallback(() => {
@@ -308,22 +281,19 @@ export const TranslatorBox: React.FC = () => {
 	const safeTranscript = typeof transcript === "string" ? transcript : "";
 
 	useEffect(() => {
-		if (text) {
-			setInput(text);
-			// Очищаем URL параметр после установки текста
-			const url = new URL(window.location.href);
-			url.searchParams.delete("text");
-			router.replace(url.pathname + url.search, { scroll: false });
-		}
-	}, [text, setInput, router]);
-
-	useEffect(() => {
 		// синкаем transcript с input при любом изменении transcript
 		// но только если transcript не пустой
 		if (safeTranscript && safeTranscript !== input) {
-			setInput(safeTranscript);
+			
+			setInput(input + " " + safeTranscript);
+			resetTranscript()
 		}
-	}, [safeTranscript, setInput, input]);
+
+		if (fromGrammarCheckText.trim()) {
+			setInput(fromGrammarCheckText);
+			setInputText("");
+		}
+	}, [safeTranscript, setInput, input, fromGrammarCheckText, setInputText, resetTranscript]);
 
 	// если начался перевод, а юзер сного печататет, останавливаем перевод
 	const handleUserInputChange = useCallback(

@@ -1,331 +1,352 @@
 "use client";
 
 import { useState, useCallback, useRef, useEffect } from "react";
-import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
+import SpeechRecognition, {
+	useSpeechRecognition,
+} from "react-speech-recognition";
 import { SpeechToText } from "@/presentation/API/speech-to-text/SpeechToText";
 import { LanguageShort } from "@/shared/config/translation";
 import { SpeechMode } from "@/shared/types/settings";
 
 interface SpeechToTextOptions {
-  language: LanguageShort;
-  mode: SpeechMode;
-  isAdmin?: boolean;
-  onTranscriptUpdate?: (transcript: string) => void;
-  onError?: (error: string) => void;
+	language: LanguageShort;
+	mode: SpeechMode;
+	isAdmin?: boolean;
+	onTranscriptUpdate?: (transcript: string) => void;
+	onError?: (error: string) => void;
 }
 
 interface SpeechToTextReturn {
-  transcript: string;
-  listening: boolean;
-  isSupported: boolean;
-  isBrowserSupported: boolean;
-  isMicrophoneAvailable: boolean;
-  startListening: () => Promise<void>;
-  stopListening: () => void;
-  resetTranscript: () => void;
-  error: string | null;
-  isTranscribing: boolean;
+	transcript: string;
+	listening: boolean;
+	isSupported: boolean;
+	isBrowserSupported: boolean;
+	isMicrophoneAvailable: boolean;
+	startListening: () => Promise<void>;
+	stopListening: () => void;
+	resetTranscript: () => void;
+	error: string | null;
+	isTranscribing: boolean;
 }
 
 const BASE_LOCALES = {
-  en: "en-US",
-  ru: "ru-RU",
+	en: "en-US",
+	ru: "ru-RU",
 } as const;
 
 function resolveLocale(lang: "en" | "ru") {
-  if (typeof navigator === "undefined") return BASE_LOCALES[lang];
-  const prefs = navigator.languages ?? [navigator.language];
+	if (typeof navigator === "undefined") return BASE_LOCALES[lang];
+	const prefs = navigator.languages ?? [navigator.language];
 
-  if (lang === "en") {
-    if (prefs.some(l => l.toLowerCase().startsWith("en-gb"))) return "en-GB";
-    return "en-US";
-  }
-  return "ru-RU";
+	if (lang === "en") {
+		if (prefs.some((l) => l.toLowerCase().startsWith("en-gb")))
+			return "en-GB";
+		return "en-US";
+	}
+	return "ru-RU";
 }
 
 export const useSpeechToText = ({
-  language,
-  mode,
-  isAdmin = false,
-  onTranscriptUpdate,
-  onError,
+	language,
+	mode,
+	isAdmin = false,
+	onTranscriptUpdate,
+	onError,
 }: SpeechToTextOptions): SpeechToTextReturn => {
-  // Browser speech recognition
-  const {
-    transcript: browserTranscript,
-    listening: browserListening,
-    resetTranscript: resetBrowserTranscript,
-    isMicrophoneAvailable,
-    browserSupportsSpeechRecognition,
-  } = useSpeechRecognition();
+	// Browser speech recognition
+	const {
+		// transcript: browserTranscriptChunk,
+		finalTranscript: browserTranscript,
+		listening: browserListening,
+		resetTranscript: resetBrowserTranscript,
+		isMicrophoneAvailable,
+		browserSupportsSpeechRecognition,
+	} = useSpeechRecognition();
 
-  // Whisper speech recognition state
-  const [whisperTranscript, setWhisperTranscript] = useState("");
-  const [whisperListening, setWhisperListening] = useState(false);
-  const [isTranscribing, setIsTranscribing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+	// Whisper speech recognition state
+	const [whisperTranscript, setWhisperTranscript] = useState("");
+	const [whisperListening, setWhisperListening] = useState(false);
+	const [isTranscribing, setIsTranscribing] = useState(false);
+	const [error, setError] = useState<string | null>(null);
 
-  // Media recording for Whisper
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const chunksRef = useRef<Blob[]>([]);
-  const streamRef = useRef<MediaStream | null>(null);
-  const pendingRef = useRef(false);
-  const abortControllerRef = useRef<AbortController | null>(null);
+	// Media recording for Whisper
+	const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+	const chunksRef = useRef<Blob[]>([]);
+	const streamRef = useRef<MediaStream | null>(null);
+	const pendingRef = useRef(false);
+	const abortControllerRef = useRef<AbortController | null>(null);
 
-  // Force browser mode for non-admin users
-  const effectiveMode: SpeechMode = !isAdmin ? "browser" : mode;
+	// Force browser mode for non-admin users
+	const effectiveMode: SpeechMode = !isAdmin ? "browser" : mode;
 
-  // Current active transcript and listening state based on effective mode
-  const transcript = effectiveMode === "browser" ? browserTranscript : whisperTranscript;
-  const listening = effectiveMode === "browser" ? browserListening : whisperListening;
+	// Current active transcript and listening state based on effective mode
+	const transcript =
+		effectiveMode === "browser" ? browserTranscript : whisperTranscript;
+	const listening =
+		effectiveMode === "browser" ? browserListening : whisperListening;
 
-  // Support checks
-  const isBrowserSupported = browserSupportsSpeechRecognition;
-  const isWhisperSupported = typeof navigator !== "undefined" && 
-    navigator.mediaDevices && 
-    typeof MediaRecorder !== "undefined";
-  
-  const isSupported = effectiveMode === "browser" 
-    ? isBrowserSupported && ["en", "ru"].includes(language)
-    : isWhisperSupported;
+	// Support checks
+	const isBrowserSupported = browserSupportsSpeechRecognition;
+	const isWhisperSupported =
+		typeof navigator !== "undefined" &&
+		navigator.mediaDevices &&
+		typeof MediaRecorder !== "undefined";
 
-  // Reset error when mode or language changes
-  useEffect(() => {
-    setError(null);
-  }, [mode, language, isAdmin]);
+	const isSupported =
+		effectiveMode === "browser"
+			? isBrowserSupported && ["en", "ru"].includes(language)
+			: isWhisperSupported;
 
-  // Notify about transcript updates
-  useEffect(() => {
-    if (onTranscriptUpdate && transcript) {
-      onTranscriptUpdate(transcript);
-    }
-  }, [transcript, onTranscriptUpdate]);
+	// Reset error when mode or language changes
+	useEffect(() => {
+		setError(null);
+	}, [mode, language, isAdmin]);
 
-  // Whisper transcription function
-  const transcribeWithWhisper = useCallback(async (audioBlob: Blob) => {
-    try {
-      setError(null);
-      setIsTranscribing(true);
-      
-      // Create abort controller for this request
-      const abortController = new AbortController();
-      abortControllerRef.current = abortController;
-      
-      const formData = new FormData();
-      formData.append("audio", audioBlob, "audio.webm");
-      formData.append("language", language);
+	// Notify about transcript updates
+	useEffect(() => {
+		if (onTranscriptUpdate && transcript) {
+			onTranscriptUpdate(transcript);
+		}
+	}, [transcript, onTranscriptUpdate]);
 
-      const result = await SpeechToText(formData, abortController);
-      const transcriptText = result.text || "";
-      
-      // Get current transcript and concatenate
-      const currentTranscript = whisperTranscript || "";
-      const newTranscript = currentTranscript 
-        ? `${currentTranscript} ${transcriptText}`
-        : transcriptText;
-      
-      setWhisperTranscript(newTranscript);
-      
-      // Notify about transcript update with new text for concatenation
-      if (onTranscriptUpdate && transcriptText) {
-        onTranscriptUpdate(transcriptText);
-      }
-      
-      // Log additional info from API response if available
-      if (result.language) {
-        console.log(`Detected language: ${result.language}`);
-      }
-      if (result.duration) {
-        console.log(`Audio duration: ${result.duration}s`);
-      }
-      
-    } catch (error) {
-      // Handle abort gracefully
-      if (error instanceof Error && error.name === 'AbortError') {
-        return;
-      }
-      
-      const errorMessage = error instanceof Error ? error.message : "Speech recognition failed";
-      setError(errorMessage);
-      if (onError) {
-        onError(errorMessage);
-      }
-    } finally {
-      abortControllerRef.current = null;
-      setIsTranscribing(false);
-    }
-  }, [language, onError, onTranscriptUpdate, whisperTranscript]);
+	// Whisper transcription function
+	const transcribeWithWhisper = useCallback(
+		async (audioBlob: Blob) => {
+			try {
+				setError(null);
+				setIsTranscribing(true);
 
-  // Clean up resources
-  const cleanupResources = useCallback(() => {
-    // Stop recording if active
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
-      mediaRecorderRef.current.stop();
-    }
-    
-    // Clean up stream
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
-      streamRef.current = null;
-    }
-    
-    // Abort any ongoing transcription
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-      abortControllerRef.current = null;
-    }
-    
-    setWhisperListening(false);
-  }, []);
+				// Create abort controller for this request
+				const abortController = new AbortController();
+				abortControllerRef.current = abortController;
 
-  // Start listening function
-  const startListening = useCallback(async () => {
-    if (pendingRef.current) return;
-    pendingRef.current = true;
+				const formData = new FormData();
+				formData.append("audio", audioBlob, "audio.webm");
+				formData.append("language", language);
 
-    try {
-      setError(null);
+				const result = await SpeechToText(formData, abortController);
+				const transcriptText = result.text || "";
 
-      if (effectiveMode === "browser") {
-        // Browser speech recognition
-        if (!isBrowserSupported || !isMicrophoneAvailable) {
-          throw new Error("Browser speech recognition not supported or microphone unavailable");
-        }
-        if (!["en", "ru"].includes(language)) {
-          throw new Error("Language not supported for browser speech recognition");
-        }
+				// Get current transcript and concatenate
+				const currentTranscript = whisperTranscript || "";
+				const newTranscript = currentTranscript
+					? `${currentTranscript} ${transcriptText}`
+					: transcriptText;
 
-        if (browserListening) {
-          SpeechRecognition.stopListening();
-          return;
-        }
+				setWhisperTranscript(newTranscript);
 
-        const lang = resolveLocale(language as "en" | "ru");
-        resetBrowserTranscript();
-        await new Promise(r => setTimeout(r, 50));
+				// Notify about transcript update with new text for concatenation
+				if (onTranscriptUpdate && transcriptText) {
+					onTranscriptUpdate(transcriptText);
+				}
 
-        SpeechRecognition.startListening({
-          language: lang,
-          interimResults: true,
-        });
-      } else {
-        // Whisper speech recognition
-        if (!isWhisperSupported) {
-          throw new Error("Whisper speech recognition not supported");
-        }
+				// Log additional info from API response if available
+				if (result.language) {
+					console.log(`Detected language: ${result.language}`);
+				}
+				if (result.duration) {
+					console.log(`Audio duration: ${result.duration}s`);
+				}
+			} catch (error) {
+				// Handle abort gracefully
+				if (error instanceof Error && error.name === "AbortError") {
+					return;
+				}
 
-        if (whisperListening) {
-          // Stop current recording
-          cleanupResources();
-          return;
-        }
+				const errorMessage =
+					error instanceof Error
+						? error.message
+						: "Speech recognition failed";
+				setError(errorMessage);
+				if (onError) {
+					onError(errorMessage);
+				}
+			} finally {
+				abortControllerRef.current = null;
+				setIsTranscribing(false);
+			}
+		},
+		[language, onError, onTranscriptUpdate, whisperTranscript]
+	);
 
-        // Request microphone access
-        const stream = await navigator.mediaDevices.getUserMedia({ 
-          audio: {
-            echoCancellation: true,
-            noiseSuppression: true,
-            autoGainControl: true,
-            sampleRate: 16000,
-          }
-        });
-        
-        streamRef.current = stream;
-        
-        const mediaRecorder = new MediaRecorder(stream, {
-          mimeType: 'audio/webm;codecs=opus'
-        });
-        mediaRecorderRef.current = mediaRecorder;
-        chunksRef.current = [];
+	// Clean up resources
+	const cleanupResources = useCallback(() => {
+		// Stop recording if active
+		if (
+			mediaRecorderRef.current &&
+			mediaRecorderRef.current.state === "recording"
+		) {
+			mediaRecorderRef.current.stop();
+		}
 
-        mediaRecorder.ondataavailable = (event) => {
-          if (event.data.size > 0) {
-            chunksRef.current.push(event.data);
-          }
-        };
+		// Clean up stream
+		if (streamRef.current) {
+			streamRef.current.getTracks().forEach((track) => track.stop());
+			streamRef.current = null;
+		}
 
-        mediaRecorder.onstop = async () => {
-          const audioBlob = new Blob(chunksRef.current, { type: "audio/webm" });
-          
-          // Transcribe if we have sufficient audio data
-          if (audioBlob.size > 1000) {
-            try {
-              await transcribeWithWhisper(audioBlob);
-            } catch (error) {
-              console.error('Transcription failed:', error);
-            }
-          } else {
-            setError("Recording too short or no audio detected");
-          }
-          
-          // Clean up resources
-          cleanupResources();
-        };
+		// Abort any ongoing transcription
+		if (abortControllerRef.current) {
+			abortControllerRef.current.abort();
+			abortControllerRef.current = null;
+		}
 
-        // Start recording
-        mediaRecorder.start(250);
-        setWhisperListening(true);
-      }
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      setError(errorMessage);
-      if (onError) {
-        onError(errorMessage);
-      }
-      cleanupResources();
-    } finally {
-      pendingRef.current = false;
-    }
-  }, [
-    effectiveMode,
-    language,
-    isBrowserSupported,
-    isMicrophoneAvailable,
-    browserListening,
-    whisperListening,
-    isWhisperSupported,
-    resetBrowserTranscript,
-    transcribeWithWhisper,
-    onError,
-    cleanupResources,
-  ]);
+		setWhisperListening(false);
+	}, []);
 
-  // Stop listening function
-  const stopListening = useCallback(() => {
-    if (effectiveMode === "browser") {
-      SpeechRecognition.stopListening();
-    } else {
-      cleanupResources();
-    }
-  }, [effectiveMode, cleanupResources]);
+	// Start listening function
+	const startListening = useCallback(async () => {
+		if (pendingRef.current) return;
+		pendingRef.current = true;
 
-  // Reset transcript function
-  const resetTranscript = useCallback(() => {
-    if (effectiveMode === "browser") {
-      resetBrowserTranscript();
-    } else {
-      setWhisperTranscript("");
-    }
-    setError(null);
-  }, [effectiveMode, resetBrowserTranscript]);
+		try {
+			setError(null);
 
-  // Clean up on unmount
-  useEffect(() => {
-    return () => {
-      cleanupResources();
-    };
-  }, [cleanupResources]);
+			if (effectiveMode === "browser") {
+				// Browser speech recognition
+				if (!isBrowserSupported || !isMicrophoneAvailable) {
+					throw new Error(
+						"Browser speech recognition not supported or microphone unavailable"
+					);
+				}
+				if (!["en", "ru"].includes(language)) {
+					throw new Error(
+						"Language not supported for browser speech recognition"
+					);
+				}
 
-  return {
-    transcript,
-    listening,
-    isSupported,
-    isBrowserSupported,
-    isMicrophoneAvailable,
-    startListening,
-    stopListening,
-    resetTranscript,
-    error,
-    isTranscribing,
-  };
+				if (browserListening) {
+					SpeechRecognition.stopListening();
+					return;
+				}
+
+				const lang = resolveLocale(language as "en" | "ru");
+				resetBrowserTranscript();
+				await new Promise((r) => setTimeout(r, 50));
+
+				SpeechRecognition.startListening({
+					language: lang,
+					interimResults: true,
+				});
+			} else {
+				// Whisper speech recognition
+				if (!isWhisperSupported) {
+					throw new Error("Whisper speech recognition not supported");
+				}
+
+				if (whisperListening) {
+					// Stop current recording
+					cleanupResources();
+					return;
+				}
+
+				// Request microphone access
+				const stream = await navigator.mediaDevices.getUserMedia({
+					audio: {
+						echoCancellation: true,
+						noiseSuppression: true,
+						autoGainControl: true,
+						sampleRate: 16000,
+					},
+				});
+
+				streamRef.current = stream;
+
+				const mediaRecorder = new MediaRecorder(stream, {
+					mimeType: "audio/webm;codecs=opus",
+				});
+				mediaRecorderRef.current = mediaRecorder;
+				chunksRef.current = [];
+
+				mediaRecorder.ondataavailable = (event) => {
+					if (event.data.size > 0) {
+						chunksRef.current.push(event.data);
+					}
+				};
+
+				mediaRecorder.onstop = async () => {
+					const audioBlob = new Blob(chunksRef.current, {
+						type: "audio/webm",
+					});
+
+					// Transcribe if we have sufficient audio data
+					if (audioBlob.size > 1000) {
+						try {
+							await transcribeWithWhisper(audioBlob);
+						} catch (error) {
+							console.error("Transcription failed:", error);
+						}
+					} else {
+						setError("Recording too short or no audio detected");
+					}
+
+					// Clean up resources
+					cleanupResources();
+				};
+
+				// Start recording
+				mediaRecorder.start(250);
+				setWhisperListening(true);
+			}
+		} catch (error) {
+			const errorMessage =
+				error instanceof Error ? error.message : "Unknown error";
+			setError(errorMessage);
+			if (onError) {
+				onError(errorMessage);
+			}
+			cleanupResources();
+		} finally {
+			pendingRef.current = false;
+		}
+	}, [
+		effectiveMode,
+		language,
+		isBrowserSupported,
+		isMicrophoneAvailable,
+		browserListening,
+		whisperListening,
+		isWhisperSupported,
+		resetBrowserTranscript,
+		transcribeWithWhisper,
+		onError,
+		cleanupResources,
+	]);
+
+	// Stop listening function
+	const stopListening = useCallback(() => {
+		if (effectiveMode === "browser") {
+			SpeechRecognition.stopListening();
+		} else {
+			cleanupResources();
+		}
+	}, [effectiveMode, cleanupResources]);
+
+	// Reset transcript function
+	const resetTranscript = useCallback(() => {
+		
+		resetBrowserTranscript();
+		setWhisperTranscript("");
+		setError(null);
+	}, [resetBrowserTranscript, setWhisperTranscript, setError]);
+
+	// Clean up on unmount
+	useEffect(() => {
+		return () => {
+			cleanupResources();
+		};
+	}, [cleanupResources]);
+
+	return {
+		transcript,
+		listening,
+		isSupported,
+		isBrowserSupported,
+		isMicrophoneAvailable,
+		startListening,
+		stopListening,
+		resetTranscript,
+		error,
+		isTranscribing,
+	};
 };

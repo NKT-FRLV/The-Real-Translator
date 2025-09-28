@@ -12,10 +12,19 @@ import { TextDiff } from "./TextDiff";
 import { ErrorExplanations } from "./Explain-Errors/ErrorExplanations";
 import StyleSelector, { EditingStyle } from "./StyleSelector";
 import { toast } from "sonner";
-import { useRouter } from 'next/navigation'
+import { useRouter } from "next/navigation";
 // import {  GrammarError } from "./grammar-schema";
-import { RotateCcw, Copy, Check, Info } from "lucide-react";
+import {
+	RotateCcw,
+	Copy,
+	Check,
+	Info,
+	Languages,
+	MousePointerClick,
+} from "lucide-react";
 import { ErrorsExplanationsResponse, GrammarError } from "./grammar-schema";
+import { useTranslatorStore } from "@/presentation/stores/translatorStore";
+import { Skeleton } from "@/shared/shadcn/ui/skeleton";
 // import ChangesSummary from "./Explain-Errors/changes-summary";
 
 interface GrammarCheckModalProps {
@@ -46,6 +55,7 @@ export default function GrammarCheckModal({
 	correctedWithDiffText,
 }: GrammarCheckModalProps) {
 	const router = useRouter();
+	const { setInputText } = useTranslatorStore();
 	const [copied, setCopied] = useState(false);
 	const [errors, setErrors] = useState<GrammarError[]>([]);
 	const [isErrorsLoading, setIsErrorsLoading] = useState(false);
@@ -74,10 +84,13 @@ export default function GrammarCheckModal({
 			if (result.status === 401) {
 				const errorData = await result.json();
 				toast.error(errorData.error || "Authentication required", {
-					description: errorData.message || "Please log in to use this feature",
+					description:
+						errorData.message ||
+						"Please log in to use this feature",
 					action: {
 						label: "Go to Login",
-						onClick: () => router.push(errorData.redirectUrl || "/login"),
+						onClick: () =>
+							router.push(errorData.redirectUrl || "/login"),
 					},
 				});
 				return;
@@ -109,11 +122,10 @@ export default function GrammarCheckModal({
 		}
 	};
 
-
 	const handleTranslate = () => {
-		// console.log("correctedText", correctedText);
-		const encodedText = encodeURIComponent(correctedText);
-		router.push(`/?text=${encodedText}`);
+		// const encodedText = encodeURIComponent(correctedText);
+		router.push("/");
+		setInputText(correctedText);
 	};
 
 	return (
@@ -136,59 +148,75 @@ export default function GrammarCheckModal({
 							onValueChange={onStyleChange}
 							className="flex-1"
 						/>
-						<div className="flex flex-row gap-2 sm:flex-row sm:justify-end flex-1">
-							<Button
-								variant="outline"
-								size="lg"
-								onClick={handleExplainErrors}
-								disabled={isLoading || isErrorsLoading}
-								className="flex items-center justify-center gap-2"
-							>
-								<Info className="h-4 w-4" />
-								<span className="hidden sm:inline">
-									Explain Errors
-								</span>
-								<span className="sm:hidden">Explain</span>
-							</Button>
-							<Button
-								variant="outline"
-								size="lg"
-								onClick={onRegenerate}
-								disabled={isLoading}
-								className="flex items-center justify-center gap-2 sm:w-auto"
-							>
-								<RotateCcw className="h-4 w-4" />
-								<span className="hidden sm:inline">
-									Regenerate
-								</span>
-								<span className="sm:hidden">Regen</span>
-							</Button>
-							<Button
-								variant="outline"
-								size="lg"
-								onClick={handleCopy}
-								className="flex items-center justify-center gap-2 sm:w-auto"
-							>
-								{copied ? (
-									<Check className="h-4 w-4" />
-								) : (
-									<Copy className="h-4 w-4" />
-								)}
-								{copied ? "Copied!" : "Copy"}
-							</Button>
-						</div>
-					</div>
-
-					{/* {originalText && (
-						<div className="rounded-lg border border-grammar-border bg-grammar-bg-secondary p-3 sm:p-4">
-							<h4 className="mb-2 text-xs sm:text-sm md:text-base font-medium text-grammar-text">
-								Source text:
-							</h4>
-							<div className="text-xs sm:text-sm md:text-base text-grammar-text leading-relaxed">
-								{originalText}
+						{/* Action Buttons */}
+						<div className="flex-1 flex flex-col gap-2">
+							<div className="flex gap-2">
+								<Button
+									variant="outline"
+									onClick={handleTranslate}
+									disabled={isLoading}
+									className="flex-1"
+								>
+									<Languages className="h-4 w-4" />
+									Translate
+								</Button>
+								<Button
+									variant="outline"
+									onClick={onApplyChanges}
+									disabled={isLoading}
+									className="flex-1"
+								>
+									<MousePointerClick className="h-4 w-4" />
+									<span className="hidden sm:inline">
+										Apply Changes
+									</span>
+									<span className="sm:hidden">Apply</span>
+								</Button>
+							</div>
+							<div className="flex flex-row gap-2 justify-end">
+								<Button
+									variant="outline"
+									// size="lg"
+									onClick={handleExplainErrors}
+									disabled={isLoading || isErrorsLoading}
+									className="flex items-center justify-center gap-2 flex-1"
+								>
+									<Info className="h-4 w-4" />
+									<span className="hidden sm:inline">
+										Explain Errors
+									</span>
+									<span className="sm:hidden">Explain</span>
+								</Button>
+								<Button
+									variant="outline"
+									// size="lg"
+									onClick={onRegenerate}
+									disabled={isLoading}
+									className="flex items-center justify-center gap-2 flex-1"
+								>
+									<RotateCcw className="h-4 w-4" />
+									<span className="hidden sm:inline">
+										Regenerate
+									</span>
+									<span className="sm:hidden">Regen</span>
+								</Button>
+								<Button
+									variant="outline"
+									// size="lg"
+									onClick={handleCopy}
+									disabled={isLoading}
+									className="flex items-center justify-center gap-2 flex-1"
+								>
+									{copied ? (
+										<Check className="h-4 w-4" />
+									) : (
+										<Copy className="h-4 w-4" />
+									)}
+									{copied ? "Copied!" : "Copy"}
+								</Button>
 							</div>
 						</div>
-					)} */}
+					</div>
 
 					{/* Text Comparison */}
 					<TextDiff
@@ -198,35 +226,11 @@ export default function GrammarCheckModal({
 						correctedWithDiffText={correctedWithDiffText}
 					/>
 
-					{errors.length > 0 && <ErrorExplanations errors={errors} />}
-
-					{/* Action Buttons */}
-					<div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end pt-4 border-t border-grammar-border">
-						<Button
-							variant="outline"
-							onClick={onClose}
-							className="w-full sm:w-auto order-2 sm:order-1"
-						>
-							Cancel
-						</Button>
-						<Button
-							variant="outline"
-							onClick={handleTranslate}
-							disabled={isLoading}
-							className="text-primary-foreground w-full sm:w-auto order-2 sm:order-1"
-						>
-
-							Translate It!
-						</Button>
-						<Button
-							variant="outline"
-							onClick={onApplyChanges}
-							disabled={isLoading}
-							className="text-primary-foreground w-full sm:w-auto order-1 sm:order-2"
-						>
-							{isLoading ? "Processing..." : "Apply Changes"}
-						</Button>
-					</div>
+					{/* Errors Explanations with loading skeleton */}
+					{isErrorsLoading && <Skeleton className="h-30 w-full" />}
+					{errors.length > 0 && !isErrorsLoading && (
+						<ErrorExplanations errors={errors} />
+					)}
 				</div>
 			</DialogContent>
 		</Dialog>
