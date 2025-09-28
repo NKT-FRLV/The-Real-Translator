@@ -8,7 +8,7 @@ import {
 } from "@/app/(Pages-Routes)/grammar-check/_components/grammar-schema";
 
 export const runtime = "edge";
-const envModel = process.env.GRAMMAR_MODEL || "openai/gpt-4o-mini";
+const envModel = process.env.GRAMMAR_ERRORS_EXPLAIN_MODEL || "openai/gpt-4o-mini";
 
 // ───────────────────────────────────────────────────────────────────────────────
 // HEAD — для варминга соединения
@@ -81,10 +81,10 @@ Analyze every change made between the original and enhanced text. For each impro
 		});
 
 		// Логируем результат для отладки
-		console.log(
-			"Grammar check result:",
-			JSON.stringify(result.object, null, 2)
-		);
+		// console.log(
+		// 	"Grammar check result:",
+		// 	JSON.stringify(result.object, null, 2)
+		// );
 
 		// Возвращаем валидированный JSON ответ
 		return new Response(JSON.stringify(result.object), {
@@ -104,11 +104,11 @@ Analyze every change made between the original and enhanced text. For each impro
 
 		// Логируем ошибку для отладки
 		console.error("Grammar check API error:", error);
-		console.error("Error details:", {
-			name: error instanceof Error ? error.name : "Unknown",
-			message: error instanceof Error ? error.message : "Unknown error",
-			stack: error instanceof Error ? error.stack : undefined,
-		});
+		// console.error("Error details:", {
+		// 	name: error instanceof Error ? error.name : "Unknown",
+		// 	message: error instanceof Error ? error.message : "Unknown error",
+		// 	stack: error instanceof Error ? error.stack : undefined,
+		// });
 
 		return new Response(
 			JSON.stringify({
