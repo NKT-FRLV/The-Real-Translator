@@ -103,7 +103,8 @@ export const TranslatorBox: React.FC = () => {
 	const { 
 		speak: speakText, 
 		stop: stopSpeaking, 
-		isSpeaking: isTextSpeaking, 
+		isSpeaking: isTextSpeaking,
+		currentLanguage: speakingLanguage,
 		isLanguageSupported,
 		getAvailableLanguageNames 
 	} = useTextToSpeech({
@@ -473,6 +474,7 @@ export const TranslatorBox: React.FC = () => {
 	// ────────────────────────────────────────────────────────────────────────────
 	const displayText = error?.message || completion;
 
+	// Text-to-speech для поля вывода (перевода)
 	const handleTextToSpeech = useCallback(() => {
 		if (displayText.length === 0) {
 			return;
@@ -491,8 +493,35 @@ export const TranslatorBox: React.FC = () => {
 		}
 		speakText(displayText, toLang);
 	}, [displayText, toLang, speakText, isTextSpeaking, stopSpeaking, isLanguageSupported, getAvailableLanguageNames]);
+
+	// Text-to-speech для поля ввода
+	const handleInputTextToSpeech = useCallback(() => {
+		if (input.length === 0) {
+			return;
+		}
+		if (isTextSpeaking) {
+			stopSpeaking();
+			return;
+		}
+		// Проверяем поддержку языка перед воспроизведением
+		if (!isLanguageSupported(fromLang)) {
+			const availableLanguages = getAvailableLanguageNames();
+			toast.error("Text-to-speech not available", {
+				description: `Speech synthesis is not available for language: ${fromLang}. Available languages: ${availableLanguages.join(", ")}`,
+			});
+			return;
+		}
+		speakText(input, fromLang);
+	}, [input, fromLang, speakText, isTextSpeaking, stopSpeaking, isLanguageSupported, getAvailableLanguageNames]);
+	
 	const supportedLanguages = getAvailableLanguageNames();
-	const isTextToSpeechSupported = isLanguageSupported(toLang);
+	const isOutputTextToSpeechSupported = isLanguageSupported(toLang);
+	const isInputTextToSpeechSupported = isLanguageSupported(fromLang);
+	
+	// Определяем, какое окно сейчас говорит
+	const isInputSpeaking = isTextSpeaking && speakingLanguage === fromLang;
+	const isOutputSpeaking = isTextSpeaking && speakingLanguage === toLang;
+	
 	const placeholder = isLoading
 		? "Translating..."
 		: error
@@ -529,6 +558,10 @@ export const TranslatorBox: React.FC = () => {
 					onSpeechModeToggle={handleSpeechModeToggle}
 					isAdmin={isAdmin}
 					isTranscribing={isTranscribing}
+					onTextToSpeech={handleInputTextToSpeech}
+					isTextSpeaking={isInputSpeaking}
+					isTextToSpeechSupported={isInputTextToSpeechSupported}
+					availableLanguages={supportedLanguages}
 				/>
 
 				<TextWindow
@@ -551,8 +584,8 @@ export const TranslatorBox: React.FC = () => {
 					}
 					listening={false}
 					onTextToSpeech={handleTextToSpeech}
-					isTextSpeaking={isTextSpeaking}
-					isTextToSpeechSupported={isTextToSpeechSupported}
+					isTextSpeaking={isOutputSpeaking}
+					isTextToSpeechSupported={isOutputTextToSpeechSupported}
 					availableLanguages={supportedLanguages}
 				/>
 			</div>

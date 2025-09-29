@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState, useMemo } from "react";
+import { useCallback, useRef, useState, useMemo, useEffect } from "react";
 import { LanguageShort } from "@/shared/config/translation";
 
 interface UseTextToSpeechOptions {
@@ -11,6 +11,7 @@ interface UseTextToSpeechReturn {
   speak: (text: string, language: LanguageShort) => void;
   stop: () => void;
   isSpeaking: boolean;
+  currentLanguage: LanguageShort | null;
   isSupported: boolean;
   supportedLanguages: string[];
   availableLanguages: string[];
@@ -55,6 +56,8 @@ const LANGUAGE_NAMES: Record<string, string> = {
 
 export const useTextToSpeech = (options: UseTextToSpeechOptions = {}): UseTextToSpeechReturn => {
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [currentLanguage, setCurrentLanguage] = useState<LanguageShort | null>(null);
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
   const currentUtteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   
   const { onError, onStart, onEnd } = options;
@@ -62,18 +65,31 @@ export const useTextToSpeech = (options: UseTextToSpeechOptions = {}): UseTextTo
   // Проверяем поддержку speech synthesis
   const isSupported = typeof window !== "undefined" && "speechSynthesis" in window;
 
-  // Получаем голоса один раз
-  const voices = useMemo(() => {
-    if (!isSupported) return [];
-    const allVoices = speechSynthesis.getVoices();
-    console.log('Available voices:', allVoices);
-    
-    // Если голоса еще не загружены, возвращаем пустой массив
-    if (allVoices.length === 0) {
-      console.warn('No voices available yet. They may load asynchronously.');
+  // Загружаем голоса асинхронно (браузеры загружают голоса по-разному)
+  useEffect(() => {
+    if (!isSupported) return;
+
+    const loadVoices = () => {
+      const allVoices = speechSynthesis.getVoices();
+      if (allVoices.length > 0) {
+        console.log('Available voices:', allVoices);
+        setVoices(allVoices);
+      }
+    };
+
+    // Загружаем голоса сразу
+    loadVoices();
+
+    // Подписываемся на событие загрузки голосов (для Chrome и других браузеров)
+    if (speechSynthesis.onvoiceschanged !== undefined) {
+      speechSynthesis.onvoiceschanged = loadVoices;
     }
-    
-    return allVoices;
+
+    return () => {
+      if (speechSynthesis.onvoiceschanged !== undefined) {
+        speechSynthesis.onvoiceschanged = null;
+      }
+    };
   }, [isSupported]);
 
   // Получаем список поддерживаемых языков
@@ -153,6 +169,7 @@ export const useTextToSpeech = (options: UseTextToSpeechOptions = {}): UseTextTo
       speechSynthesis.cancel();
       currentUtteranceRef.current = null;
       setIsSpeaking(false);
+      setCurrentLanguage(null);
     }
   }, []);
 
@@ -204,17 +221,20 @@ export const useTextToSpeech = (options: UseTextToSpeechOptions = {}): UseTextTo
       // Обработчики событий
       utterance.onstart = () => {
         setIsSpeaking(true);
+        setCurrentLanguage(language);
         onStart?.();
       };
 
       utterance.onend = () => {
         setIsSpeaking(false);
+        setCurrentLanguage(null);
         currentUtteranceRef.current = null;
         onEnd?.();
       };
 
       utterance.onerror = (event) => {
         setIsSpeaking(false);
+        setCurrentLanguage(null);
         currentUtteranceRef.current = null;
         onError?.(`Speech synthesis error: ${event.error}`);
       };
@@ -239,6 +259,7 @@ export const useTextToSpeech = (options: UseTextToSpeechOptions = {}): UseTextTo
     speak,
     stop,
     isSpeaking,
+    currentLanguage,
     isSupported,
     supportedLanguages,
     availableLanguages,

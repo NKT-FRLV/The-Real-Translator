@@ -199,26 +199,28 @@ export const TextWindow: React.FC<TextWindowProps> = ({
 
 			<div className="border-t border-gray-700 p-2 md:p-2 flex justify-between items-center">
 				<div className="flex items-center space-x-1 md:space-x-2">
-					<IconButton
-						icon={Volume2}
-						tip={
-							!isTextToSpeechSupported 
-								? `Only for: ${availableLanguages.join(", ")}`
-								: isTextSpeaking 
-									? "Stop speaking" 
-									: "Text to speech"
-						}
-						onClick={onTextToSpeech}
-						disabled={listening || !value.length || !isTextToSpeechSupported}
-						size="big"
-						className={
-							!isTextToSpeechSupported 
-								? "opacity-50 cursor-not-allowed" 
-								: isTextSpeaking 
-									? "bg-blue-500/20 animate-pulse" 
-									: ""
-						}
-					/>
+					{onTextToSpeech && (
+						<IconButton
+							icon={Volume2}
+							tip={
+								!isTextToSpeechSupported 
+									? `Only for: ${availableLanguages.join(", ")}`
+									: isTextSpeaking 
+										? "Stop speaking" 
+										: "Text to speech"
+							}
+							onClick={onTextToSpeech}
+							disabled={listening || !value.length || !isTextToSpeechSupported}
+							size="big"
+							className={
+								!isTextToSpeechSupported 
+									? "opacity-50 cursor-not-allowed" 
+									: isTextSpeaking 
+										? "bg-blue-500/20 animate-pulse" 
+										: ""
+							}
+						/>
+					)}
 
 					{isInput && (
 						<>

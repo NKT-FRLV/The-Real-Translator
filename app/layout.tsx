@@ -4,6 +4,7 @@ import { Geist_Mono, Rubik_Mono_One, Orbitron, Inter } from "next/font/google";
 import { PWAThemeManager } from "@/presentation/components/PWAThemeManager";
 // import { PerformanceMonitor } from "@/presentation/components/PerformanceMonitor";
 import { SplashScreenManager } from "@/presentation/components/SplashScreenManager";
+import { ServiceWorkerManager } from "@/presentation/components/ServiceWorkerManager";
 import { SessionProvider } from "next-auth/react";
 import QueryProvider from "@/presentation/providers/QueryProvider";
 import SessionHeartbeat from "@/presentation/SessionHeartBeat";
@@ -147,8 +148,7 @@ export const metadata: Metadata = {
 		],
 	},
 
-	// Подключение веб-манифеста
-	manifest: "/manifest.webmanifest",
+	// Манифест автоматически генерируется из app/manifest.ts
 };
 
 export default async function RootLayout({
@@ -172,9 +172,10 @@ export default async function RootLayout({
 							enableSystem
 							disableTransitionOnChange
 						>
-							{/* Just widgets temporals*/}
+							{/* PWA Components */}
 							<PWAThemeManager />
 							<SplashScreenManager />
+							<ServiceWorkerManager />
 
 							{/* <PerformanceMonitor /> */}
 
